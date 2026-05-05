@@ -1,0 +1,25 @@
+# Node
+node_modules/
+
+# Env
+.env
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Flutter
+nova_app/build/
+
+# Dashboard
+nova_dashboard/build/
+
+# Backend
+qr-backend/node_modules/
