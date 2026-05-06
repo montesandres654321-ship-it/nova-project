@@ -85,13 +85,13 @@ class AdminModel {
 
   factory AdminModel.fromJson(Map<String, dynamic> json) {
     return AdminModel(
-      id: json['id'] as int,
+      id:       (json['id']       as int?)    ?? 0,
       firstName: json['first_name'] as String? ?? '',
       lastName: json['last_name'] as String? ?? '',
-      username: json['username'] as String,
-      email: json['email'] as String,
+      username: (json['username'] as String?) ?? '',
+      email:    (json['email']    as String?) ?? '',
       phone: json['phone'] as String?,
-      role: json['role'] as String,
+      role:     (json['role']     as String?) ?? '',
       placeId: json['place_id'] as int?,
       placeName: json['place_name'] as String?,
       isActive: (json['is_active'] == 1 || json['is_active'] == true),
