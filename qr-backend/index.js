@@ -41,20 +41,12 @@ const sendErrorFallback = (req, res, statusCode, code, message, details = null) 
 };
 
 // ── Middleware ────────────────────────────────────────────
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || '')
-  .split(',').map(s => s.trim()).filter(Boolean);
-
 app.use(requestContext);
 app.use(responseAdapter);
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost')) {
-      return callback(null, true);
-    }
-    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    return callback(new Error(`CORS bloqueado: ${origin}`));
-  },
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
+    : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

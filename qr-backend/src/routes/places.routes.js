@@ -13,7 +13,10 @@ const checkOwnership = require('../middleware/checkOwnership');
 
 const parsePlace = (place) => ({
   ...place,
-  amenities:    place.amenities  ? JSON.parse(place.amenities) : [],
+  amenities: (() => {
+    try { return place.amenities ? JSON.parse(place.amenities) : []; }
+    catch { return []; }
+  })(),
   has_reward:   place.has_reward === 1,
   reward_stock: place.reward_stock ?? null,
 });

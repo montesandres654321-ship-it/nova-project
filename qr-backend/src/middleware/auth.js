@@ -7,6 +7,7 @@
 
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const db  = require('../config/database');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -15,8 +16,8 @@ if (!JWT_SECRET) {
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 // ─── Generar token ────────────────────────────────────────
-// Incluye role y place_id para que authorize() y
-// checkOwnership() funcionen sin consultar la BD
+// Incluye role y place_id como snapshot; authenticateToken
+// los refresca desde BD en cada request (C-03, C-04)
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -60,7 +61,12 @@ const authenticateToken = (req, res, next) => {
           error:   'Token inválido o expirado',
         });
       }
-      req.user = decoded;
+      // C-03: rechaza usuarios desactivados; C-04: refresca role/place_id del token
+      const user = db.prepare('SELECT is_active, role, place_id FROM users WHERE id = ?').get(decoded.id);
+      if (!user || user.is_active === 0) {
+        return res.status(401).json({ success: false, error: 'Sesión inactiva' });
+      }
+      req.user = { ...decoded, role: user.role, place_id: user.place_id };
       next();
     });
   } catch (error) {
