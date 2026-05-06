@@ -1,33 +1,24 @@
-# Node
-node_modules/
-
 # Env
 .env
 .env.production
-.env.local
 *.env
 
 # Logs
 *.log
 
-# Build
-dist/
-build/
-
 # IDEs
 .vscode/
 .idea/
 
-# Flutter
-nova_app/build/
+# Node
+**/node_modules/
 
-# Dashboard
-nova_dashboard/build/
-
-# Backend
-qr-backend/node_modules/
+# SQLite
 nova_app.db
 
+# Build output
+**/build/
+dist/
+
 # Dart tool cache
-nova_app/.dart_tool/
-nova_dashboard/.dart_tool/
+**/.dart_tool/
