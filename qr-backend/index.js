@@ -83,7 +83,6 @@ const analyticsRouter = require('./src/routes/analytics.routes');
 const uploadRouter    = require('./src/routes/upload.routes');
 const dashboardRouter = require('./src/routes/dashboard.routes');
 const ownerRouter     = require('./src/routes/owner.routes');
-const authV2Router    = require('./src/routes/auth-v2.routes');
 
 // ══════════════════════════════════════════════════════════
 // MONTAJE DE RUTAS
