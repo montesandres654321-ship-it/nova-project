@@ -117,8 +117,8 @@ app.use('/', dashboardRouter);
 // Owner stats: /owner/stats
 app.use('/', ownerRouter);
 
-// Auth v2 paralelo: /api/v2/auth/*
-app.use('/', authV2Router);
+// auth-v2 desactivado — pendiente migración a PG antes de reactivar
+// app.use('/', authV2Router);
 
 // ── Error handler ────────────────────────────────────────
 app.use((err, req, res, next) => {
