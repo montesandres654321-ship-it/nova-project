@@ -19,6 +19,16 @@ import '../models/scan_record.dart';
 class ApiService {
   ApiService._(); // No instanciable — todos los métodos son static
 
+  // Extrae el mensaje de error ya sea String plano o Map { message, code, ... }
+  static String _extractError(dynamic raw, String fallback) {
+    if (raw is String && raw.isNotEmpty) return raw;
+    if (raw is Map) {
+      final msg = raw['message'];
+      if (msg is String && msg.isNotEmpty) return msg;
+    }
+    return fallback;
+  }
+
   // ─── Headers ────────────────────────────────────────────
 
   /// Headers básicos sin autenticación
@@ -70,7 +80,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'error': data['error'] ?? 'Error en login (${response.statusCode})',
+          'error': _extractError(data['error'], 'Error en login (${response.statusCode})'),
         };
       }
     } catch (e) {
@@ -118,7 +128,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'error': data['error'] ?? 'Error en registro (${response.statusCode})',
+          'error': _extractError(data['error'], 'Error en registro (${response.statusCode})'),
         };
       }
     } catch (e) {
@@ -269,7 +279,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'error': data['error'] ?? 'Error al registrar escaneo (${response.statusCode})',
+          'error': _extractError(data['error'], 'Error al registrar escaneo (${response.statusCode})'),
         };
       }
     } catch (e) {
@@ -374,7 +384,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'error': data['error'] ?? 'Error al actualizar perfil',
+          'error': _extractError(data['error'], 'Error al actualizar perfil'),
         };
       }
     } catch (e) {
@@ -429,7 +439,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'error': data['error'] ?? 'Error al confirmar recompensa',
+          'error': _extractError(data['error'], 'Error al confirmar recompensa'),
         };
       }
     } catch (e) {

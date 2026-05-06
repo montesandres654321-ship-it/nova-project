@@ -216,8 +216,16 @@ class ApiClient {
       throw ApiException('Respuesta sin campo "success"');
     }
     if (success != true) {
-      final error = responseMap['error'] ?? 'Error desconocido';
-      throw ApiException(error);
+      final rawError = responseMap['error'];
+      final String errorMsg;
+      if (rawError is Map) {
+        errorMsg = (rawError['message'] as String?) ?? 'Error desconocido';
+      } else if (rawError is String && rawError.isNotEmpty) {
+        errorMsg = rawError;
+      } else {
+        errorMsg = 'Error desconocido';
+      }
+      throw ApiException(errorMsg);
     }
 
     // ── Extraer datos con formato flexible ──────────────────

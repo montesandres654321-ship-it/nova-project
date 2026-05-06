@@ -17,7 +17,7 @@ class AppConstants {
   // ──────────────────────────────────────────────────────────
   static const String backendUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://localhost:3000',
+    defaultValue: 'http://192.168.2.170:3000',
   );
 
   // ──────────────────────────────────────────────────────────

@@ -53,7 +53,6 @@ const authenticateToken = (req, res, next) => {
         error:   'Token no proporcionado',
       });
     }
-
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) {
         return res.status(403).json({
@@ -64,7 +63,6 @@ const authenticateToken = (req, res, next) => {
       req.user = decoded;
       next();
     });
-
   } catch (error) {
     console.error('❌ Error en authenticateToken:', error);
     return res.status(500).json({
