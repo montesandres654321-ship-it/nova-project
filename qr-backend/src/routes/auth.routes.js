@@ -5,7 +5,6 @@ const bcrypt   = require('bcryptjs');
 const router   = express.Router();
 const db       = require('../config/database');
 const { authenticateToken, generateToken } = require('../middleware/auth');
-const { runDualWrite } = require('../services/dual-write'); // 🔥 NUEVO
 
 // ─── Helper: respuesta de login ───────────────────────────
 const loginResponse = (user, token) => ({
@@ -45,7 +44,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email y contraseña son requeridos' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1').get(email);
+    const user = (await db.query('SELECT * FROM users WHERE email = $1 AND is_active = TRUE', [email])).rows[0];
 
     if (!user) {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
@@ -63,7 +62,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
 
-    db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
+    await db.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
 
     const token = generateToken(user);
 
@@ -98,22 +97,25 @@ router.post('/users/register', async (req, res) => {
     }
 
     // Validaciones
-    const existingTourist = db.prepare(
-      'SELECT id FROM users WHERE (email = ? OR username = ?) AND role IS NULL'
-    ).get(email, username);
+    const existingTourist = (await db.query(
+      'SELECT id FROM users WHERE (email = $1 OR username = $2) AND role IS NULL',
+      [email, username]
+    )).rows[0];
 
     if (existingTourist) {
       return res.status(409).json({ success: false, error: 'Email o usuario ya está en uso' });
     }
 
-    const existingAdmin = db.prepare(
-      'SELECT id FROM users WHERE email = ? AND role IS NOT NULL'
-    ).get(email);
+    const existingAdmin = (await db.query(
+      'SELECT id FROM users WHERE email = $1 AND role IS NOT NULL',
+      [email]
+    )).rows[0];
 
     if (existingAdmin) {
-      const usernameConflict = db.prepare(
-        'SELECT id FROM users WHERE username = ? AND role IS NULL'
-      ).get(username);
+      const usernameConflict = (await db.query(
+        'SELECT id FROM users WHERE username = $1 AND role IS NULL',
+        [username]
+      )).rows[0];
 
       if (usernameConflict) {
         return res.status(409).json({ success: false, error: 'Nombre de usuario ya está en uso' });
@@ -122,17 +124,15 @@ router.post('/users/register', async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // =========================
-    // 1. INSERT SQLITE
-    // =========================
-    const result = db.prepare(`
+    const result = await db.query(`
       INSERT INTO users (
         first_name, last_name, username,
         email, password, phone, dob, gender,
         role, is_active, accepted_terms
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 1, 1)
-    `).run(
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NULL, TRUE, TRUE)
+      RETURNING id
+    `, [
       fName || '',
       lName || '',
       username,
@@ -140,60 +140,12 @@ router.post('/users/register', async (req, res) => {
       hashed,
       phone || null,
       dob || null,
-      gender || null
-    );
+      gender || null,
+    ]);
 
-    const userId = result.lastInsertRowid;
+    const userId = result.rows[0].id;
 
-    // =========================
-    // 🔥 2. DUAL-WRITE POSTGRES
-    // =========================
-    await runDualWrite(
-      'create_user',
-      async (pg) => {
-        await pg.query(
-          `
-          INSERT INTO users (
-            id,
-            first_name,
-            last_name,
-            username,
-            email,
-            password,
-            phone,
-            dob,
-            gender,
-            role,
-            is_active,
-            accepted_terms,
-            created_at,
-            token_version
-          )
-          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NULL,$10,$11,NOW(),1)
-          ON CONFLICT (id) DO NOTHING
-          `,
-          [
-            userId,
-            fName || '',
-            lName || '',
-            username,
-            email,
-            hashed,
-            phone || null,
-            dob || null,
-            gender || null,
-            true,
-            true
-          ]
-        );
-      },
-      { userId, email }
-    );
-
-    // =========================
-    // 3. RESPUESTA
-    // =========================
-    const newUser = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    const newUser = (await db.query('SELECT * FROM users WHERE id = $1', [userId])).rows[0];
     const token   = generateToken(newUser);
 
     return res.status(201).json(loginResponse(newUser, token));

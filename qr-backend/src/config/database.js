@@ -1,27 +1,19 @@
 // src/config/database.js
 // ============================================================
-// INSTANCIA ÚNICA DE SQLITE — Nova App
+// POSTGRESQL POOL — Nova App
 // ============================================================
-// REGLA: Ningún otro archivo puede hacer new Database()
-// Todos importan desde aquí:
-//   const db = require('../config/database');
-// ============================================================
-
 require('dotenv').config();
-const Database = require('better-sqlite3');
-const path     = require('path');
+const { Pool } = require('pg');
 
-const dbPath = process.env.DB_PATH
-  ? path.resolve(process.env.DB_PATH)
-  : path.join(__dirname, '../../nova_app.db');
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
 
-const db = new Database(dbPath);
+pool.on('error', (err) => console.error('❌ PG pool error:', err));
 
-// Rendimiento y consistencia
-db.pragma('journal_mode = WAL');   // Write-Ahead Logging
-db.pragma('foreign_keys = ON');    // Validar FK siempre
-db.pragma('synchronous = NORMAL'); // Balance seguridad/velocidad
+pool.connect()
+  .then(client => { console.log('✅ PostgreSQL conectado'); client.release(); })
+  .catch(err => { console.error('❌ PG conexión fallida:', err.message); process.exit(1); });
 
-console.log('✅ Base de datos conectada:', dbPath);
-
-module.exports = db;
+module.exports = pool;

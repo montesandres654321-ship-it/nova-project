@@ -54,20 +54,25 @@ const authenticateToken = (req, res, next) => {
         error:   'Token no proporcionado',
       });
     }
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, JWT_SECRET, async (err, decoded) => {
       if (err) {
         return res.status(403).json({
           success: false,
           error:   'Token inválido o expirado',
         });
       }
-      // C-03: rechaza usuarios desactivados; C-04: refresca role/place_id del token
-      const user = db.prepare('SELECT is_active, role, place_id FROM users WHERE id = ?').get(decoded.id);
-      if (!user || user.is_active === 0) {
-        return res.status(401).json({ success: false, error: 'Sesión inactiva' });
+      try {
+        const result = await db.query('SELECT is_active, role, place_id FROM users WHERE id = $1', [decoded.id]);
+        const user = result.rows[0];
+        if (!user || !user.is_active) {
+          return res.status(401).json({ success: false, error: 'Sesión inactiva' });
+        }
+        req.user = { ...decoded, role: user.role, place_id: user.place_id };
+        next();
+      } catch (dbErr) {
+        console.error('❌ Error en auth DB check:', dbErr);
+        return res.status(500).json({ success: false, error: 'Error en autenticación' });
       }
-      req.user = { ...decoded, role: user.role, place_id: user.place_id };
-      next();
     });
   } catch (error) {
     console.error('❌ Error en authenticateToken:', error);

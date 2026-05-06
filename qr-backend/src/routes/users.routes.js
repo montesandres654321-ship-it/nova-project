@@ -31,7 +31,7 @@ const authorize = require('../middleware/authorize');
 // Cualquier usuario autenticado puede editar SU propio perfil
 // Solo acepta: first_name, last_name, phone
 // El userId viene del token JWT — no puede editar a otro
-router.patch('/users/me/profile', authenticateToken, (req, res) => {
+router.patch('/users/me/profile', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { first_name, last_name, phone } = req.body;
@@ -43,7 +43,7 @@ router.patch('/users/me/profile', authenticateToken, (req, res) => {
       });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [userId])).rows[0];
     if (!user) {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
@@ -56,13 +56,14 @@ router.patch('/users/me/profile', authenticateToken, (req, res) => {
       return res.status(400).json({ success: false, error: 'El nombre no puede estar vacío' });
     }
 
-    db.prepare(`
-      UPDATE users SET first_name = ?, last_name = ?, phone = ? WHERE id = ?
-    `).run(newFirstName, newLastName, newPhone, userId);
+    await db.query(`
+      UPDATE users SET first_name = $1, last_name = $2, phone = $3 WHERE id = $4
+    `, [newFirstName, newLastName, newPhone, userId]);
 
-    const updated = db.prepare(
-      'SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active FROM users WHERE id = ?'
-    ).get(userId);
+    const updated = (await db.query(
+      'SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active FROM users WHERE id = $1',
+      [userId]
+    )).rows[0];
 
     console.log(`✅ Perfil propio actualizado: ID:${userId} (${updated.email})`);
 
@@ -99,7 +100,7 @@ router.post('/users/me/password', authenticateToken, async (req, res) => {
       });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [userId])).rows[0];
     if (!user) {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
@@ -115,7 +116,7 @@ router.post('/users/me/password', authenticateToken, async (req, res) => {
 
     // Hashear y guardar nueva contraseña
     const hashedPassword = await bcrypt.hash(new_password, 10);
-    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, userId);
+    await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
 
     console.log(`✅ Contraseña cambiada: ID:${userId} (${user.email})`);
 
@@ -134,13 +135,13 @@ router.post('/users/me/password', authenticateToken, async (req, res) => {
 // ══════════════════════════════════════════════════════════
 
 // ─── GET /users ───────────────────────────────────────────
-router.get('/users', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/users', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const users = db.prepare(`
+    const users = (await db.query(`
       SELECT id, username, email, first_name, last_name, role,
              is_active, created_at, last_login, phone, place_id
       FROM users ORDER BY created_at DESC
-    `).all();
+    `)).rows;
     return res.json({ success: true, data: users });
   } catch (error) {
     console.error('❌ Error en GET /users:', error);
@@ -149,7 +150,7 @@ router.get('/users', authenticateToken, authorize(['admin_general', 'user_genera
 });
 
 // ─── GET /users/:id ───────────────────────────────────────
-router.get('/users/:id', authenticateToken, (req, res) => {
+router.get('/users/:id', authenticateToken, async (req, res) => {
   try {
     const requestedId = parseInt(req.params.id);
     if (req.user.id !== requestedId &&
@@ -158,11 +159,11 @@ router.get('/users/:id', authenticateToken, (req, res) => {
       return res.status(403).json({ success: false, error: 'Sin permiso para ver este usuario' });
     }
 
-    const user = db.prepare(`
+    const user = (await db.query(`
       SELECT id, username, email, first_name, last_name, role,
              is_active, created_at, last_login, phone, place_id
-      FROM users WHERE id = ?
-    `).get(req.params.id);
+      FROM users WHERE id = $1
+    `, [req.params.id])).rows[0];
 
     if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     return res.json({ success: true, data: user });
@@ -173,22 +174,22 @@ router.get('/users/:id', authenticateToken, (req, res) => {
 });
 
 // ─── GET /admin/users ─────────────────────────────────────
-router.get('/admin/users', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/admin/users', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const users = db.prepare(`
+    const users = (await db.query(`
       SELECT
         u.id, u.first_name, u.last_name, u.username, u.email, u.phone,
         u.created_at, u.last_login, u.is_active, u.google_id, u.role,
-        COUNT(DISTINCT s.id)  as total_scans,
-        COUNT(DISTINCT ur.id) as total_rewards,
-        SUM(CASE WHEN ur.is_redeemed = 1 THEN 1 ELSE 0 END) as redeemed_rewards
+        COUNT(DISTINCT s.id)::int  as total_scans,
+        COUNT(DISTINCT ur.id)::int as total_rewards,
+        SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as redeemed_rewards
       FROM users u
       LEFT JOIN scans s         ON u.id = s.user_id
       LEFT JOIN user_rewards ur ON u.id = ur.user_id
       WHERE u.role IS NULL
       GROUP BY u.id
       ORDER BY u.created_at DESC
-    `).all();
+    `)).rows;
 
     return res.json({ success: true, data: users });
   } catch (error) {
@@ -198,31 +199,31 @@ router.get('/admin/users', authenticateToken, authorize(['admin_general', 'user_
 });
 
 // ─── GET /admin/users/:id ─────────────────────────────────
-router.get('/admin/users/:id', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/admin/users/:id', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
     const { id } = req.params;
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [id])).rows[0];
     if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
 
-    const scans = db.prepare(`
+    const scans = (await db.query(`
       SELECT s.*, p.name as place_name, p.tipo, p.lugar
       FROM scans s JOIN places p ON s.place_id = p.id
-      WHERE s.user_id = ? ORDER BY s.created_at DESC
-    `).all(id);
+      WHERE s.user_id = $1 ORDER BY s.created_at DESC
+    `, [id])).rows;
 
-    const rewards = db.prepare(`
+    const rewards = (await db.query(`
       SELECT ur.*, p.name as place_name
       FROM user_rewards ur JOIN places p ON ur.place_id = p.id
-      WHERE ur.user_id = ? ORDER BY ur.earned_at DESC
-    `).all(id);
+      WHERE ur.user_id = $1 ORDER BY ur.earned_at DESC
+    `, [id])).rows;
 
-    const topPlaces = db.prepare(`
-      SELECT p.name, p.tipo, p.lugar, COUNT(*) as visit_count
+    const topPlaces = (await db.query(`
+      SELECT p.name, p.tipo, p.lugar, COUNT(*)::int as visit_count
       FROM scans s JOIN places p ON s.place_id = p.id
-      WHERE s.user_id = ? GROUP BY p.id
+      WHERE s.user_id = $1 GROUP BY p.id, p.name, p.tipo, p.lugar
       ORDER BY visit_count DESC LIMIT 5
-    `).all(id);
+    `, [id])).rows;
 
     const { password: _, ...userWithoutPassword } = user;
 
@@ -236,7 +237,7 @@ router.get('/admin/users/:id', authenticateToken, authorize(['admin_general', 'u
         stats: {
           totalScans:      scans.length,
           totalRewards:    rewards.length,
-          redeemedRewards: rewards.filter(r => r.is_redeemed === 1).length,
+          redeemedRewards: rewards.filter(r => r.is_redeemed).length,
         },
       },
     });
@@ -247,18 +248,18 @@ router.get('/admin/users/:id', authenticateToken, authorize(['admin_general', 'u
 });
 
 // ─── PATCH /admin/users/:id/toggle ───────────────────────
-router.patch('/admin/users/:id/toggle', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.patch('/admin/users/:id/toggle', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [req.params.id])).rows[0];
     if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
 
-    const newStatus = user.is_active === 1 ? 0 : 1;
-    db.prepare('UPDATE users SET is_active = ? WHERE id = ?').run(newStatus, req.params.id);
+    const newStatus = !user.is_active;
+    await db.query('UPDATE users SET is_active = $1 WHERE id = $2', [newStatus, req.params.id]);
 
     return res.json({
       success: true,
       data: {
-        message:   `Usuario ${newStatus === 1 ? 'activado' : 'desactivado'}`,
+        message:   `Usuario ${newStatus ? 'activado' : 'desactivado'}`,
         is_active: newStatus,
       },
     });
@@ -286,7 +287,7 @@ router.post('/admin/users/create', authenticateToken, authorize(['admin_general'
       return res.status(400).json({ success: false, error: 'place_id es requerido para user_place' });
     }
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ? OR username = ?').get(email, username);
+    const existing = (await db.query('SELECT id FROM users WHERE email = $1 OR username = $2', [email, username])).rows[0];
     if (existing) {
       return res.status(409).json({ success: false, error: 'Email o usuario ya en uso' });
     }
@@ -294,14 +295,16 @@ router.post('/admin/users/create', authenticateToken, authorize(['admin_general'
     const hashed      = await bcrypt.hash(password, 10);
     const finalPlaceId = role === 'user_place' ? place_id : null;
 
-    const result = db.prepare(`
+    const result = await db.query(`
       INSERT INTO users (first_name, last_name, username, email, password, role, place_id, is_active, accepted_terms)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1)
-    `).run(first_name || '', last_name || '', username, email, hashed, role, finalPlaceId);
+      VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, TRUE)
+      RETURNING id
+    `, [first_name || '', last_name || '', username, email, hashed, role, finalPlaceId]);
 
-    const newUser = db.prepare(
-      'SELECT id, username, email, first_name, last_name, role, place_id, is_active FROM users WHERE id = ?'
-    ).get(result.lastInsertRowid);
+    const newUser = (await db.query(
+      'SELECT id, username, email, first_name, last_name, role, place_id, is_active FROM users WHERE id = $1',
+      [result.rows[0].id]
+    )).rows[0];
 
     console.log(`✅ Usuario del panel creado: ${email} (${role})`);
     return res.status(201).json({ success: true, data: newUser });
@@ -313,7 +316,7 @@ router.post('/admin/users/create', authenticateToken, authorize(['admin_general'
 });
 
 // ─── PATCH /admin/users/:id/role ─────────────────────────
-router.patch('/admin/users/:id/role', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.patch('/admin/users/:id/role', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
     const { role, place_id } = req.body;
     const { id } = req.params;
@@ -327,11 +330,11 @@ router.patch('/admin/users/:id/role', authenticateToken, authorize(['admin_gener
       return res.status(400).json({ success: false, error: 'place_id requerido para user_place' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [id])).rows[0];
     if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
 
-    db.prepare('UPDATE users SET role = ?, place_id = ? WHERE id = ?')
-      .run(role, role === 'user_place' ? place_id : null, id);
+    await db.query('UPDATE users SET role = $1, place_id = $2 WHERE id = $3',
+      [role, role === 'user_place' ? place_id : null, id]);
 
     return res.json({ success: true, message: `Rol actualizado a ${role}` });
   } catch (error) {
@@ -341,7 +344,7 @@ router.patch('/admin/users/:id/role', authenticateToken, authorize(['admin_gener
 });
 
 // ─── PATCH /admin/users/:id ───────────────────────────────
-router.patch('/admin/users/:id', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.patch('/admin/users/:id', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
     const { id } = req.params;
     const { first_name, last_name, phone } = req.body;
@@ -353,7 +356,7 @@ router.patch('/admin/users/:id', authenticateToken, authorize(['admin_general'])
       });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [id])).rows[0];
     if (!user) {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
@@ -369,13 +372,14 @@ router.patch('/admin/users/:id', authenticateToken, authorize(['admin_general'])
       return res.status(400).json({ success: false, error: 'El apellido no puede estar vacío' });
     }
 
-    db.prepare(`
-      UPDATE users SET first_name = ?, last_name = ?, phone = ? WHERE id = ?
-    `).run(newFirstName, newLastName, newPhone, id);
+    await db.query(`
+      UPDATE users SET first_name = $1, last_name = $2, phone = $3 WHERE id = $4
+    `, [newFirstName, newLastName, newPhone, id]);
 
-    const updated = db.prepare(
-      'SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active FROM users WHERE id = ?'
-    ).get(id);
+    const updated = (await db.query(
+      'SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active FROM users WHERE id = $1',
+      [id]
+    )).rows[0];
 
     console.log(`✅ Usuario actualizado: ID:${id} (${updated.email})`);
 
@@ -391,7 +395,7 @@ router.patch('/admin/users/:id', authenticateToken, authorize(['admin_general'])
 });
 
 // ─── DELETE /admin/users/:id ──────────────────────────────
-router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
     const { id } = req.params;
     const targetId = parseInt(id);
@@ -403,12 +407,12 @@ router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']
       });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(targetId);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [targetId])).rows[0];
     if (!user) {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
 
-    if (user.is_active === 0) {
+    if (!user.is_active) {
       return res.status(400).json({
         success: false,
         error: 'El usuario ya está desactivado',
@@ -416,9 +420,9 @@ router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']
     }
 
     if (user.role === 'admin_general') {
-      const activeAdmins = db.prepare(
-        "SELECT COUNT(*) as c FROM users WHERE role = 'admin_general' AND is_active = 1"
-      ).get();
+      const activeAdmins = (await db.query(
+        "SELECT COUNT(*)::int as c FROM users WHERE role = 'admin_general' AND is_active = TRUE"
+      )).rows[0];
 
       if (activeAdmins.c <= 1) {
         return res.status(400).json({
@@ -428,7 +432,7 @@ router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']
       }
     }
 
-    db.prepare('UPDATE users SET is_active = 0 WHERE id = ?').run(targetId);
+    await db.query('UPDATE users SET is_active = FALSE WHERE id = $1', [targetId]);
 
     const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ')
       || user.username;
@@ -438,7 +442,7 @@ router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']
     return res.json({
       success: true,
       message: `Usuario "${displayName}" desactivado. Su historial se conserva.`,
-      data: { id: targetId, is_active: 0 },
+      data: { id: targetId, is_active: false },
     });
   } catch (error) {
     console.error('❌ Error en DELETE /admin/users/:id:', error);
@@ -447,9 +451,9 @@ router.delete('/admin/users/:id', authenticateToken, authorize(['admin_general']
 });
 
 // ─── GET /api/admins/owners ───────────────────────────────
-router.get('/api/admins/owners', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/api/admins/owners', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const owners = db.prepare(`
+    const owners = (await db.query(`
       SELECT u.id, u.first_name, u.last_name, u.username, u.email,
              u.phone, u.role, u.place_id, u.is_active, u.created_at, u.last_login,
              p.name as place_name, p.tipo as place_tipo, p.lugar as place_lugar
@@ -462,7 +466,7 @@ router.get('/api/admins/owners', authenticateToken, authorize(['admin_general', 
           WHEN 'user_general'  THEN 2
           WHEN 'user_place'    THEN 3
         END, u.created_at DESC
-    `).all();
+    `)).rows;
 
     return res.json({ success: true, data: owners });
   } catch (error) {
@@ -472,17 +476,17 @@ router.get('/api/admins/owners', authenticateToken, authorize(['admin_general', 
 });
 
 // ─── PATCH /api/admins/:id/toggle ────────────────────────
-router.patch('/api/admins/:id/toggle', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.patch('/api/admins/:id/toggle', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+    const user = (await db.query('SELECT * FROM users WHERE id = $1', [req.params.id])).rows[0];
     if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
 
-    const newStatus = user.is_active === 1 ? 0 : 1;
-    db.prepare('UPDATE users SET is_active = ? WHERE id = ?').run(newStatus, req.params.id);
+    const newStatus = !user.is_active;
+    await db.query('UPDATE users SET is_active = $1 WHERE id = $2', [newStatus, req.params.id]);
 
     return res.json({
       success: true,
-      data: { message: `Usuario ${newStatus === 1 ? 'activado' : 'desactivado'}`, is_active: newStatus },
+      data: { message: `Usuario ${newStatus ? 'activado' : 'desactivado'}`, is_active: newStatus },
     });
   } catch (error) {
     console.error('❌ Error en toggle admin:', error);
@@ -491,16 +495,16 @@ router.patch('/api/admins/:id/toggle', authenticateToken, authorize(['admin_gene
 });
 
 // ─── GET /api/admins/owners/without-place ────────────────
-router.get('/api/admins/owners/without-place', authenticateToken, authorize(['admin_general']), (req, res) => {
+router.get('/api/admins/owners/without-place', authenticateToken, authorize(['admin_general']), async (req, res) => {
   try {
-    const owners = db.prepare(`
+    const owners = (await db.query(`
       SELECT u.id, u.first_name, u.last_name, u.username, u.email, u.phone, u.created_at
       FROM users u
       WHERE u.role = 'user_place'
-        AND (u.place_id IS NULL OR u.place_id NOT IN (SELECT id FROM places WHERE is_active = 1))
-        AND u.is_active = 1
+        AND (u.place_id IS NULL OR u.place_id NOT IN (SELECT id FROM places WHERE is_active = TRUE))
+        AND u.is_active = TRUE
       ORDER BY u.created_at DESC
-    `).all();
+    `)).rows;
 
     return res.json({ success: true, data: owners, total: owners.length });
   } catch (error) {
@@ -510,29 +514,29 @@ router.get('/api/admins/owners/without-place', authenticateToken, authorize(['ad
 });
 
 // ─── GET /stats/dashboard ─────────────────────────────────
-router.get('/stats/dashboard', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/stats/dashboard', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const totalUsers   = db.prepare("SELECT COUNT(*) as c FROM users WHERE role IS NULL").get();
-    const totalPlaces  = db.prepare("SELECT COUNT(*) as c FROM places WHERE is_active = 1").get();
-    const totalScans   = db.prepare("SELECT COUNT(*) as c FROM scans").get();
-    const totalRewards = db.prepare("SELECT COUNT(*) as c FROM user_rewards").get();
+    const totalUsers   = (await db.query("SELECT COUNT(*)::int as c FROM users WHERE role IS NULL")).rows[0];
+    const totalPlaces  = (await db.query("SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE")).rows[0];
+    const totalScans   = (await db.query("SELECT COUNT(*)::int as c FROM scans")).rows[0];
+    const totalRewards = (await db.query("SELECT COUNT(*)::int as c FROM user_rewards")).rows[0];
 
-    const placesByType = db.prepare(`
-      SELECT tipo, COUNT(*) as count FROM places WHERE is_active = 1 GROUP BY tipo
-    `).all();
+    const placesByType = (await db.query(`
+      SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo
+    `)).rows;
 
-    const scansByDay = db.prepare(`
-      SELECT DATE(created_at) as date, COUNT(*) as count
+    const scansByDay = (await db.query(`
+      SELECT created_at::date AS date, COUNT(*)::int as count
       FROM scans
-      GROUP BY DATE(created_at) ORDER BY date ASC
-    `).all();
+      GROUP BY created_at::date ORDER BY date ASC
+    `)).rows;
 
-    const topPlaces = db.prepare(`
-      SELECT p.id, p.name, p.tipo, p.lugar, COUNT(s.id) as total_scans
+    const topPlaces = (await db.query(`
+      SELECT p.id, p.name, p.tipo, p.lugar, COUNT(s.id)::int as total_scans
       FROM places p LEFT JOIN scans s ON p.id = s.place_id
-      WHERE p.is_active = 1
+      WHERE p.is_active = TRUE
       GROUP BY p.id ORDER BY total_scans DESC LIMIT 10
-    `).all();
+    `)).rows;
 
     return res.json({
       success: true,

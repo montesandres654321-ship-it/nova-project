@@ -18,19 +18,19 @@ router.use(authenticateToken);
 router.use(authorize(['admin_general', 'user_general']));
 
 // ── STATS GENERALES ───────────────────────────────────────
-router.get('/stats/general', (req, res) => {
+router.get('/stats/general', async (req, res) => {
   try {
-    const totalUsers   = db.prepare('SELECT COUNT(*) as c FROM users WHERE role IS NULL').get();
-    const totalPlaces  = db.prepare('SELECT COUNT(*) as c FROM places WHERE is_active = 1').get();
-    const totalScans   = db.prepare('SELECT COUNT(*) as c FROM scans').get();
-    const totalRewards = db.prepare('SELECT COUNT(*) as c FROM user_rewards').get();
-    const activeUsers  = db.prepare(`
-      SELECT COUNT(DISTINCT user_id) as c FROM scans
-      WHERE created_at >= datetime('now','-30 days')
-    `).get();
-    const placesByType = db.prepare(
-      `SELECT tipo, COUNT(*) as count FROM places WHERE is_active = 1 GROUP BY tipo`
-    ).all();
+    const totalUsers   = (await db.query('SELECT COUNT(*)::int as c FROM users WHERE role IS NULL')).rows[0];
+    const totalPlaces  = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE')).rows[0];
+    const totalScans   = (await db.query('SELECT COUNT(*)::int as c FROM scans')).rows[0];
+    const totalRewards = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards')).rows[0];
+    const activeUsers  = (await db.query(`
+      SELECT COUNT(DISTINCT user_id)::int as c FROM scans
+      WHERE created_at >= NOW() - INTERVAL '30 days'
+    `)).rows[0];
+    const placesByType = (await db.query(
+      `SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`
+    )).rows;
 
     res.json({
       success: true,
@@ -57,17 +57,17 @@ router.get('/stats/general', (req, res) => {
 // CORRECCIÓN CRÍTICA: nombres alineados con rewards_page.dart
 // rewards_page.dart lee: total_rewards, redeemed_rewards,
 //   pending_rewards, redemption_rate, total_value
-router.get('/rewards/stats', (req, res) => {
+router.get('/rewards/stats', async (req, res) => {
   try {
-    const total    = db.prepare('SELECT COUNT(*) as c FROM user_rewards').get();
-    const redeemed = db.prepare('SELECT COUNT(*) as c FROM user_rewards WHERE is_redeemed = 1').get();
-    const pending  = db.prepare('SELECT COUNT(*) as c FROM user_rewards WHERE is_redeemed = 0').get();
-    const today    = db.prepare(`SELECT COUNT(*) as c FROM user_rewards WHERE DATE(earned_at) = DATE('now')`).get();
-    const week     = db.prepare(`SELECT COUNT(*) as c FROM user_rewards WHERE earned_at >= datetime('now','-7 days')`).get();
-    const avgTime  = db.prepare(`
-      SELECT AVG(julianday(redeemed_at) - julianday(earned_at)) as avg
-      FROM user_rewards WHERE is_redeemed = 1
-    `).get();
+    const total    = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards')).rows[0];
+    const redeemed = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = TRUE')).rows[0];
+    const pending  = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = FALSE')).rows[0];
+    const today    = (await db.query(`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at::date = CURRENT_DATE`)).rows[0];
+    const week     = (await db.query(`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at >= NOW() - INTERVAL '7 days'`)).rows[0];
+    const avgTime  = (await db.query(`
+      SELECT AVG(EXTRACT(EPOCH FROM (redeemed_at - earned_at)) / 86400) as avg
+      FROM user_rewards WHERE is_redeemed = TRUE
+    `)).rows[0];
     const rate = total.c > 0 ? parseFloat((redeemed.c / total.c * 100).toFixed(2)) : 0;
 
     res.json({
@@ -96,15 +96,15 @@ router.get('/rewards/stats', (req, res) => {
 });
 
 // ── RECOMPENSAS POR DÍA ───────────────────────────────────
-router.get('/rewards/by-day', (req, res) => {
+router.get('/rewards/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = db.prepare(`
-      SELECT DATE(earned_at) as date, COUNT(*) as count
+    const data = (await db.query(`
+      SELECT earned_at::date AS date, COUNT(*)::int as count
       FROM user_rewards
-      WHERE earned_at >= datetime('now', '-${days} days')
-      GROUP BY DATE(earned_at) ORDER BY date ASC
-    `).all();
+      WHERE earned_at >= NOW() - INTERVAL '1 day' * $1
+      GROUP BY earned_at::date ORDER BY date ASC
+    `, [days])).rows;
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error recompensas por día' });
@@ -112,19 +112,19 @@ router.get('/rewards/by-day', (req, res) => {
 });
 
 // ── RECOMPENSAS TOP LUGARES ───────────────────────────────
-router.get('/rewards/top-places', (req, res) => {
+router.get('/rewards/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = db.prepare(`
+    const places = (await db.query(`
       SELECT p.id, p.name, p.tipo, p.lugar,
-        COUNT(ur.id) as total_rewards,
-        SUM(CASE WHEN ur.is_redeemed = 1 THEN 1 ELSE 0 END) as redeemed,
-        SUM(CASE WHEN ur.is_redeemed = 0 THEN 1 ELSE 0 END) as pending
+        COUNT(ur.id)::int as total_rewards,
+        SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as redeemed,
+        SUM(CASE WHEN ur.is_redeemed = FALSE THEN 1 ELSE 0 END)::int as pending
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
-      WHERE p.is_active = 1
-      GROUP BY p.id ORDER BY total_rewards DESC LIMIT ?
-    `).all(limit);
+      WHERE p.is_active = TRUE
+      GROUP BY p.id ORDER BY total_rewards DESC LIMIT $1
+    `, [limit])).rows;
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares recompensas' });
@@ -132,17 +132,17 @@ router.get('/rewards/top-places', (req, res) => {
 });
 
 // ── RECOMPENSAS POR TIPO ──────────────────────────────────
-router.get('/rewards/by-type', (req, res) => {
+router.get('/rewards/by-type', async (req, res) => {
   try {
-    const data = db.prepare(`
+    const data = (await db.query(`
       SELECT p.tipo,
-        COUNT(ur.id) as total,
-        SUM(CASE WHEN ur.is_redeemed = 1 THEN 1 ELSE 0 END) as canjeadas,
-        SUM(CASE WHEN ur.is_redeemed = 0 THEN 1 ELSE 0 END) as pendientes
+        COUNT(ur.id)::int as total,
+        SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as canjeadas,
+        SUM(CASE WHEN ur.is_redeemed = FALSE THEN 1 ELSE 0 END)::int as pendientes
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
-      WHERE p.is_active = 1 GROUP BY p.tipo
-    `).all();
+      WHERE p.is_active = TRUE GROUP BY p.tipo
+    `)).rows;
     const result = {
       hotel:      { total: 0, canjeadas: 0, pendientes: 0 },
       restaurant: { total: 0, canjeadas: 0, pendientes: 0 },
@@ -160,17 +160,17 @@ router.get('/rewards/by-type', (req, res) => {
 });
 
 // ── ESCANEOS POR DÍA ──────────────────────────────────────
-router.get('/scans/by-day', (req, res) => {
+router.get('/scans/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = db.prepare(`
-      SELECT DATE(created_at) as date,
-        COUNT(*) as count,
-        COUNT(DISTINCT user_id) as unique_users
+    const data = (await db.query(`
+      SELECT created_at::date AS date,
+        COUNT(*)::int as count,
+        COUNT(DISTINCT user_id)::int as unique_users
       FROM scans
-      WHERE created_at >= datetime('now', '-${days} days')
-      GROUP BY DATE(created_at) ORDER BY date ASC
-    `).all();
+      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
+      GROUP BY created_at::date ORDER BY date ASC
+    `, [days])).rows;
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por día' });
@@ -178,15 +178,15 @@ router.get('/scans/by-day', (req, res) => {
 });
 
 // ── ESCANEOS POR HORA ─────────────────────────────────────
-router.get('/scans/by-hour', (req, res) => {
+router.get('/scans/by-hour', async (req, res) => {
   try {
-    const data = db.prepare(`
-      SELECT CAST(strftime('%H', created_at) AS INTEGER) as hour,
-        COUNT(*) as count
+    const data = (await db.query(`
+      SELECT EXTRACT(HOUR FROM created_at)::int as hour,
+        COUNT(*)::int as count
       FROM scans
-      WHERE created_at >= datetime('now', '-30 days')
+      WHERE created_at >= NOW() - INTERVAL '30 days'
       GROUP BY hour ORDER BY hour ASC
-    `).all();
+    `)).rows;
     res.json({ success: true, data });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por hora' });
@@ -194,18 +194,18 @@ router.get('/scans/by-hour', (req, res) => {
 });
 
 // ── ESCANEOS TOP LUGARES ──────────────────────────────────
-router.get('/scans/top-places', (req, res) => {
+router.get('/scans/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = db.prepare(`
+    const places = (await db.query(`
       SELECT p.id, p.name, p.tipo, p.lugar, p.rating,
-        COUNT(s.id) as total_scans,
-        COUNT(DISTINCT s.user_id) as unique_visitors
+        COUNT(s.id)::int as total_scans,
+        COUNT(DISTINCT s.user_id)::int as unique_visitors
       FROM places p
       INNER JOIN scans s ON p.id = s.place_id
-      WHERE p.is_active = 1
-      GROUP BY p.id ORDER BY total_scans DESC LIMIT ?
-    `).all(limit);
+      WHERE p.is_active = TRUE
+      GROUP BY p.id ORDER BY total_scans DESC LIMIT $1
+    `, [limit])).rows;
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares escaneos' });
@@ -213,23 +213,23 @@ router.get('/scans/top-places', (req, res) => {
 });
 
 // ── USUARIOS STATS ────────────────────────────────────────
-router.get('/users/stats', (req, res) => {
+router.get('/users/stats', async (req, res) => {
   try {
-    const total    = db.prepare('SELECT COUNT(*) as c FROM users WHERE role IS NULL').get();
-    const active   = db.prepare(`
-      SELECT COUNT(DISTINCT user_id) as c FROM scans
-      WHERE created_at >= datetime('now', '-30 days')
-    `).get();
-    const newMonth = db.prepare(`
-      SELECT COUNT(*) as c FROM users
-      WHERE created_at >= datetime('now', 'start of month') AND role IS NULL
-    `).get();
-    const byMonth  = db.prepare(`
-      SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count
+    const total    = (await db.query('SELECT COUNT(*)::int as c FROM users WHERE role IS NULL')).rows[0];
+    const active   = (await db.query(`
+      SELECT COUNT(DISTINCT user_id)::int as c FROM scans
+      WHERE created_at >= NOW() - INTERVAL '30 days'
+    `)).rows[0];
+    const newMonth = (await db.query(`
+      SELECT COUNT(*)::int as c FROM users
+      WHERE created_at >= DATE_TRUNC('month', NOW()) AND role IS NULL
+    `)).rows[0];
+    const byMonth  = (await db.query(`
+      SELECT TO_CHAR(created_at, 'YYYY-MM') as month, COUNT(*)::int as count
       FROM users
-      WHERE role IS NULL AND created_at >= datetime('now', '-6 months')
+      WHERE role IS NULL AND created_at >= NOW() - INTERVAL '6 months'
       GROUP BY month ORDER BY month ASC
-    `).all();
+    `)).rows;
     res.json({
       success: true,
       stats: { total: total.c, active: active.c, newThisMonth: newMonth.c, byMonth },
@@ -240,13 +240,13 @@ router.get('/users/stats', (req, res) => {
 });
 
 // ── LUGARES STATS ─────────────────────────────────────────
-router.get('/places/stats', (req, res) => {
+router.get('/places/stats', async (req, res) => {
   try {
-    const total      = db.prepare('SELECT COUNT(*) as c FROM places WHERE is_active = 1').get();
-    const withOwner  = db.prepare('SELECT COUNT(*) as c FROM places WHERE owner_id IS NOT NULL AND is_active = 1').get();
-    const withReward = db.prepare('SELECT COUNT(*) as c FROM places WHERE has_reward = 1 AND is_active = 1').get();
-    const byType     = db.prepare('SELECT tipo, COUNT(*) as count FROM places WHERE is_active = 1 GROUP BY tipo').all();
-    const avgRating  = db.prepare('SELECT AVG(rating) as avg FROM places WHERE is_active = 1 AND rating > 0').get();
+    const total      = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE')).rows[0];
+    const withOwner  = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE owner_id IS NOT NULL AND is_active = TRUE')).rows[0];
+    const withReward = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE has_reward = TRUE AND is_active = TRUE')).rows[0];
+    const byType     = (await db.query('SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo')).rows;
+    const avgRating  = (await db.query('SELECT AVG(rating) as avg FROM places WHERE is_active = TRUE AND rating > 0')).rows[0];
     res.json({
       success: true,
       stats: {
@@ -270,9 +270,9 @@ router.get('/places/stats', (req, res) => {
 // ── ADMINS CON DETALLES ───────────────────────────────────
 // CORRECCIÓN: subquery en lugar de JOIN con scans/rewards
 // El JOIN anterior traía turistas que tenían escaneos en algún lugar
-router.get('/admins/users-with-details', (req, res) => {
+router.get('/admins/users-with-details', async (req, res) => {
   try {
-    const users = db.prepare(`
+    const users = (await db.query(`
       SELECT
         u.id,
         u.first_name,
@@ -288,8 +288,8 @@ router.get('/admins/users-with-details', (req, res) => {
         p.name  AS place_name,
         p.tipo  AS place_type,
         p.lugar AS place_location,
-        (SELECT COUNT(*) FROM scans       s  WHERE s.place_id  = p.id) AS total_scans,
-        (SELECT COUNT(*) FROM user_rewards ur WHERE ur.place_id = p.id) AS total_rewards
+        (SELECT COUNT(*)::int FROM scans       s  WHERE s.place_id  = p.id) AS total_scans,
+        (SELECT COUNT(*)::int FROM user_rewards ur WHERE ur.place_id = p.id) AS total_rewards
       FROM users u
       LEFT JOIN places p ON u.place_id = p.id
       WHERE u.role IN ('admin_general', 'user_general', 'user_place')
@@ -300,7 +300,7 @@ router.get('/admins/users-with-details', (req, res) => {
           WHEN 'user_place'    THEN 3
         END,
         u.created_at DESC
-    `).all();
+    `)).rows;
 
     res.json({ success: true, data: users, total: users.length });
   } catch (e) {
@@ -310,16 +310,16 @@ router.get('/admins/users-with-details', (req, res) => {
 });
 
 // ── PROPIETARIOS SIN LUGAR ────────────────────────────────
-router.get('/admins/owners-without-place', (req, res) => {
+router.get('/admins/owners-without-place', async (req, res) => {
   try {
-    const owners = db.prepare(`
+    const owners = (await db.query(`
       SELECT id, first_name, last_name, username, email, phone, created_at
       FROM users
       WHERE role = 'user_place'
         AND (place_id IS NULL
-          OR place_id NOT IN (SELECT id FROM places WHERE is_active = 1))
+          OR place_id NOT IN (SELECT id FROM places WHERE is_active = TRUE))
       ORDER BY created_at DESC
-    `).all();
+    `)).rows;
     res.json({ success: true, data: owners, total: owners.length });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error propietarios sin lugar' });

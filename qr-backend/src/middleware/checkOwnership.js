@@ -4,7 +4,7 @@
 // ============================================================
 const db = require('../config/database'); // ← FIX
 
-const checkPlaceOwnership = (req, res, next) => {
+const checkPlaceOwnership = async (req, res, next) => {
   try {
     const placeId = req.params.id || req.body.place_id;
     const userId  = req.user.id;
@@ -13,7 +13,7 @@ const checkPlaceOwnership = (req, res, next) => {
     if (userRole === 'admin_general') return next();
 
     if (userRole === 'user_place') {
-      const place = db.prepare('SELECT * FROM places WHERE id = ?').get(placeId);
+      const place = (await db.query('SELECT * FROM places WHERE id = $1', [placeId])).rows[0];
       if (!place) {
         return res.status(404).json({ success: false, error: 'Lugar no encontrado' });
       }

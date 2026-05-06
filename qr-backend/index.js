@@ -161,6 +161,6 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 process.on('SIGINT', () => {
-  try { require('./src/config/database').close(); } catch (e) {}
+  try { require('./src/config/database').end(); } catch (e) {}
   process.exit(0);
 });

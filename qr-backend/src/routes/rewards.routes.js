@@ -11,7 +11,7 @@ const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
 // ─── GET /rewards/user/:userId ────────────────────────────
-router.get('/rewards/user/:userId', authenticateToken, (req, res) => {
+router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -21,7 +21,7 @@ router.get('/rewards/user/:userId', authenticateToken, (req, res) => {
       return res.status(403).json({ success: false, error: 'Acceso denegado' });
     }
 
-    const rewards = db.prepare(`
+    const rewards = (await db.query(`
       SELECT
         ur.id, ur.reward_name, ur.reward_description, ur.reward_icon,
         ur.is_redeemed, ur.earned_at, ur.redeemed_at,
@@ -29,14 +29,14 @@ router.get('/rewards/user/:userId', authenticateToken, (req, res) => {
         p.lugar as place_lugar, p.image_url as place_image
       FROM user_rewards ur
       JOIN places p ON ur.place_id = p.id
-      WHERE ur.user_id = ?
+      WHERE ur.user_id = $1
       ORDER BY ur.earned_at DESC
-    `).all(userId);
+    `, [userId])).rows;
 
     const stats = {
       total:    rewards.length,
-      pending:  rewards.filter(r => r.is_redeemed === 0).length,
-      redeemed: rewards.filter(r => r.is_redeemed === 1).length,
+      pending:  rewards.filter(r => !r.is_redeemed).length,
+      redeemed: rewards.filter(r => r.is_redeemed).length,
     };
 
     return res.json({ success: true, data: rewards, stats });
@@ -48,7 +48,7 @@ router.get('/rewards/user/:userId', authenticateToken, (req, res) => {
 
 // ─── GET /rewards/place/:placeId ──────────────────────────
 // NUEVO: Recompensas de un lugar específico (para el propietario)
-router.get('/rewards/place/:placeId', authenticateToken, (req, res) => {
+router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
   try {
     const { placeId } = req.params;
 
@@ -61,7 +61,7 @@ router.get('/rewards/place/:placeId', authenticateToken, (req, res) => {
       return res.status(403).json({ success: false, error: 'Acceso denegado' });
     }
 
-    const rewards = db.prepare(`
+    const rewards = (await db.query(`
       SELECT
         ur.id, ur.user_id, ur.reward_name, ur.reward_description, ur.reward_icon,
         ur.is_redeemed, ur.earned_at, ur.redeemed_at,
@@ -70,12 +70,12 @@ router.get('/rewards/place/:placeId', authenticateToken, (req, res) => {
       FROM user_rewards ur
       JOIN users u ON ur.user_id = u.id
       JOIN places p ON ur.place_id = p.id
-      WHERE ur.place_id = ?
+      WHERE ur.place_id = $1
       ORDER BY ur.earned_at DESC
-    `).all(placeId);
+    `, [placeId])).rows;
 
-    const pending = rewards.filter(r => r.is_redeemed === 0);
-    const redeemed = rewards.filter(r => r.is_redeemed === 1);
+    const pending = rewards.filter(r => !r.is_redeemed);
+    const redeemed = rewards.filter(r => r.is_redeemed);
 
     return res.json({
       success: true,
@@ -95,15 +95,15 @@ router.get('/rewards/place/:placeId', authenticateToken, (req, res) => {
 
 // ─── PATCH /rewards/:id/redeem ────────────────────────────
 // FIX: ahora permite admin_general, user_place (de su lugar), Y el turista dueño
-router.patch('/rewards/:id/redeem', authenticateToken, (req, res) => {
+router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
   try {
-    const reward = db.prepare('SELECT * FROM user_rewards WHERE id = ?').get(req.params.id);
+    const reward = (await db.query('SELECT * FROM user_rewards WHERE id = $1', [req.params.id])).rows[0];
 
     if (!reward) {
       return res.status(404).json({ success: false, error: 'Recompensa no encontrada' });
     }
 
-    if (reward.is_redeemed === 1) {
+    if (reward.is_redeemed) {
       return res.status(400).json({ success: false, error: 'Esta recompensa ya fue canjeada' });
     }
 
@@ -119,15 +119,15 @@ router.patch('/rewards/:id/redeem', authenticateToken, (req, res) => {
       return res.status(403).json({ success: false, error: 'No tienes permiso para canjear esta recompensa' });
     }
 
-    db.prepare(`
+    await db.query(`
       UPDATE user_rewards
-      SET is_redeemed = 1, redeemed_at = datetime('now')
-      WHERE id = ?
-    `).run(req.params.id);
+      SET is_redeemed = TRUE, redeemed_at = NOW()
+      WHERE id = $1
+    `, [req.params.id]);
 
     // Obtener datos para el log
-    const place = db.prepare('SELECT name FROM places WHERE id = ?').get(reward.place_id);
-    const user = db.prepare('SELECT first_name, email FROM users WHERE id = ?').get(reward.user_id);
+    const place = (await db.query('SELECT name FROM places WHERE id = $1', [reward.place_id])).rows[0];
+    const user = (await db.query('SELECT first_name, email FROM users WHERE id = $1', [reward.user_id])).rows[0];
     console.log(`🎁 Recompensa canjeada: ID:${req.params.id} — ${reward.reward_name} → ${user?.first_name || user?.email} en ${place?.name}`);
 
     return res.json({ success: true, message: '¡Recompensa canjeada exitosamente!' });
@@ -139,9 +139,9 @@ router.patch('/rewards/:id/redeem', authenticateToken, (req, res) => {
 });
 
 // ─── GET /admin/rewards ───────────────────────────────────
-router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'user_general']), (req, res) => {
+router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const rewards = db.prepare(`
+    const rewards = (await db.query(`
       SELECT
         ur.id, ur.reward_name, ur.reward_description, ur.reward_icon,
         ur.is_redeemed, ur.earned_at, ur.redeemed_at,
@@ -153,12 +153,12 @@ router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'use
       JOIN places p ON ur.place_id = p.id
       ORDER BY ur.earned_at DESC
       LIMIT 500
-    `).all();
+    `)).rows;
 
     const stats = {
       total:    rewards.length,
-      pending:  rewards.filter(r => r.is_redeemed === 0).length,
-      redeemed: rewards.filter(r => r.is_redeemed === 1).length,
+      pending:  rewards.filter(r => !r.is_redeemed).length,
+      redeemed: rewards.filter(r => r.is_redeemed).length,
     };
 
     return res.json({ success: true, data: rewards, stats });
