@@ -22,3 +22,5 @@ dist/
 
 # Dart tool cache
 **/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies

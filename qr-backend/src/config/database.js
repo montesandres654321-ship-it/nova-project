@@ -21,7 +21,7 @@ pool.on('error', (err) => {
 
 pool.connect()
   .then(client => {
-    console.log('✅ PostgreSQL conectado');
+    console.log('✅ PostgreSQL (Supabase) conectado');
     client.release();
   })
   .catch(err => {
