@@ -13,15 +13,24 @@ class RewardService {
   static Future<List<RewardModel>> getAllRewards({String? status}) async {
     try {
       final response = await ApiClient.get<dynamic>('/admin/rewards');
-      final data = response.data;
+      final raw = response.data;
 
-      if (data is List) {
-        return data
-            .where((item) => item is Map<String, dynamic>)
-            .map((json) => RewardModel.fromJson(json as Map<String, dynamic>))
-            .toList();
+      List<dynamic> list;
+      if (raw is List) {
+        list = raw;
+      } else if (raw is Map<String, dynamic>) {
+        // Backend devuelve { success, data: [...], stats: {...} }
+        // ApiClient puede devolver el mapa completo si hay más de un campo de datos
+        final nested = raw['data'];
+        list = nested is List ? nested : [];
+      } else {
+        return [];
       }
-      return [];
+
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map((json) => RewardModel.fromJson(json))
+          .toList();
     } catch (e) {
       debugPrint('❌ Error en getAllRewards: $e');
       return [];

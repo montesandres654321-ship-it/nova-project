@@ -318,20 +318,25 @@ class ApiService {
   /// Obtener historial de escaneos del usuario
   static Future<List<ScanRecord>> getScanHistory() async {
     try {
-      final headers = await _authHeaders();
-      final userId = await _getUserId();
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(AppConstants.keyToken);
+      if (token == null) throw Exception('Usuario no autenticado');
 
+      final userId = await _getUserId();
       if (userId == null) throw Exception('Usuario no autenticado');
 
       final response = await http.get(
         Uri.parse(AppConstants.buildUrl('${AppConstants.scanDetailsEndpoint}/$userId')),
-        headers: headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       ).timeout(AppConstants.timeoutNormal);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
-          final List<dynamic> scansData = data['scans'] ?? data['data'] ?? [];
+          final List<dynamic> scansData = data['data'] ?? [];
           return scansData.map((scan) => ScanRecord.fromMap(scan)).toList();
         }
       }
