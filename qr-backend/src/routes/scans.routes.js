@@ -178,4 +178,49 @@ router.get('/scans/details/:userId', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── POST /qr/validate ───────────────────────────────────
+router.post('/qr/validate', async (req, res) => {
+  try {
+    const { qr_data } = req.body;
+
+    if (!qr_data) {
+      return res.status(400).json({ success: false, error: 'qr_data es requerido' });
+    }
+
+    let placeId = null;
+
+    if (typeof qr_data === 'number') {
+      placeId = qr_data;
+    } else if (typeof qr_data === 'string') {
+      if (qr_data.startsWith('PLACE:')) {
+        // Formatos: "PLACE:1" o "PLACE:1:nombre"
+        const parts = qr_data.split(':');
+        placeId = parseInt(parts[1]);
+      } else {
+        placeId = parseInt(qr_data);
+      }
+    }
+
+    if (!placeId || isNaN(placeId)) {
+      return res.status(400).json({ success: false, error: 'Formato QR inválido' });
+    }
+
+    const result = await db.query(
+      'SELECT id, name, tipo, lugar, description, image_url, rating, has_reward, reward_name, is_active FROM places WHERE id = $1',
+      [placeId]
+    );
+    const place = result.rows[0];
+
+    if (!place || !place.is_active) {
+      return res.status(404).json({ success: false, error: 'Lugar no encontrado o inactivo' });
+    }
+
+    return res.json({ success: true, valid: true, place });
+
+  } catch (error) {
+    console.error('❌ Error en POST /qr/validate:', error);
+    return res.status(500).json({ success: false, error: 'Error al validar QR' });
+  }
+});
+
 module.exports = router;
