@@ -1,6 +1,7 @@
-# Env
+# Variables de entorno — NUNCA al repositorio
 .env
 .env.production
+.env.local
 *.env
 
 # Logs
@@ -13,7 +14,8 @@
 # Node
 **/node_modules/
 
-# SQLite
+# SQLite — ya no se usa
+*.db
 nova_app.db
 
 # Build output
@@ -24,3 +26,4 @@ dist/
 **/.dart_tool/
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
+**/pubspec.lock
