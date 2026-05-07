@@ -5,3 +5,4 @@ logs/
 *.db-shm
 *.db-wal
 *.log
+/src/generated/prisma

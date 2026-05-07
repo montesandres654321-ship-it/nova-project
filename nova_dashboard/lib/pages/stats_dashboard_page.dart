@@ -257,10 +257,15 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         ]),
       ]);
     }
-    return Column(
-      children: cards.map((c) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: SizedBox(width: double.infinity, child: _KpiCard(item: c)))).toList(),
+    // Móvil < 580px: grid 2×2
+    return GridView.count(
+      crossAxisCount:   2,
+      shrinkWrap:       true,
+      physics:          const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 12,
+      mainAxisSpacing:  12,
+      childAspectRatio: 1.5,
+      children: cards.map((c) => _KpiCard(item: c)).toList(),
     );
   }
 

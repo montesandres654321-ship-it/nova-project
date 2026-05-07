@@ -80,7 +80,7 @@ router.get('/rewards/by-day', async (req, res) => {
     const data = await prisma.$queryRaw`
       SELECT earned_at::date AS date, COUNT(*)::int as count
       FROM user_rewards
-      WHERE earned_at >= NOW() - INTERVAL '1 day' * ${days}
+      WHERE earned_at >= NOW() - make_interval(days => ${days}::int)
       GROUP BY earned_at::date ORDER BY date ASC
     `;
     res.json({ success: true, data, period: `${days} días` });
@@ -101,7 +101,7 @@ router.get('/rewards/top-places', async (req, res) => {
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
       WHERE p.is_active = TRUE
-      GROUP BY p.id ORDER BY total_rewards DESC LIMIT ${limit}
+      GROUP BY p.id ORDER BY total_rewards DESC LIMIT ${limit}::int
     `;
     res.json({ success: true, places });
   } catch (e) {
@@ -142,7 +142,7 @@ router.get('/scans/by-day', async (req, res) => {
         COUNT(*)::int as count,
         COUNT(DISTINCT user_id)::int as unique_users
       FROM scans
-      WHERE created_at >= NOW() - INTERVAL '1 day' * ${days}
+      WHERE created_at >= NOW() - make_interval(days => ${days}::int)
       GROUP BY created_at::date ORDER BY date ASC
     `;
     res.json({ success: true, data, period: `${days} días` });
@@ -177,7 +177,7 @@ router.get('/scans/top-places', async (req, res) => {
       FROM places p
       INNER JOIN scans s ON p.id = s.place_id
       WHERE p.is_active = TRUE
-      GROUP BY p.id ORDER BY total_scans DESC LIMIT ${limit}
+      GROUP BY p.id ORDER BY total_scans DESC LIMIT ${limit}::int
     `;
     res.json({ success: true, places });
   } catch (e) {

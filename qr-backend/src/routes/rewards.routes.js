@@ -114,27 +114,38 @@ router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
 // ─── GET /admin/rewards ───────────────────────────────────
 router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
-    const rewards = await prisma.$queryRaw`
-      SELECT
-        ur.id, ur.reward_name, ur.reward_description, ur.reward_icon,
-        ur.is_redeemed, ur.earned_at, ur.redeemed_at,
-        u.id as user_id, u.first_name, u.last_name, u.email as user_email,
-        p.id as place_id, p.name as place_name, p.tipo as place_tipo,
-        p.lugar as place_lugar
-      FROM user_rewards ur
-      JOIN users u ON ur.user_id = u.id
-      JOIN places p ON ur.place_id = p.id
-      ORDER BY ur.earned_at DESC
-      LIMIT 500
-    `;
+    const rawRewards = await prisma.userReward.findMany({
+      include: {
+        user:  { select: { id: true, firstName: true, lastName: true, email: true } },
+        place: { select: { id: true, name: true, tipo: true, lugar: true } },
+      },
+      orderBy: { earnedAt: 'desc' },
+      take: 500,
+    });
 
-    const stats = {
-      total:    rewards.length,
-      pending:  rewards.filter(r => !r.is_redeemed).length,
-      redeemed: rewards.filter(r =>  r.is_redeemed).length,
-    };
+    const rewards = rawRewards.map(r => ({
+      id:               r.id,
+      reward_name:      r.rewardName,
+      reward_description: r.rewardDescription,
+      reward_icon:      r.rewardIcon,
+      is_redeemed:      r.isRedeemed,
+      earned_at:        r.earnedAt,
+      redeemed_at:      r.redeemedAt,
+      user_id:          r.user.id,
+      first_name:       r.user.firstName,
+      last_name:        r.user.lastName,
+      user_email:       r.user.email,
+      place_id:         r.place.id,
+      place_name:       r.place.name,
+      place_tipo:       r.place.tipo,
+      place_lugar:      r.place.lugar,
+    }));
 
-    return res.json({ success: true, data: rewards, stats });
+    const total    = await prisma.userReward.count();
+    const redeemed = await prisma.userReward.count({ where: { isRedeemed: true } });
+    const pending  = total - redeemed;
+
+    return res.json({ success: true, data: rewards, stats: { total, pending, redeemed } });
   } catch (error) {
     console.error('❌ Error en GET /admin/rewards:', error);
     return res.status(500).json({ success: false, error: 'Error al obtener recompensas' });

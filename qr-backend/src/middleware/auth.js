@@ -41,12 +41,16 @@ const authenticateToken = (req, res, next) => {
         return res.status(403).json({ success: false, error: 'Token inválido o expirado' });
       }
       try {
-        const rows = await prisma.$queryRaw`SELECT is_active, role, place_id FROM users WHERE id = ${decoded.id}`;
-        const user = rows[0];
-        if (!user || !user.is_active) {
+        const user = await prisma.user.findUnique({
+          where:  { id: decoded.id },
+          select: { isActive: true, role: true, placeId: true },
+        });
+
+        if (!user || !user.isActive) {
           return res.status(401).json({ success: false, error: 'Sesión inactiva' });
         }
-        req.user = { ...decoded, role: user.role, place_id: user.place_id };
+
+        req.user = { ...decoded, role: user.role, place_id: user.placeId };
         next();
       } catch (dbErr) {
         console.error('❌ Error en auth DB check:', dbErr);
