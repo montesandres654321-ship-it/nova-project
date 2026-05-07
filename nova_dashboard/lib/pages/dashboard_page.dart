@@ -124,37 +124,67 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     if (!_loaded) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: _teal,
-        title: Row(children: [
+    return LayoutBuilder(builder: (_, constraints) {
+      final isDesktop = constraints.maxWidth > 900;
+
+      if (isDesktop) {
+        // ── DESKTOP: NavigationRail permanente ──────────────
+        return Scaffold(
+          appBar: _buildAppBar(showMenuButton: true),
+          body: Row(children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: _sidebarExpanded ? 200 : 64,
+              child: _buildNavigationRail(),
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(child: _pages[_selectedIndex]),
+          ]),
+        );
+      }
+
+      // ── MOBILE: Drawer con botón hamburguesa ────────────
+      return Scaffold(
+        appBar: _buildAppBar(showMenuButton: false),
+        drawer: Drawer(
+          width: 220,
+          child: SafeArea(child: _buildNavigationRail(forceLabels: true)),
+        ),
+        body: _pages[_selectedIndex],
+      );
+    });
+  }
+
+  PreferredSizeWidget _buildAppBar({required bool showMenuButton}) {
+    return AppBar(
+      backgroundColor: _teal,
+      title: Row(children: [
+        if (showMenuButton)
           IconButton(
-            icon: AnimatedSwitcher(duration: const Duration(milliseconds: 200),
-                child: Icon(_sidebarExpanded ? Icons.menu_open : Icons.menu,
-                    key: ValueKey(_sidebarExpanded), color: Colors.white)),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                _sidebarExpanded ? Icons.menu_open : Icons.menu,
+                key: ValueKey(_sidebarExpanded),
+                color: Colors.white,
+              ),
+            ),
             onPressed: _toggleSidebar,
           ),
-          const SizedBox(width: 4),
-          const Icon(Icons.qr_code_scanner, color: Colors.white),
-          const SizedBox(width: 8),
-          const Text('Nova App Dashboard', style: TextStyle(color: Colors.white)),
-        ]),
-        actions: [
-          // FIX: menú usuario completo con nombre, rol, perfil, contraseña, cerrar sesión
-          _buildUserMenu(),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: Row(children: [
-        AnimatedContainer(duration: const Duration(milliseconds: 250),
-            width: _sidebarExpanded ? 200 : 64, child: _buildNavigationRail()),
-        const VerticalDivider(width: 1),
-        Expanded(child: _pages[_selectedIndex]),
+        const SizedBox(width: 4),
+        const Icon(Icons.qr_code_scanner, color: Colors.white),
+        const SizedBox(width: 8),
+        const Text('Nova App Dashboard', style: TextStyle(color: Colors.white)),
       ]),
+      actions: [
+        _buildUserMenu(),
+        const SizedBox(width: 16),
+      ],
     );
   }
 
-  Widget _buildNavigationRail() {
+  Widget _buildNavigationRail({bool forceLabels = false}) {
+    final showLabels = forceLabels || _sidebarExpanded;
     return Container(color: Colors.white, child: Column(children: [
       const SizedBox(height: 12),
       Expanded(child: ListView.builder(
@@ -169,7 +199,7 @@ class _DashboardPageState extends State<DashboardPage> {
               color: selected ? _teal.withOpacity(0.12) : null,
               child: Row(children: [
                 Icon(item.icon, color: selected ? _teal : Colors.grey),
-                if (_sidebarExpanded) ...[
+                if (showLabels) ...[
                   const SizedBox(width: 10),
                   Expanded(child: Text(item.label,
                       style: TextStyle(color: selected ? _teal : Colors.grey[700],

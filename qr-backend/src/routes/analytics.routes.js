@@ -1,45 +1,28 @@
-// src/routes/analytics.routes.js
-// ============================================================
-// CORRECCIONES:
-//  1. rewards/stats: campos total_rewards, redeemed_rewards,
-//     pending_rewards, redemption_rate, total_value
-//     (alineados con lo que lee rewards_page.dart)
-//  2. admins/users-with-details: subquery en lugar de JOIN
-//     para que turistas con escaneos NO aparezcan en la lista
-// ============================================================
 const express = require('express');
 const router  = express.Router();
-const db      = require('../config/database');
+const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
-// Proteger todos los endpoints de analytics
 router.use(authenticateToken);
 router.use(authorize(['admin_general', 'user_general']));
 
 // ── STATS GENERALES ───────────────────────────────────────
 router.get('/stats/general', async (req, res) => {
   try {
-    const totalUsers   = (await db.query('SELECT COUNT(*)::int as c FROM users WHERE role IS NULL')).rows[0];
-    const totalPlaces  = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE')).rows[0];
-    const totalScans   = (await db.query('SELECT COUNT(*)::int as c FROM scans')).rows[0];
-    const totalRewards = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards')).rows[0];
-    const activeUsers  = (await db.query(`
-      SELECT COUNT(DISTINCT user_id)::int as c FROM scans
-      WHERE created_at >= NOW() - INTERVAL '30 days'
-    `)).rows[0];
-    const placesByType = (await db.query(
-      `SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`
-    )).rows;
+    const [{ c: totalUsers }]   = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`;
+    const [{ c: totalPlaces }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`;
+    const [{ c: totalScans }]   = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans`;
+    const [{ c: totalRewards }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`;
+    const [{ c: activeUsers }]  = await prisma.$queryRaw`
+      SELECT COUNT(DISTINCT user_id)::int as c FROM scans WHERE created_at >= NOW() - INTERVAL '30 days'
+    `;
+    const placesByType = await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`;
 
     res.json({
       success: true,
       stats: {
-        totalUsers:   totalUsers.c,
-        totalPlaces:  totalPlaces.c,
-        totalScans:   totalScans.c,
-        totalRewards: totalRewards.c,
-        activeUsers:  activeUsers.c,
+        totalUsers, totalPlaces, totalScans, totalRewards, activeUsers,
         placesByType: {
           hotel:      placesByType.find(p => p.tipo === 'hotel')?.count      || 0,
           restaurant: placesByType.find(p => p.tipo === 'restaurant')?.count || 0,
@@ -54,39 +37,34 @@ router.get('/stats/general', async (req, res) => {
 });
 
 // ── RECOMPENSAS STATS ─────────────────────────────────────
-// CORRECCIÓN CRÍTICA: nombres alineados con rewards_page.dart
-// rewards_page.dart lee: total_rewards, redeemed_rewards,
-//   pending_rewards, redemption_rate, total_value
 router.get('/rewards/stats', async (req, res) => {
   try {
-    const total    = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards')).rows[0];
-    const redeemed = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = TRUE')).rows[0];
-    const pending  = (await db.query('SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = FALSE')).rows[0];
-    const today    = (await db.query(`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at::date = CURRENT_DATE`)).rows[0];
-    const week     = (await db.query(`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at >= NOW() - INTERVAL '7 days'`)).rows[0];
-    const avgTime  = (await db.query(`
-      SELECT AVG(EXTRACT(EPOCH FROM (redeemed_at - earned_at)) / 86400) as avg
+    const [{ c: total }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`;
+    const [{ c: redeemed }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = TRUE`;
+    const [{ c: pending }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = FALSE`;
+    const [{ c: today }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at::date = CURRENT_DATE`;
+    const [{ c: week }]     = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at >= NOW() - INTERVAL '7 days'`;
+    const [{ avg: avgRaw }] = await prisma.$queryRaw`
+      SELECT AVG(EXTRACT(EPOCH FROM (redeemed_at - earned_at)) / 86400)::float8 as avg
       FROM user_rewards WHERE is_redeemed = TRUE
-    `)).rows[0];
-    const rate = total.c > 0 ? parseFloat((redeemed.c / total.c * 100).toFixed(2)) : 0;
+    `;
+    const rate = total > 0 ? parseFloat((redeemed / total * 100).toFixed(2)) : 0;
 
     res.json({
       success: true,
       stats: {
-        // ── Campos que lee rewards_page.dart ──────────
-        total_rewards:    total.c,
-        redeemed_rewards: redeemed.c,
-        pending_rewards:  pending.c,
+        total_rewards:    total,
+        redeemed_rewards: redeemed,
+        pending_rewards:  pending,
         redemption_rate:  rate,
         total_value:      0,
-        // ── Campos adicionales de compatibilidad ──────
-        total:      total.c,
-        canjeadas:  redeemed.c,
-        pendientes: pending.c,
+        total,
+        canjeadas:  redeemed,
+        pendientes: pending,
         tasaCanje:  rate,
-        hoy:        today.c,
-        semana:     week.c,
-        tiempoPromedioCanje: avgTime.avg ? parseFloat(avgTime.avg.toFixed(1)) : 0,
+        hoy:        today,
+        semana:     week,
+        tiempoPromedioCanje: avgRaw ? parseFloat(Number(avgRaw).toFixed(1)) : 0,
       },
     });
   } catch (e) {
@@ -99,12 +77,12 @@ router.get('/rewards/stats', async (req, res) => {
 router.get('/rewards/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = (await db.query(`
+    const data = await prisma.$queryRaw`
       SELECT earned_at::date AS date, COUNT(*)::int as count
       FROM user_rewards
-      WHERE earned_at >= NOW() - INTERVAL '1 day' * $1
+      WHERE earned_at >= NOW() - INTERVAL '1 day' * ${days}
       GROUP BY earned_at::date ORDER BY date ASC
-    `, [days])).rows;
+    `;
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error recompensas por día' });
@@ -115,7 +93,7 @@ router.get('/rewards/by-day', async (req, res) => {
 router.get('/rewards/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = (await db.query(`
+    const places = await prisma.$queryRaw`
       SELECT p.id, p.name, p.tipo, p.lugar,
         COUNT(ur.id)::int as total_rewards,
         SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as redeemed,
@@ -123,8 +101,8 @@ router.get('/rewards/top-places', async (req, res) => {
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
       WHERE p.is_active = TRUE
-      GROUP BY p.id ORDER BY total_rewards DESC LIMIT $1
-    `, [limit])).rows;
+      GROUP BY p.id ORDER BY total_rewards DESC LIMIT ${limit}
+    `;
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares recompensas' });
@@ -134,7 +112,7 @@ router.get('/rewards/top-places', async (req, res) => {
 // ── RECOMPENSAS POR TIPO ──────────────────────────────────
 router.get('/rewards/by-type', async (req, res) => {
   try {
-    const data = (await db.query(`
+    const data = await prisma.$queryRaw`
       SELECT p.tipo,
         COUNT(ur.id)::int as total,
         SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as canjeadas,
@@ -142,17 +120,13 @@ router.get('/rewards/by-type', async (req, res) => {
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
       WHERE p.is_active = TRUE GROUP BY p.tipo
-    `)).rows;
+    `;
     const result = {
       hotel:      { total: 0, canjeadas: 0, pendientes: 0 },
       restaurant: { total: 0, canjeadas: 0, pendientes: 0 },
       bar:        { total: 0, canjeadas: 0, pendientes: 0 },
     };
-    data.forEach(i => {
-      if (result[i.tipo]) {
-        result[i.tipo] = { total: i.total, canjeadas: i.canjeadas, pendientes: i.pendientes };
-      }
-    });
+    data.forEach(i => { if (result[i.tipo]) result[i.tipo] = { total: i.total, canjeadas: i.canjeadas, pendientes: i.pendientes }; });
     res.json({ success: true, data: result });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error recompensas por tipo' });
@@ -163,14 +137,14 @@ router.get('/rewards/by-type', async (req, res) => {
 router.get('/scans/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = (await db.query(`
+    const data = await prisma.$queryRaw`
       SELECT created_at::date AS date,
         COUNT(*)::int as count,
         COUNT(DISTINCT user_id)::int as unique_users
       FROM scans
-      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
+      WHERE created_at >= NOW() - INTERVAL '1 day' * ${days}
       GROUP BY created_at::date ORDER BY date ASC
-    `, [days])).rows;
+    `;
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por día' });
@@ -180,13 +154,12 @@ router.get('/scans/by-day', async (req, res) => {
 // ── ESCANEOS POR HORA ─────────────────────────────────────
 router.get('/scans/by-hour', async (req, res) => {
   try {
-    const data = (await db.query(`
-      SELECT EXTRACT(HOUR FROM created_at)::int as hour,
-        COUNT(*)::int as count
+    const data = await prisma.$queryRaw`
+      SELECT EXTRACT(HOUR FROM created_at)::int as hour, COUNT(*)::int as count
       FROM scans
       WHERE created_at >= NOW() - INTERVAL '30 days'
       GROUP BY hour ORDER BY hour ASC
-    `)).rows;
+    `;
     res.json({ success: true, data });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por hora' });
@@ -197,15 +170,15 @@ router.get('/scans/by-hour', async (req, res) => {
 router.get('/scans/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = (await db.query(`
+    const places = await prisma.$queryRaw`
       SELECT p.id, p.name, p.tipo, p.lugar, p.rating,
         COUNT(s.id)::int as total_scans,
         COUNT(DISTINCT s.user_id)::int as unique_visitors
       FROM places p
       INNER JOIN scans s ON p.id = s.place_id
       WHERE p.is_active = TRUE
-      GROUP BY p.id ORDER BY total_scans DESC LIMIT $1
-    `, [limit])).rows;
+      GROUP BY p.id ORDER BY total_scans DESC LIMIT ${limit}
+    `;
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares escaneos' });
@@ -215,25 +188,20 @@ router.get('/scans/top-places', async (req, res) => {
 // ── USUARIOS STATS ────────────────────────────────────────
 router.get('/users/stats', async (req, res) => {
   try {
-    const total    = (await db.query('SELECT COUNT(*)::int as c FROM users WHERE role IS NULL')).rows[0];
-    const active   = (await db.query(`
-      SELECT COUNT(DISTINCT user_id)::int as c FROM scans
-      WHERE created_at >= NOW() - INTERVAL '30 days'
-    `)).rows[0];
-    const newMonth = (await db.query(`
-      SELECT COUNT(*)::int as c FROM users
-      WHERE created_at >= DATE_TRUNC('month', NOW()) AND role IS NULL
-    `)).rows[0];
-    const byMonth  = (await db.query(`
+    const [{ c: total }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`;
+    const [{ c: active }]   = await prisma.$queryRaw`
+      SELECT COUNT(DISTINCT user_id)::int as c FROM scans WHERE created_at >= NOW() - INTERVAL '30 days'
+    `;
+    const [{ c: newMonth }] = await prisma.$queryRaw`
+      SELECT COUNT(*)::int as c FROM users WHERE created_at >= DATE_TRUNC('month', NOW()) AND role IS NULL
+    `;
+    const byMonth = await prisma.$queryRaw`
       SELECT TO_CHAR(created_at, 'YYYY-MM') as month, COUNT(*)::int as count
       FROM users
       WHERE role IS NULL AND created_at >= NOW() - INTERVAL '6 months'
       GROUP BY month ORDER BY month ASC
-    `)).rows;
-    res.json({
-      success: true,
-      stats: { total: total.c, active: active.c, newThisMonth: newMonth.c, byMonth },
-    });
+    `;
+    res.json({ success: true, stats: { total, active, newThisMonth: newMonth, byMonth } });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error estadísticas usuarios' });
   }
@@ -242,24 +210,25 @@ router.get('/users/stats', async (req, res) => {
 // ── LUGARES STATS ─────────────────────────────────────────
 router.get('/places/stats', async (req, res) => {
   try {
-    const total      = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE')).rows[0];
-    const withOwner  = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE owner_id IS NOT NULL AND is_active = TRUE')).rows[0];
-    const withReward = (await db.query('SELECT COUNT(*)::int as c FROM places WHERE has_reward = TRUE AND is_active = TRUE')).rows[0];
-    const byType     = (await db.query('SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo')).rows;
-    const avgRating  = (await db.query('SELECT AVG(rating) as avg FROM places WHERE is_active = TRUE AND rating > 0')).rows[0];
+    const [{ c: total }]      = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`;
+    const [{ c: withOwner }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE owner_id IS NOT NULL AND is_active = TRUE`;
+    const [{ c: withReward }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE has_reward = TRUE AND is_active = TRUE`;
+    const byType              = await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`;
+    const [{ avg: avgRaw }]   = await prisma.$queryRaw`SELECT AVG(rating)::float8 as avg FROM places WHERE is_active = TRUE AND rating > 0`;
+
     res.json({
       success: true,
       stats: {
-        total: total.c,
-        withOwner: withOwner.c,
-        withoutOwner: total.c - withOwner.c,
-        withReward: withReward.c,
+        total,
+        withOwner,
+        withoutOwner: total - withOwner,
+        withReward,
         byType: {
           hotel:      byType.find(p => p.tipo === 'hotel')?.count      || 0,
           restaurant: byType.find(p => p.tipo === 'restaurant')?.count || 0,
           bar:        byType.find(p => p.tipo === 'bar')?.count        || 0,
         },
-        avgRating: avgRating.avg ? parseFloat(avgRating.avg.toFixed(2)) : 0,
+        avgRating: avgRaw ? parseFloat(Number(avgRaw).toFixed(2)) : 0,
       },
     });
   } catch (e) {
@@ -268,23 +237,12 @@ router.get('/places/stats', async (req, res) => {
 });
 
 // ── ADMINS CON DETALLES ───────────────────────────────────
-// CORRECCIÓN: subquery en lugar de JOIN con scans/rewards
-// El JOIN anterior traía turistas que tenían escaneos en algún lugar
 router.get('/admins/users-with-details', async (req, res) => {
   try {
-    const users = (await db.query(`
+    const users = await prisma.$queryRaw`
       SELECT
-        u.id,
-        u.first_name,
-        u.last_name,
-        u.username,
-        u.email,
-        u.phone,
-        u.role,
-        u.place_id,
-        u.is_active,
-        u.created_at,
-        u.last_login,
+        u.id, u.first_name, u.last_name, u.username, u.email, u.phone,
+        u.role, u.place_id, u.is_active, u.created_at, u.last_login,
         p.name  AS place_name,
         p.tipo  AS place_type,
         p.lugar AS place_location,
@@ -300,8 +258,7 @@ router.get('/admins/users-with-details', async (req, res) => {
           WHEN 'user_place'    THEN 3
         END,
         u.created_at DESC
-    `)).rows;
-
+    `;
     res.json({ success: true, data: users, total: users.length });
   } catch (e) {
     console.error('❌ /analytics/admins/users-with-details:', e);
@@ -312,14 +269,13 @@ router.get('/admins/users-with-details', async (req, res) => {
 // ── PROPIETARIOS SIN LUGAR ────────────────────────────────
 router.get('/admins/owners-without-place', async (req, res) => {
   try {
-    const owners = (await db.query(`
+    const owners = await prisma.$queryRaw`
       SELECT id, first_name, last_name, username, email, phone, created_at
       FROM users
       WHERE role = 'user_place'
-        AND (place_id IS NULL
-          OR place_id NOT IN (SELECT id FROM places WHERE is_active = TRUE))
+        AND (place_id IS NULL OR place_id NOT IN (SELECT id FROM places WHERE is_active = TRUE))
       ORDER BY created_at DESC
-    `)).rows;
+    `;
     res.json({ success: true, data: owners, total: owners.length });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error propietarios sin lugar' });

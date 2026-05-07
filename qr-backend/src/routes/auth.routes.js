@@ -1,12 +1,9 @@
-// src/routes/auth.routes.js
-
 const express  = require('express');
 const bcrypt   = require('bcryptjs');
 const router   = express.Router();
-const db       = require('../config/database');
+const prisma   = require('../config/prisma');
 const { authenticateToken, generateToken } = require('../middleware/auth');
 
-// ─── Helper: respuesta de login ───────────────────────────
 const loginResponse = (user, token) => ({
   success: true,
   token,
@@ -44,7 +41,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email y contraseña son requeridos' });
     }
 
-    const user = (await db.query('SELECT * FROM users WHERE email = $1 AND is_active = TRUE', [email])).rows[0];
+    const rows = await prisma.$queryRaw`SELECT * FROM users WHERE email = ${email} AND is_active = TRUE`;
+    const user = rows[0];
 
     if (!user) {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
@@ -62,10 +60,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
 
-    await db.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
+    await prisma.$executeRaw`UPDATE users SET last_login = NOW() WHERE id = ${user.id}`;
 
     const token = generateToken(user);
-
     return res.json(loginResponse(user, token));
 
   } catch (error) {
@@ -79,13 +76,13 @@ router.post('/users/register', async (req, res) => {
   try {
     const {
       firstName, first_name,
-      lastName, last_name,
+      lastName,  last_name,
       username, email, password,
-      phone, dob, gender
+      phone, dob, gender,
     } = req.body;
 
     const fName = firstName || first_name;
-    const lName = lastName || last_name;
+    const lName = lastName  || last_name;
 
     if (!email || !password || !username) {
       return res.status(400).json({ success: false, error: 'Email, contraseña y usuario son requeridos' });
@@ -96,26 +93,22 @@ router.post('/users/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Formato de email inválido' });
     }
 
-    // Validaciones
-    const existingTourist = (await db.query(
-      'SELECT id FROM users WHERE (email = $1 OR username = $2) AND role IS NULL',
-      [email, username]
-    )).rows[0];
+    const existingTourist = (await prisma.$queryRaw`
+      SELECT id FROM users WHERE (email = ${email} OR username = ${username}) AND role IS NULL
+    `)[0];
 
     if (existingTourist) {
       return res.status(409).json({ success: false, error: 'Email o usuario ya está en uso' });
     }
 
-    const existingAdmin = (await db.query(
-      'SELECT id FROM users WHERE email = $1 AND role IS NOT NULL',
-      [email]
-    )).rows[0];
+    const existingAdmin = (await prisma.$queryRaw`
+      SELECT id FROM users WHERE email = ${email} AND role IS NOT NULL
+    `)[0];
 
     if (existingAdmin) {
-      const usernameConflict = (await db.query(
-        'SELECT id FROM users WHERE username = $1 AND role IS NULL',
-        [username]
-      )).rows[0];
+      const usernameConflict = (await prisma.$queryRaw`
+        SELECT id FROM users WHERE username = ${username} AND role IS NULL
+      `)[0];
 
       if (usernameConflict) {
         return res.status(409).json({ success: false, error: 'Nombre de usuario ya está en uso' });
@@ -124,28 +117,23 @@ router.post('/users/register', async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const result = await db.query(`
+    const phoneVal  = phone  || null;
+    const dobVal    = dob    || null;
+    const genderVal = gender || null;
+
+    const inserted = await prisma.$queryRaw`
       INSERT INTO users (
         first_name, last_name, username,
         email, password, phone, dob, gender,
         role, is_active, accepted_terms
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NULL, TRUE, TRUE)
+      VALUES (${fName || ''}, ${lName || ''}, ${username}, ${email}, ${hashed},
+              ${phoneVal}, ${dobVal}, ${genderVal}, ${null}, TRUE, TRUE)
       RETURNING id
-    `, [
-      fName || '',
-      lName || '',
-      username,
-      email,
-      hashed,
-      phone || null,
-      dob || null,
-      gender || null,
-    ]);
+    `;
+    const userId = inserted[0].id;
 
-    const userId = result.rows[0].id;
-
-    const newUser = (await db.query('SELECT * FROM users WHERE id = $1', [userId])).rows[0];
+    const newUser = (await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`)[0];
     const token   = generateToken(newUser);
 
     return res.status(201).json(loginResponse(newUser, token));
@@ -158,10 +146,7 @@ router.post('/users/register', async (req, res) => {
 
 // ─── GET /health ─────────────────────────────────────────
 router.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 module.exports = router;

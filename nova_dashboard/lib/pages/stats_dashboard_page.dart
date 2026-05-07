@@ -136,46 +136,59 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       child: LayoutBuilder(builder: (_, constraints) {
         final wide   = constraints.maxWidth > 900;
         final medium = constraints.maxWidth > 580;
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-              horizontal: wide ? 36.0 : 20.0, vertical: 28.0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        final hPad   = wide ? 36.0 : 20.0;
 
-            // 1 ── Header
-            _buildHeader(),
-            const SizedBox(height: 32),
+        // ── DESKTOP: layout fijo sin scroll ─────────────────
+        if (wide) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-            // 2 ── KPI cards
-            _buildKpiGrid(wide, medium),
-            const SizedBox(height: 28),
+              // 1. Header
+              _buildHeader(),
+              const SizedBox(height: 20),
 
-            // 3 ── Main chart (full width)
-            _buildMainChart(),
-            const SizedBox(height: 24),
+              // 2. KPI cards (fijo)
+              _buildKpiGrid(wide, medium),
+              const SizedBox(height: 16),
 
-            // 4 ── Bottom grid
-            if (wide)
-              IntrinsicHeight(child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(flex: 3, child: _buildTopPlacesCard()),
-                  const SizedBox(width: 20),
-                  Expanded(flex: 2, child: _buildDistributionCard()),
-                ],
-              ))
-            else
-              Column(children: [
-                _buildTopPlacesCard(),
+              // 3. Gráfica + panel derecho (Expanded — ocupa todo el espacio restante)
+              Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Expanded(flex: 2, child: _buildMainChart()),
+                const SizedBox(width: 16),
+                Expanded(flex: 1, child: Column(children: [
+                  Expanded(child: _buildTopPlacesCard()),
+                  const SizedBox(height: 16),
+                  Expanded(child: _buildDistributionCard()),
+                ])),
+              ])),
+
+              // 4. Actividad reciente (fijo, máximo 3 items)
+              if (_recentActivity.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _buildDistributionCard(),
-              ]),
+                _buildActivityFeed(),
+              ],
+            ]),
+          );
+        }
 
-            // 5 ── Activity feed
+        // ── MOBILE / TABLET: scroll normal con alturas fijas ─
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 28),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _buildHeader(),
+            const SizedBox(height: 28),
+            _buildKpiGrid(wide, medium),
+            const SizedBox(height: 24),
+            SizedBox(height: 300, child: _buildMainChart()),
+            const SizedBox(height: 20),
+            SizedBox(height: 300, child: _buildTopPlacesCard()),
+            const SizedBox(height: 16),
+            SizedBox(height: 320, child: _buildDistributionCard()),
             if (_recentActivity.isNotEmpty) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               _buildActivityFeed(),
             ],
-
             const SizedBox(height: 24),
           ]),
         );
@@ -301,14 +314,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         const SizedBox(height: 6),
         const Divider(color: _kBorder, thickness: 0.5, height: 20),
 
-        // Gráfica
-        SizedBox(
-          height: 240,
-          child: chartData.isEmpty
+        // Gráfica — rellena el espacio restante en desktop
+        Expanded(
+          child: LayoutBuilder(builder: (_, box) => chartData.isEmpty
               ? _emptyState(Icons.show_chart_rounded, 'Sin datos de escaneos')
               : LineChartWidget(
                   title: '', data: chartData,
-                  color: _kPrimary, fillArea: true, height: 240),
+                  color: _kPrimary, fillArea: true,
+                  height: box.maxHeight.isFinite ? box.maxHeight : 240)),
         ),
       ]),
     );
@@ -345,9 +358,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         ]),
         const SizedBox(height: 6),
         const Divider(color: _kBorder, thickness: 0.5, height: 20),
-        data.isEmpty
-            ? SizedBox(height: 200, child: _emptyState(Icons.bar_chart_rounded, 'Sin escaneos registrados'))
-            : BarChartWidget(title: '', data: data, color: _kPrimary, height: 200, showValues: true),
+        Expanded(
+          child: LayoutBuilder(builder: (_, box) => data.isEmpty
+              ? _emptyState(Icons.bar_chart_rounded, 'Sin escaneos registrados')
+              : BarChartWidget(
+                  title: '', data: data, color: _kPrimary,
+                  height: box.maxHeight.isFinite ? box.maxHeight : 200,
+                  showValues: true)),
+        ),
       ]),
     );
   }
@@ -372,30 +390,28 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         const Divider(color: _kBorder, thickness: 0.5, height: 20),
 
         total == 0
-            ? SizedBox(height: 200,
-                child: _emptyState(Icons.pie_chart_rounded, 'Sin lugares registrados'))
-            : Column(children: [
-                SizedBox(
-                  height: 150,
-                  child: DonutChartWidget(
+            ? Expanded(child: _emptyState(Icons.pie_chart_rounded, 'Sin lugares registrados'))
+            : Expanded(child: Column(children: [
+                Expanded(
+                  child: LayoutBuilder(builder: (_, box) => DonutChartWidget(
                     title: '', subtitle: '',
                     data: [
                       {'label': 'Hoteles',      'value': hotels,      'color': _kBlue},
                       {'label': 'Restaurantes', 'value': restaurants, 'color': _kGreen},
                       {'label': 'Bares',        'value': bars,        'color': _kAmber},
                     ],
-                    height: 150,
+                    height: box.maxHeight.isFinite ? box.maxHeight : 150,
                     showLegend: false,
-                  ),
+                  )),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 // Legend rows con progress bars
                 _legendRow('🏨', 'Hoteles',       hotels,      _kBlue,  'hotel',      total),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 _legendRow('🍽️', 'Restaurantes',  restaurants, _kGreen, 'restaurant', total),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 _legendRow('🍹', 'Bares',         bars,        _kAmber, 'bar',        total),
-              ]),
+              ])),
       ]),
     );
   }
@@ -441,7 +457,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   // 5. ACTIVITY FEED
   // ─────────────────────────────────────────────────────────
   Widget _buildActivityFeed() {
-    final items = _recentActivity.take(10).toList();
+    final items = _recentActivity.take(3).toList();
     return _SectionCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
