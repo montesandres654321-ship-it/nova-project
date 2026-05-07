@@ -174,11 +174,16 @@ class _DashboardPageState extends State<DashboardPage> {
         const SizedBox(width: 4),
         const Icon(Icons.qr_code_scanner, color: Colors.white),
         const SizedBox(width: 8),
-        const Text('Nova App Dashboard', style: TextStyle(color: Colors.white)),
+        const Flexible(child: Text('Nova App Dashboard',
+            style: TextStyle(color: Colors.white),
+            overflow: TextOverflow.ellipsis, maxLines: 1)),
       ]),
       actions: [
-        _buildUserMenu(),
-        const SizedBox(width: 16),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 140),
+          child: _buildUserMenu(),
+        ),
+        const SizedBox(width: 8),
       ],
     );
   }
@@ -228,10 +233,12 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Text(_userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
                   style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 14))),
           const SizedBox(width: 8),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(_userName.split(' ').first, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+          Flexible(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Text(_userName.split(' ').first,
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis, maxLines: 1),
             Text('$roleEmoji $roleLabel', style: const TextStyle(color: Colors.white70, fontSize: 10)),
-          ]),
+          ])),
           const Icon(Icons.arrow_drop_down, color: Colors.white),
         ]),
       ),

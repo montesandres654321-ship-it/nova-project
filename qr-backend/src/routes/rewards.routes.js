@@ -4,6 +4,16 @@ const prisma    = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [key, value] of Object.entries(row)) {
+      obj[key] = typeof value === 'bigint' ? Number(value) : value;
+    }
+    return obj;
+  });
+}
+
 // ─── GET /rewards/user/:userId ────────────────────────────
 router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
   try {
@@ -15,7 +25,7 @@ router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Acceso denegado' });
     }
 
-    const rewards = await prisma.$queryRaw`
+    const rewards = serializeRaw(await prisma.$queryRaw`
       SELECT
         ur.id, ur.reward_name, ur.reward_description, ur.reward_icon,
         ur.is_redeemed, ur.earned_at, ur.redeemed_at,
@@ -25,7 +35,7 @@ router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
       JOIN places p ON ur.place_id = p.id
       WHERE ur.user_id = ${userId}
       ORDER BY ur.earned_at DESC
-    `;
+    `);
 
     const stats = {
       total:    rewards.length,
@@ -53,7 +63,7 @@ router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Acceso denegado' });
     }
 
-    const rewards = await prisma.$queryRaw`
+    const rewards = serializeRaw(await prisma.$queryRaw`
       SELECT
         ur.id, ur.user_id, ur.reward_name, ur.reward_description, ur.reward_icon,
         ur.is_redeemed, ur.earned_at, ur.redeemed_at,
@@ -64,7 +74,7 @@ router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
       JOIN places p ON ur.place_id = p.id
       WHERE ur.place_id = ${placeId}
       ORDER BY ur.earned_at DESC
-    `;
+    `);
 
     const pending  = rewards.filter(r => !r.is_redeemed);
     const redeemed = rewards.filter(r =>  r.is_redeemed);

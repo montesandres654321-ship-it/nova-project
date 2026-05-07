@@ -180,11 +180,11 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
             const SizedBox(height: 28),
             _buildKpiGrid(wide, medium),
             const SizedBox(height: 24),
-            SizedBox(height: 300, child: _buildMainChart()),
+            SizedBox(height: 220, child: _buildMainChart()),
             const SizedBox(height: 20),
-            SizedBox(height: 300, child: _buildTopPlacesCard()),
+            SizedBox(height: 220, child: _buildTopPlacesCard()),
             const SizedBox(height: 16),
-            SizedBox(height: 320, child: _buildDistributionCard()),
+            SizedBox(height: 200, child: _buildDistributionCard()),
             if (_recentActivity.isNotEmpty) ...[
               const SizedBox(height: 20),
               _buildActivityFeed(),
@@ -224,49 +224,36 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   // ─────────────────────────────────────────────────────────
   Widget _buildKpiGrid(bool wide, bool medium) {
     final cards = [
-      _KpiItem(label: 'Turistas',       value: _totalUsers,   icon: Icons.people_rounded,
+      _KpiItem(label: 'Turistas',        value: _totalUsers,   icon: Icons.people_rounded,
           color: _kBlue,   onTap: () => widget.onNavigate?.call(widget.placesIndex + 2)),
-      _KpiItem(label: 'Lugares activos', value: _totalPlaces, icon: Icons.store_rounded,
+      _KpiItem(label: 'Lugares activos', value: _totalPlaces,  icon: Icons.store_rounded,
           color: _kGreen,  onTap: () => widget.onNavigate?.call(widget.placesIndex)),
-      _KpiItem(label: 'Escaneos totales', value: _totalScans, icon: Icons.qr_code_scanner_rounded,
+      _KpiItem(label: 'Escaneos totales', value: _totalScans,  icon: Icons.qr_code_scanner_rounded,
           color: _kAmber,  onTap: () => widget.onNavigate?.call(widget.reportsIndex)),
       _KpiItem(label: 'Recompensas',     value: _totalRewards, icon: Icons.card_giftcard_rounded,
           color: _kPurple, onTap: () => widget.onNavigate?.call(widget.rewardsIndex)),
     ];
 
-    if (wide) {
-      return Row(children: [
-        Expanded(child: _KpiCard(item: cards[0])), const SizedBox(width: 16),
-        Expanded(child: _KpiCard(item: cards[1])), const SizedBox(width: 16),
-        Expanded(child: _KpiCard(item: cards[2])), const SizedBox(width: 16),
-        Expanded(child: _KpiCard(item: cards[3])),
-      ]);
-    }
-    if (medium) {
-      return Column(children: [
-        Row(children: [
-          Expanded(child: _KpiCard(item: cards[0])),
-          const SizedBox(width: 14),
-          Expanded(child: _KpiCard(item: cards[1])),
-        ]),
-        const SizedBox(height: 14),
-        Row(children: [
-          Expanded(child: _KpiCard(item: cards[2])),
-          const SizedBox(width: 14),
+    return LayoutBuilder(builder: (context, constraints) {
+      final isMobile = constraints.maxWidth < 600;
+      if (!isMobile) {
+        return Row(children: [
+          Expanded(child: _KpiCard(item: cards[0])), const SizedBox(width: 16),
+          Expanded(child: _KpiCard(item: cards[1])), const SizedBox(width: 16),
+          Expanded(child: _KpiCard(item: cards[2])), const SizedBox(width: 16),
           Expanded(child: _KpiCard(item: cards[3])),
-        ]),
-      ]);
-    }
-    // Móvil < 580px: grid 2×2
-    return GridView.count(
-      crossAxisCount:   2,
-      shrinkWrap:       true,
-      physics:          const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing:  12,
-      childAspectRatio: 1.5,
-      children: cards.map((c) => _KpiCard(item: c)).toList(),
-    );
+        ]);
+      }
+      return GridView.count(
+        crossAxisCount:   2,
+        shrinkWrap:       true,
+        physics:          const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 10,
+        mainAxisSpacing:  10,
+        childAspectRatio: 1.6,
+        children: cards.map((c) => _KpiCard(item: c, compact: true)).toList(),
+      );
+    });
   }
 
   // ─────────────────────────────────────────────────────────
@@ -629,10 +616,18 @@ class _KpiItem {
 // ─────────────────────────────────────────────────────────────────────────────
 class _KpiCard extends StatelessWidget {
   final _KpiItem item;
-  const _KpiCard({required this.item});
+  final bool compact;
+  const _KpiCard({required this.item, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
+    final iconSize  = compact ? 15.0 : 18.0;
+    final boxSize   = compact ? 28.0 : 36.0;
+    final padding   = compact
+        ? const EdgeInsets.all(10)
+        : const EdgeInsets.symmetric(horizontal: 16, vertical: 14);
+    final gap       = compact ? 8.0 : 12.0;
+
     return InkWell(
       onTap: item.onTap,
       borderRadius: BorderRadius.circular(12),
@@ -652,22 +647,22 @@ class _KpiCard extends StatelessWidget {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-            // Accent strip (3px colored top bar)
+            // Accent strip
             Container(height: 3, color: item.color),
 
-            // Card content — horizontal compact layout
+            // Card content
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: padding,
               child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Container(
-                  width: 36, height: 36,
+                  width: boxSize, height: boxSize,
                   decoration: BoxDecoration(
                     color: item.color.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(9),
                   ),
-                  child: Icon(item.icon, color: item.color, size: 18),
+                  child: Icon(item.icon, color: item.color, size: iconSize),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: gap),
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -681,6 +676,8 @@ class _KpiCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 11, color: _kTextMuted)),
                   ],
                 )),

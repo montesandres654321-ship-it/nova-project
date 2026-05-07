@@ -4,20 +4,30 @@ const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [key, value] of Object.entries(row)) {
+      obj[key] = typeof value === 'bigint' ? Number(value) : value;
+    }
+    return obj;
+  });
+}
+
 router.use(authenticateToken);
 router.use(authorize(['admin_general', 'user_general']));
 
 // ── STATS GENERALES ───────────────────────────────────────
 router.get('/stats/general', async (req, res) => {
   try {
-    const [{ c: totalUsers }]   = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`;
-    const [{ c: totalPlaces }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`;
-    const [{ c: totalScans }]   = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans`;
-    const [{ c: totalRewards }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`;
-    const [{ c: activeUsers }]  = await prisma.$queryRaw`
+    const [{ c: totalUsers }]   = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`);
+    const [{ c: totalPlaces }]  = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`);
+    const [{ c: totalScans }]   = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans`);
+    const [{ c: totalRewards }] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`);
+    const [{ c: activeUsers }]  = serializeRaw(await prisma.$queryRaw`
       SELECT COUNT(DISTINCT user_id)::int as c FROM scans WHERE created_at >= NOW() - INTERVAL '30 days'
-    `;
-    const placesByType = await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`;
+    `);
+    const placesByType = serializeRaw(await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`);
 
     res.json({
       success: true,
@@ -39,15 +49,15 @@ router.get('/stats/general', async (req, res) => {
 // ── RECOMPENSAS STATS ─────────────────────────────────────
 router.get('/rewards/stats', async (req, res) => {
   try {
-    const [{ c: total }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`;
-    const [{ c: redeemed }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = TRUE`;
-    const [{ c: pending }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = FALSE`;
-    const [{ c: today }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at::date = CURRENT_DATE`;
-    const [{ c: week }]     = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at >= NOW() - INTERVAL '7 days'`;
-    const [{ avg: avgRaw }] = await prisma.$queryRaw`
+    const [{ c: total }]    = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`);
+    const [{ c: redeemed }] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = TRUE`);
+    const [{ c: pending }]  = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE is_redeemed = FALSE`);
+    const [{ c: today }]    = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at::date = CURRENT_DATE`);
+    const [{ c: week }]     = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE earned_at >= NOW() - INTERVAL '7 days'`);
+    const [{ avg: avgRaw }] = serializeRaw(await prisma.$queryRaw`
       SELECT AVG(EXTRACT(EPOCH FROM (redeemed_at - earned_at)) / 86400)::float8 as avg
       FROM user_rewards WHERE is_redeemed = TRUE
-    `;
+    `);
     const rate = total > 0 ? parseFloat((redeemed / total * 100).toFixed(2)) : 0;
 
     res.json({
@@ -77,12 +87,12 @@ router.get('/rewards/stats', async (req, res) => {
 router.get('/rewards/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = await prisma.$queryRaw`
+    const data = serializeRaw(await prisma.$queryRaw`
       SELECT earned_at::date AS date, COUNT(*)::int as count
       FROM user_rewards
       WHERE earned_at >= NOW() - make_interval(days => ${days}::int)
       GROUP BY earned_at::date ORDER BY date ASC
-    `;
+    `);
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error recompensas por día' });
@@ -93,7 +103,7 @@ router.get('/rewards/by-day', async (req, res) => {
 router.get('/rewards/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = await prisma.$queryRaw`
+    const places = serializeRaw(await prisma.$queryRaw`
       SELECT p.id, p.name, p.tipo, p.lugar,
         COUNT(ur.id)::int as total_rewards,
         SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as redeemed,
@@ -102,7 +112,7 @@ router.get('/rewards/top-places', async (req, res) => {
       INNER JOIN user_rewards ur ON p.id = ur.place_id
       WHERE p.is_active = TRUE
       GROUP BY p.id ORDER BY total_rewards DESC LIMIT ${limit}::int
-    `;
+    `);
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares recompensas' });
@@ -112,7 +122,7 @@ router.get('/rewards/top-places', async (req, res) => {
 // ── RECOMPENSAS POR TIPO ──────────────────────────────────
 router.get('/rewards/by-type', async (req, res) => {
   try {
-    const data = await prisma.$queryRaw`
+    const data = serializeRaw(await prisma.$queryRaw`
       SELECT p.tipo,
         COUNT(ur.id)::int as total,
         SUM(CASE WHEN ur.is_redeemed = TRUE THEN 1 ELSE 0 END)::int as canjeadas,
@@ -120,7 +130,7 @@ router.get('/rewards/by-type', async (req, res) => {
       FROM places p
       INNER JOIN user_rewards ur ON p.id = ur.place_id
       WHERE p.is_active = TRUE GROUP BY p.tipo
-    `;
+    `);
     const result = {
       hotel:      { total: 0, canjeadas: 0, pendientes: 0 },
       restaurant: { total: 0, canjeadas: 0, pendientes: 0 },
@@ -137,14 +147,14 @@ router.get('/rewards/by-type', async (req, res) => {
 router.get('/scans/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = await prisma.$queryRaw`
+    const data = serializeRaw(await prisma.$queryRaw`
       SELECT created_at::date AS date,
         COUNT(*)::int as count,
         COUNT(DISTINCT user_id)::int as unique_users
       FROM scans
       WHERE created_at >= NOW() - make_interval(days => ${days}::int)
       GROUP BY created_at::date ORDER BY date ASC
-    `;
+    `);
     res.json({ success: true, data, period: `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por día' });
@@ -154,12 +164,12 @@ router.get('/scans/by-day', async (req, res) => {
 // ── ESCANEOS POR HORA ─────────────────────────────────────
 router.get('/scans/by-hour', async (req, res) => {
   try {
-    const data = await prisma.$queryRaw`
+    const data = serializeRaw(await prisma.$queryRaw`
       SELECT EXTRACT(HOUR FROM created_at)::int as hour, COUNT(*)::int as count
       FROM scans
       WHERE created_at >= NOW() - INTERVAL '30 days'
       GROUP BY hour ORDER BY hour ASC
-    `;
+    `);
     res.json({ success: true, data });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por hora' });
@@ -170,7 +180,7 @@ router.get('/scans/by-hour', async (req, res) => {
 router.get('/scans/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const places = await prisma.$queryRaw`
+    const places = serializeRaw(await prisma.$queryRaw`
       SELECT p.id, p.name, p.tipo, p.lugar, p.rating,
         COUNT(s.id)::int as total_scans,
         COUNT(DISTINCT s.user_id)::int as unique_visitors
@@ -178,7 +188,7 @@ router.get('/scans/top-places', async (req, res) => {
       INNER JOIN scans s ON p.id = s.place_id
       WHERE p.is_active = TRUE
       GROUP BY p.id ORDER BY total_scans DESC LIMIT ${limit}::int
-    `;
+    `);
     res.json({ success: true, places });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error top lugares escaneos' });
@@ -188,19 +198,19 @@ router.get('/scans/top-places', async (req, res) => {
 // ── USUARIOS STATS ────────────────────────────────────────
 router.get('/users/stats', async (req, res) => {
   try {
-    const [{ c: total }]    = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`;
-    const [{ c: active }]   = await prisma.$queryRaw`
+    const [{ c: total }]    = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`);
+    const [{ c: active }]   = serializeRaw(await prisma.$queryRaw`
       SELECT COUNT(DISTINCT user_id)::int as c FROM scans WHERE created_at >= NOW() - INTERVAL '30 days'
-    `;
-    const [{ c: newMonth }] = await prisma.$queryRaw`
+    `);
+    const [{ c: newMonth }] = serializeRaw(await prisma.$queryRaw`
       SELECT COUNT(*)::int as c FROM users WHERE created_at >= DATE_TRUNC('month', NOW()) AND role IS NULL
-    `;
-    const byMonth = await prisma.$queryRaw`
+    `);
+    const byMonth = serializeRaw(await prisma.$queryRaw`
       SELECT TO_CHAR(created_at, 'YYYY-MM') as month, COUNT(*)::int as count
       FROM users
       WHERE role IS NULL AND created_at >= NOW() - INTERVAL '6 months'
       GROUP BY month ORDER BY month ASC
-    `;
+    `);
     res.json({ success: true, stats: { total, active, newThisMonth: newMonth, byMonth } });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error estadísticas usuarios' });
@@ -210,11 +220,11 @@ router.get('/users/stats', async (req, res) => {
 // ── LUGARES STATS ─────────────────────────────────────────
 router.get('/places/stats', async (req, res) => {
   try {
-    const [{ c: total }]      = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`;
-    const [{ c: withOwner }]  = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE owner_id IS NOT NULL AND is_active = TRUE`;
-    const [{ c: withReward }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE has_reward = TRUE AND is_active = TRUE`;
-    const byType              = await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`;
-    const [{ avg: avgRaw }]   = await prisma.$queryRaw`SELECT AVG(rating)::float8 as avg FROM places WHERE is_active = TRUE AND rating > 0`;
+    const [{ c: total }]      = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`);
+    const [{ c: withOwner }]  = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE owner_id IS NOT NULL AND is_active = TRUE`);
+    const [{ c: withReward }] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE has_reward = TRUE AND is_active = TRUE`);
+    const byType              = serializeRaw(await prisma.$queryRaw`SELECT tipo, COUNT(*)::int as count FROM places WHERE is_active = TRUE GROUP BY tipo`);
+    const [{ avg: avgRaw }]   = serializeRaw(await prisma.$queryRaw`SELECT AVG(rating)::float8 as avg FROM places WHERE is_active = TRUE AND rating > 0`);
 
     res.json({
       success: true,
@@ -239,7 +249,7 @@ router.get('/places/stats', async (req, res) => {
 // ── ADMINS CON DETALLES ───────────────────────────────────
 router.get('/admins/users-with-details', async (req, res) => {
   try {
-    const users = await prisma.$queryRaw`
+    const users = serializeRaw(await prisma.$queryRaw`
       SELECT
         u.id, u.first_name, u.last_name, u.username, u.email, u.phone,
         u.role, u.place_id, u.is_active, u.created_at, u.last_login,
@@ -258,7 +268,7 @@ router.get('/admins/users-with-details', async (req, res) => {
           WHEN 'user_place'    THEN 3
         END,
         u.created_at DESC
-    `;
+    `);
     res.json({ success: true, data: users, total: users.length });
   } catch (e) {
     console.error('❌ /analytics/admins/users-with-details:', e);
@@ -269,13 +279,13 @@ router.get('/admins/users-with-details', async (req, res) => {
 // ── PROPIETARIOS SIN LUGAR ────────────────────────────────
 router.get('/admins/owners-without-place', async (req, res) => {
   try {
-    const owners = await prisma.$queryRaw`
+    const owners = serializeRaw(await prisma.$queryRaw`
       SELECT id, first_name, last_name, username, email, phone, created_at
       FROM users
       WHERE role = 'user_place'
         AND (place_id IS NULL OR place_id NOT IN (SELECT id FROM places WHERE is_active = TRUE))
       ORDER BY created_at DESC
-    `;
+    `);
     res.json({ success: true, data: owners, total: owners.length });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error propietarios sin lugar' });

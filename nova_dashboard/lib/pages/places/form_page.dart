@@ -379,20 +379,19 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   // ── Contenido por sección ──────────────────────────────────
 
   List<Widget> _buildInfoBasica() => [
-    _row([
-      Expanded(flex: 2, child: _field(
+    _responsiveFieldRow(
+      _field(
           controller: _nameController,
           label: 'Nombre del lugar',
           icon: Icons.business,
-          validator: (v) => v?.isEmpty ?? true ? 'Requerido' : null)),
-      const SizedBox(width: 16),
-      Expanded(child: _dropdown(
+          validator: (v) => v?.isEmpty ?? true ? 'Requerido' : null),
+      _dropdown(
           value: _selectedType,
           label: 'Tipo',
           icon: Icons.category,
           items: _types,
-          onChanged: (v) => setState(() => _selectedType = v!))),
-    ]),
+          onChanged: (v) => setState(() => _selectedType = v!)),
+    ),
     const SizedBox(height: 12),
     _field(
         controller: _lugarController,
@@ -409,14 +408,13 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   ];
 
   List<Widget> _buildImagen() => [
-    _row([
-      Expanded(child: _field(
+    _responsiveFieldRow(
+      _field(
           controller: _imageUrlController,
           label: 'URL de imagen (opcional)',
           icon: Icons.link,
-          hint: 'https://...')),
-      const SizedBox(width: 16),
-      Expanded(child: OutlinedButton.icon(
+          hint: 'https://...'),
+      OutlinedButton.icon(
           onPressed: _uploadingImage ? null : _pickImage,
           icon: const Icon(Icons.upload_file),
           label: Text(_selectedImageFile != null
@@ -427,8 +425,8 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
               padding: const EdgeInsets.symmetric(
                   vertical: 14, horizontal: 12),
               side: const BorderSide(color: _teal),
-              foregroundColor: _teal))),
-    ]),
+              foregroundColor: _teal)),
+    ),
     if (_selectedImageFile != null) ...[
       const SizedBox(height: 8),
       Container(
@@ -454,17 +452,10 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   ];
 
   List<Widget> _buildDetalles() => [
-    _row([
-      Expanded(child: _field(
-          controller: _addressController,
-          label: 'Dirección',
-          icon: Icons.home)),
-      const SizedBox(width: 16),
-      Expanded(child: _field(
-          controller: _phoneController,
-          label: 'Teléfono',
-          icon: Icons.phone)),
-    ]),
+    _responsiveFieldRow(
+      _field(controller: _addressController, label: 'Dirección', icon: Icons.home),
+      _field(controller: _phoneController, label: 'Teléfono', icon: Icons.phone),
+    ),
     const SizedBox(height: 12),
     _field(
         controller: _amenitiesController,
@@ -530,22 +521,21 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                     ])));
           }).toList()),
       const SizedBox(height: 14),
-      _row([
-        Expanded(child: _field(
+      _responsiveFieldRow(
+        _field(
             controller: _rewardNameController,
             label: 'Nombre de la recompensa',
             icon: Icons.card_giftcard,
             hint: 'Ej: Café gratis',
             validator: _hasReward
                 ? (v) => v?.isEmpty ?? true ? 'Requerido' : null
-                : null)),
-        const SizedBox(width: 16),
-        Expanded(child: _field(
+                : null),
+        _field(
             controller: _rewardDescriptionController,
             label: 'Descripción',
             icon: Icons.info_outline,
-            hint: 'Ej: 1 café americano mediano')),
-      ]),
+            hint: 'Ej: 1 café americano mediano'),
+      ),
       const SizedBox(height: 12),
       TextFormField(
         controller: _rewardStockController,
@@ -655,6 +645,19 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
 
   Widget _row(List<Widget> children) =>
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: children);
+
+  Widget _responsiveFieldRow(Widget left, Widget right) {
+    return LayoutBuilder(builder: (ctx, constraints) {
+      if (constraints.maxWidth < 500) {
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          left, const SizedBox(height: 12), right,
+        ]);
+      }
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: left), const SizedBox(width: 16), Expanded(child: right),
+      ]);
+    });
+  }
 
   InputDecoration _inputDecoration(String label, IconData icon,
       {String? hint}) {

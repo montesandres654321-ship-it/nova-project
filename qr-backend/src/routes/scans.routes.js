@@ -3,6 +3,16 @@ const router  = express.Router();
 const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [key, value] of Object.entries(row)) {
+      obj[key] = typeof value === 'bigint' ? Number(value) : value;
+    }
+    return obj;
+  });
+}
+
 // ─── POST /scan ───────────────────────────────────────────
 router.post('/scan', authenticateToken, async (req, res) => {
   try {
@@ -33,7 +43,7 @@ router.post('/scan', authenticateToken, async (req, res) => {
       let stockOk = true;
 
       if (place.reward_stock !== null && place.reward_stock !== undefined) {
-        const [{ c: givenCount }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE place_id = ${placeId}`;
+        const [{ c: givenCount }] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE place_id = ${placeId}`);
         if (givenCount >= place.reward_stock) stockOk = false;
       }
 
@@ -60,7 +70,7 @@ router.post('/scan', authenticateToken, async (req, res) => {
       }
     }
 
-    const [{ c: visitCount }] = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans WHERE user_id = ${userId} AND place_id = ${placeId}`;
+    const [{ c: visitCount }] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans WHERE user_id = ${userId} AND place_id = ${placeId}`);
 
     return res.json({
       success: true,
