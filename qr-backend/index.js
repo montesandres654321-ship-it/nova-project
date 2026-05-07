@@ -152,7 +152,6 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log('\n🚀 NOVA APP BACKEND listo');
   console.log(`📡  http://localhost:${PORT}`);
-  console.log(`🗄️   ${process.env.DB_PATH || './nova_app.db'}`);
   console.log('📱  /login  /scan  /places  /places/:id  /places/type/:type');
   console.log('🖥️   /admin/users  /users/me/profile  /users/me/password');
   console.log('📊  /analytics/*  /dashboard/summary  /owner/stats');

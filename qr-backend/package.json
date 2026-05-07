@@ -5,25 +5,22 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build": "echo 'No build needed'",
     "dev": "nodemon index.js",
     "migrate": "node scripts/migrate-supabase.js",
-    "start:prod": "NODE_ENV=production node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pg:migrate": "node scripts/migrate-sqlite-to-postgres.js",
-    "pg:validate": "node scripts/validate-postgres-integrity.js"
+    "start:prod": "NODE_ENV=production node index.js"
   },
   "keywords": [
     "qr",
     "tourism",
     "backend",
     "express",
-    "sqlite"
+    "postgresql"
   ],
   "author": "Nova App Team",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^9.2.2",
     "cors": "^2.8.5",
     "dotenv": "^17.4.1",
     "express": "^4.18.2",
@@ -33,14 +30,12 @@
     "pg": "^8.13.1",
     "postgres": "^3.4.9",
     "qrcode": "^1.5.3",
-    "sharp": "^0.33.1",
-    "sqlite3": "^6.0.1"
+    "sharp": "^0.33.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": "20.x"
   }
 }

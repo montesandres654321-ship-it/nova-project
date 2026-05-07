@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nova-app-backend
+    runtime: node
+    rootDir: qr-backend
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.18.1
