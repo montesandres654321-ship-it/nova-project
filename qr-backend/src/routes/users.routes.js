@@ -9,7 +9,8 @@ function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
     for (const [key, value] of Object.entries(row)) {
-      obj[key] = typeof value === 'bigint' ? Number(value) : value;
+      obj[key] = typeof value === 'bigint' ? Number(value) :
+                 value instanceof Date ? value.toISOString() : value;
     }
     return obj;
   });

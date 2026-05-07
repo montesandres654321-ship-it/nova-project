@@ -4,22 +4,33 @@ const prisma    = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [key, value] of Object.entries(row)) {
+      obj[key] = typeof value === 'bigint' ? Number(value) :
+                 value instanceof Date ? value.toISOString() : value;
+    }
+    return obj;
+  });
+}
+
 router.get(
   '/dashboard/summary',
   authenticateToken,
   authorize(['admin_general', 'user_general']),
   async (req, res) => {
     try {
-      const kpis = (await prisma.$queryRaw`
+      const [kpis] = serializeRaw(await prisma.$queryRaw`
         SELECT
           (SELECT COUNT(*)::int FROM users        WHERE role IS NULL AND is_active = TRUE) AS "totalUsers",
           (SELECT COUNT(*)::int FROM scans)                                                AS "totalScans",
           (SELECT COUNT(*)::int FROM scans        WHERE created_at::date = CURRENT_DATE)  AS "scansToday",
           (SELECT COUNT(*)::int FROM places       WHERE is_active = TRUE)                 AS "activePlaces",
           (SELECT COUNT(*)::int FROM user_rewards WHERE is_redeemed = FALSE)              AS "pendingRewards"
-      `)[0];
+      `);
 
-      const topPlaces = await prisma.$queryRaw`
+      const topPlaces = serializeRaw(await prisma.$queryRaw`
         SELECT
           p.id, p.name, p.tipo, p.lugar, p.rating,
           COUNT(s.id)::int               AS "totalScans",
@@ -34,13 +45,13 @@ router.get(
         GROUP BY p.id
         ORDER BY "totalScans" DESC
         LIMIT 5
-      `;
+      `);
 
-      const scansByDay = await prisma.$queryRaw`
+      const scansByDay = serializeRaw(await prisma.$queryRaw`
         SELECT
-          gs::date                      AS date,
-          COALESCE(agg.count, 0)        AS count,
-          COALESCE(agg."uniqueUsers", 0) AS "uniqueUsers"
+          gs::date                           AS date,
+          COALESCE(agg.count, 0)::int        AS count,
+          COALESCE(agg."uniqueUsers", 0)::int AS "uniqueUsers"
         FROM generate_series(CURRENT_DATE - 6, CURRENT_DATE, INTERVAL '1 day') gs
         LEFT JOIN (
           SELECT
@@ -52,9 +63,9 @@ router.get(
           GROUP BY created_at::date
         ) agg ON gs::date = agg.day
         ORDER BY gs ASC
-      `;
+      `);
 
-      const recentActivity = await prisma.$queryRaw`
+      const recentActivity = serializeRaw(await prisma.$queryRaw`
         SELECT
           s.id,
           s.created_at                        AS timestamp,
@@ -69,7 +80,7 @@ router.get(
         INNER JOIN places p ON s.place_id = p.id
         ORDER BY s.created_at DESC
         LIMIT 10
-      `;
+      `);
 
       return res.status(200).json({
         success: true,

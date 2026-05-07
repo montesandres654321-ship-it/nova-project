@@ -4,6 +4,17 @@ const prisma   = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [key, value] of Object.entries(row)) {
+      obj[key] = typeof value === 'bigint' ? Number(value) :
+                 value instanceof Date ? value.toISOString() : value;
+    }
+    return obj;
+  });
+}
+
 router.get(
   '/owner/stats',
   authenticateToken,
@@ -19,7 +30,7 @@ router.get(
         });
       }
 
-      const kpis = (await prisma.$queryRaw`
+      const [kpis] = serializeRaw(await prisma.$queryRaw`
         SELECT
           (SELECT COUNT(*)::int             FROM scans WHERE place_id = ${placeId})                                AS "totalScans",
           (SELECT COUNT(*)::int             FROM scans WHERE place_id = ${placeId} AND created_at::date = CURRENT_DATE) AS "scansToday",
@@ -31,9 +42,9 @@ router.get(
             (SELECT COUNT(DISTINCT user_id) FROM scans WHERE place_id = ${placeId})::numeric /
             NULLIF((SELECT COUNT(*) FROM scans WHERE place_id = ${placeId}), 0) * 100
           , 1)::float8                                                                                             AS "conversionRate"
-      `)[0];
+      `);
 
-      const scansByDay = await prisma.$queryRaw`
+      const scansByDay = serializeRaw(await prisma.$queryRaw`
         SELECT
           gs::date                  AS date,
           COALESCE(agg.cnt, 0)::int AS count
@@ -46,9 +57,9 @@ router.get(
           GROUP BY created_at::date
         ) agg ON gs::date = agg.day
         ORDER BY gs ASC
-      `;
+      `);
 
-      const rawActivity = await prisma.$queryRaw`
+      const recentActivity = serializeRaw(await prisma.$queryRaw`
         SELECT
           u.first_name || ' ' || u.last_name AS "userName",
           s.created_at                        AS timestamp,
@@ -62,7 +73,7 @@ router.get(
         WHERE s.place_id = ${placeId}
         ORDER BY s.created_at DESC
         LIMIT 10
-      `;
+      `);
 
       return res.status(200).json({
         success: true,
@@ -75,11 +86,7 @@ router.get(
           pendingRewards:  kpis.pendingRewards,
           conversionRate:  kpis.conversionRate ?? 0.0,
           scansByDay,
-          recentActivity: rawActivity.map(row => ({
-            userName:     row.userName,
-            timestamp:    row.timestamp,
-            rewardEarned: row.rewardEarned,
-          })),
+          recentActivity,
           meta: { generatedAt: new Date().toISOString(), timezone: 'UTC' },
         },
       });
