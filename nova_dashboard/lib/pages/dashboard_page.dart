@@ -180,7 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ]),
       actions: [
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 140),
+          constraints: const BoxConstraints(maxWidth: 180),
           child: _buildUserMenu(),
         ),
         const SizedBox(width: 8),

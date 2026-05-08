@@ -17,6 +17,7 @@ class _RewardsPageState extends State<RewardsPage> {
   final _analytics = AnalyticsService();
   Map<String, dynamic>? _stats; List<Map<String, dynamic>> _rewardsByDay = [];
   bool _loading = true; String? _error; int _selectedDays = 0;
+  String _chartFilter = 'all';
   final List<int> _daysOptions = [7, 15, 30, 60, 90, 0];
   static const _teal = Color(0xFF06B6A4), _green = Color(0xFF059669),
       _amber = Color(0xFFD97706), _blue = Color(0xFF2563EB);
@@ -106,58 +107,95 @@ class _RewardsPageState extends State<RewardsPage> {
         childAspectRatio: 2.2, children: cards);
   }
 
-  Widget _statCard(String title, String value, IconData icon, Color color, String? tapFilter) => InkWell(
-      onTap: tapFilter != null ? () => _navigateToDetail(tapFilter) : null, borderRadius: BorderRadius.circular(12),
-      child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
-            ],
+  Widget _statCard(String title, String value, IconData icon, Color color, String? tapFilter) {
+    final isSelected = tapFilter != null && _chartFilter == tapFilter;
+    return InkWell(
+      onTap: tapFilter != null ? () => setState(() => _chartFilter = _chartFilter == tapFilter ? 'all' : tapFilter) : null,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.06) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? color : const Color(0xFFE5E7EB), width: isSelected ? 2 : 1),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
+          ],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(height: 3, decoration: BoxDecoration(
+            color: color,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+          )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(children: [
+              Container(padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: color.withOpacity(isSelected ? 0.15 : 0.08), borderRadius: BorderRadius.circular(9)),
+                  child: Icon(icon, color: color, size: 16)),
+              const SizedBox(width: 10),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), height: 1.1)),
+                Text(title, style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280))),
+                if (tapFilter != null && isSelected)
+                  Text('Filtrando', style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
+              ])),
+            ]),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Franja de color superior (único acento de color)
-            Container(height: 3, decoration: BoxDecoration(
-              color: color,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
-            )),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: Row(children: [
-                Container(padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(9)),
-                    child: Icon(icon, color: color, size: 16)),
-                const SizedBox(width: 10),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), height: 1.1)),
-                  Text(title, style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280))),
-                  if (tapFilter != null) Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.open_in_new_rounded, size: 10, color: color.withOpacity(0.5)), const SizedBox(width: 3),
-                    Text('Ver detalle', style: TextStyle(fontSize: 9, color: color.withOpacity(0.6)))]),
-                ])),
-              ]),
-            ),
-          ])));
+        ]),
+      ),
+    );
+  }
 
   Widget _buildLineChart() {
     if (_rewardsByDay.isEmpty) return _emptyChart('Sin actividad en este período');
     final cd = _rewardsByDay.map((i) { final ds = i['date']?.toString() ?? ''; String l = ds;
     try { l = DateFormat('d MMM', 'es').format(DateTime.parse(ds)); } catch (_) {}
     return {'label': l, 'value': i['count'] ?? 0}; }).toList();
-    return LineChartWidget(title: 'Recompensas por Día', subtitle: _periodLabel,
-        data: cd, color: _teal, height: double.infinity, fillArea: true);
+    final lineColor = _chartFilter == 'redeemed' ? _green
+        : _chartFilter == 'pending' ? _amber
+        : _teal;
+    final filterLabel = _chartFilter == 'redeemed' ? 'Canjeadas'
+        : _chartFilter == 'pending' ? 'Pendientes'
+        : 'Total';
+    return LineChartWidget(
+      title: 'Recompensas por Día · $filterLabel',
+      subtitle: _periodLabel,
+      data: cd,
+      color: lineColor,
+      height: double.infinity,
+      fillArea: true,
+    );
   }
 
   Widget _buildDonutChart() {
     final rd = (_stats?['redeemed_rewards'] as num?)?.toInt() ?? 0;
     final pn = (_stats?['pending_rewards'] as num?)?.toInt() ?? 0;
     if (rd == 0 && pn == 0) return _emptyChart('Sin recompensas aún');
-    return DonutChartWidget(title: 'Estado de Recompensas', subtitle: 'Distribución actual',
-        data: [{'label': 'Canjeadas', 'value': rd, 'color': _green},
-          {'label': 'Pendientes', 'value': pn, 'color': _amber}],
-        height: double.infinity, showLegend: true);
+
+    final List<Map<String, dynamic>> chartData;
+    final String subtitle;
+    if (_chartFilter == 'redeemed') {
+      chartData = [{'label': 'Canjeadas', 'value': rd, 'color': _green}];
+      subtitle = 'Solo canjeadas';
+    } else if (_chartFilter == 'pending') {
+      chartData = [{'label': 'Pendientes', 'value': pn, 'color': _amber}];
+      subtitle = 'Solo pendientes';
+    } else {
+      chartData = [
+        {'label': 'Canjeadas', 'value': rd, 'color': _green},
+        {'label': 'Pendientes', 'value': pn, 'color': _amber},
+      ];
+      subtitle = 'Distribución actual';
+    }
+
+    return DonutChartWidget(
+      title: 'Estado de Recompensas',
+      subtitle: subtitle,
+      data: chartData,
+      height: double.infinity,
+      showLegend: true,
+    );
   }
 
   Widget _emptyChart(String msg) => Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),

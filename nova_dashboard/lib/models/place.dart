@@ -95,8 +95,12 @@ class Place {
       phone:       json['phone'],
       priceRange:  json['price_range'],
       amenities:   amenitiesList,
-      isActive:    (json['is_active']  ?? 1) == 1,
-      hasReward:   (json['has_reward'] ?? 0) == 1,
+      isActive:    json['is_active'] is bool
+          ? json['is_active'] as bool
+          : (json['is_active']  ?? 1) == 1,
+      hasReward:   json['has_reward'] is bool
+          ? json['has_reward'] as bool
+          : (json['has_reward'] ?? 0) == 1,
       rewardName:        json['reward_name'],
       rewardDescription: json['reward_description'],
       rewardIcon:        json['reward_icon'],

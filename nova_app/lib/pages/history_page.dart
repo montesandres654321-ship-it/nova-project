@@ -201,7 +201,7 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _shimmerBox(44, 44, radius: AppRadius.sm),
+          _shimmerBox(48, 48, radius: AppRadius.sm),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -402,6 +402,15 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  Widget _buildTypeIconBox(Color color, String type) {
+    return Container(
+      width: 48,
+      height: 48,
+      color: color.withValues(alpha: 0.12),
+      child: Icon(_typeIcon(type), color: color, size: 22),
+    );
+  }
+
   Widget _buildGroupHeader(String label) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -451,14 +460,18 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ícono del tipo de lugar
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: AppRadius.smAll,
-            ),
-            child: Icon(_typeIcon(r.type), color: color, size: 22),
+          // Imagen del lugar o ícono del tipo
+          ClipRRect(
+            borderRadius: AppRadius.smAll,
+            child: r.image != null && r.image!.isNotEmpty
+                ? Image.network(
+                    r.image!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildTypeIconBox(color, r.type),
+                  )
+                : _buildTypeIconBox(color, r.type),
           ),
           const SizedBox(width: AppSpacing.md),
 

@@ -122,6 +122,28 @@ router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── PATCH /admin/rewards/:id/redeem ─────────────────────
+router.patch('/admin/rewards/:id/redeem', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rewardId = parseInt(id);
+    const reward = (await prisma.$queryRaw`SELECT * FROM user_rewards WHERE id = ${rewardId}`)[0];
+    if (!reward) return res.status(404).json({ success: false, error: 'Recompensa no encontrada' });
+    if (reward.is_redeemed) return res.status(400).json({ success: false, error: 'Esta recompensa ya fue canjeada' });
+
+    await prisma.$executeRaw`UPDATE user_rewards SET is_redeemed = TRUE, redeemed_at = NOW() WHERE id = ${rewardId}`;
+
+    const place = (await prisma.$queryRaw`SELECT name FROM places WHERE id = ${reward.place_id}`)[0];
+    const user  = (await prisma.$queryRaw`SELECT first_name, email FROM users WHERE id = ${reward.user_id}`)[0];
+    console.log(`🎁 [Admin] Recompensa entregada: ID:${rewardId} — ${reward.reward_name} → ${user?.first_name || user?.email} en ${place?.name}`);
+
+    return res.json({ success: true, message: '¡Recompensa entregada exitosamente!' });
+  } catch (error) {
+    console.error('❌ Error en PATCH /admin/rewards/:id/redeem:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ─── GET /admin/rewards ───────────────────────────────────
 router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {

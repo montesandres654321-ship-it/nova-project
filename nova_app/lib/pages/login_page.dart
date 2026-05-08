@@ -61,6 +61,33 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (data['success'] == true) {
+        // Verificar que no sea admin/propietario — la app es solo para turistas
+        final user = data['user'];
+        final role = user?['role']?.toString() ?? '';
+        if (role.isNotEmpty &&
+            ['admin_general', 'user_general', 'user_place'].contains(role)) {
+          await ApiService.logout();
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Acceso restringido'),
+              content: const Text(
+                'Esta aplicación es exclusiva para turistas.\n\n'
+                'Si eres administrador, accede desde:\n'
+                'nova-project-wk67.vercel.app',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Entendido'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(AppConstants.keyAuthProvider, 'email');
         if (_rememberMe) {
@@ -72,7 +99,6 @@ class _LoginPageState extends State<LoginPage> {
         }
 
         if (!mounted) return;
-        final user = data['user'];
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Bienvenido ${user?['first_name'] ?? user?['username'] ?? ''}'),
           backgroundColor: AppColors.success,

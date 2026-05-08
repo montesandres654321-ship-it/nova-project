@@ -278,30 +278,28 @@ class PlaceDetailsPage extends StatelessWidget {
   // KPI ROW (datos del modelo)
   // ─────────────────────────────────────────────────────────
   Widget _buildKpiRow() {
-    final rating = place.rating > 0
-        ? place.rating.toStringAsFixed(1) : '—';
-    final services = place.amenities.length.toString();
     final reward = place.hasReward
         ? (place.rewardStock?.toString() ?? '∞') : '—';
+    final rewardStatus = place.hasReward ? 'Activa' : 'Sin recompensa';
 
     return Row(children: [
       Expanded(child: _KpiMini(
-          icon: Icons.star_rounded,
-          label: 'Valoración',
-          value: rating,
-          color: _kAmber)),
-      const SizedBox(width: 10),
-      Expanded(child: _KpiMini(
-          icon: Icons.check_circle_outline_rounded,
-          label: 'Servicios',
-          value: services,
+          icon: Icons.location_on_outlined,
+          label: 'Municipio',
+          value: place.lugar,
           color: _kPrimary)),
       const SizedBox(width: 10),
       Expanded(child: _KpiMini(
           icon: Icons.card_giftcard_rounded,
-          label: 'Recompensa',
+          label: place.hasReward ? 'Stock recompensa' : 'Recompensa',
           value: reward,
-          color: _kBlue)),
+          color: _kAmber)),
+      const SizedBox(width: 10),
+      Expanded(child: _KpiMini(
+          icon: place.isActive ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
+          label: 'Estado',
+          value: place.isActive ? 'Activo' : 'Inactivo',
+          color: place.isActive ? _kGreen : _kTextSub)),
     ]);
   }
 
@@ -318,10 +316,8 @@ class PlaceDetailsPage extends StatelessWidget {
     _buildKpiRow(),
     const SizedBox(height: 16),
     _buildDescriptionCard(),
-    if (place.amenities.isNotEmpty) ...[
-      const SizedBox(height: 16),
-      _buildAmenitiesCard(),
-    ],
+    const SizedBox(height: 16),
+    _buildAmenitiesCard(),
     if (place.hasReward) ...[
       const SizedBox(height: 16),
       _buildRewardCard(),
@@ -338,10 +334,8 @@ class PlaceDetailsPage extends StatelessWidget {
     _buildInfoCard(),
     const SizedBox(height: 14),
     _buildDescriptionCard(),
-    if (place.amenities.isNotEmpty) ...[
-      const SizedBox(height: 14),
-      _buildAmenitiesCard(),
-    ],
+    const SizedBox(height: 14),
+    _buildAmenitiesCard(),
     if (place.hasReward) ...[
       const SizedBox(height: 14),
       _buildRewardCard(),
@@ -407,28 +401,35 @@ class PlaceDetailsPage extends StatelessWidget {
   Widget _buildAmenitiesCard() {
     return _SectionCard(
       title: 'Servicios',
-      subtitle: '${place.amenities.length} disponibles',
-      child: Wrap(
-        spacing: 7,
-        runSpacing: 7,
-        children: place.amenities
-            .map((a) => Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 11, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: _kPrimary.withOpacity(0.07),
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: _kPrimary.withOpacity(0.15)),
-                  ),
-                  child: Text(a,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: _kPrimary,
-                          fontWeight: FontWeight.w500)),
-                ))
-            .toList(),
-      ),
+      subtitle: place.amenities.isEmpty
+          ? 'Sin servicios registrados'
+          : '${place.amenities.length} disponibles',
+      child: place.amenities.isEmpty
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Text('Sin servicios registrados',
+                  style: TextStyle(fontSize: 12, color: _kTextSub)),
+            )
+          : Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: place.amenities
+                  .map((a) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 11, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: _kPrimary.withOpacity(0.07),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: _kPrimary.withOpacity(0.15)),
+                        ),
+                        child: Text(a,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: _kPrimary,
+                                fontWeight: FontWeight.w500)),
+                      ))
+                  .toList(),
+            ),
     );
   }
 

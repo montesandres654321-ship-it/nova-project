@@ -50,6 +50,22 @@ class RewardService {
     }
   }
 
+  /// Entregar recompensa desde panel admin — PATCH /admin/rewards/:id/redeem
+  static Future<Map<String, dynamic>> redeemRewardAdmin(int rewardId) async {
+    try {
+      final response = await ApiClient.patch<dynamic>('/admin/rewards/$rewardId/redeem');
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['success'] == false) {
+        return {'success': false, 'error': data['error'] ?? 'Error al entregar'};
+      }
+      final message = (data is Map<String, dynamic>) ? (data['message'] ?? 'Entregada') : 'Entregada';
+      return {'success': true, 'message': message};
+    } catch (e) {
+      debugPrint('❌ Error en redeemRewardAdmin: $e');
+      return {'success': false, 'error': 'Error al entregar recompensa: $e'};
+    }
+  }
+
   /// Estadísticas de recompensas
   static Future<Map<String, int>> getRewardStats() async {
     try {

@@ -96,6 +96,35 @@ class _PlacesListTabState extends State<PlacesListTab> {
     setState(() => _filteredPlaces = list);
   }
 
+  Future<void> _togglePlaceStatus(Place place) async {
+    final activate = !place.isActive;
+    final label = activate ? 'Activar' : 'Desactivar';
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('$label lugar'),
+        content: Text('¿$label "${place.name}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: activate ? _kGreen : _kRed, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(label),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    final result = await PlaceService.togglePlaceStatus(place.id, activate: activate);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(result['success'] == true ? result['message'] ?? 'Estado actualizado' : result['error'] ?? 'Error'),
+      backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+    ));
+    if (result['success'] == true) _loadPlaces();
+  }
+
   void _showDeleteDialog(Place place) {
     showDialog(context: context, builder: (_) => AlertDialog(
       title: const Text('Confirmar eliminación'),
@@ -137,6 +166,9 @@ class _PlacesListTabState extends State<PlacesListTab> {
         Navigator.push(context,
             MaterialPageRoute(builder: (_) => PlaceFormPage(place: place)))
             .then((_) => _loadPlaces());
+        break;
+      case 'toggle':
+        _togglePlaceStatus(place);
         break;
       case 'delete':
         _showDeleteDialog(place);
@@ -268,21 +300,21 @@ class _PlacesListTabState extends State<PlacesListTab> {
             Container(width: 1, height: 22, color: _kBorder,
                 margin: const EdgeInsets.symmetric(horizontal: 8)),
 
-            // Estado
-            _filterPill('all', 'Todos', _statusFilter == 'all',
-                () { setState(() => _statusFilter = 'all'); _filterPlaces(); },
-                activeColor: _kTextHead.withOpacity(0.08),
-                activeTextColor: _kTextHead,
-                activeBorderColor: _kTextHead.withOpacity(0.3)),
-
+            // Estado (sin duplicar "Todos" — clic en pill activo lo deselecciona)
             _filterPill('active', 'Activos', _statusFilter == 'active',
-                () { setState(() => _statusFilter = 'active'); _filterPlaces(); },
+                () {
+                  setState(() => _statusFilter = _statusFilter == 'active' ? 'all' : 'active');
+                  _filterPlaces();
+                },
                 activeColor: _kGreen.withOpacity(0.1),
                 activeTextColor: _kGreen,
                 activeBorderColor: _kGreen.withOpacity(0.35)),
 
             _filterPill('inactive', 'Inactivos', _statusFilter == 'inactive',
-                () { setState(() => _statusFilter = 'inactive'); _filterPlaces(); },
+                () {
+                  setState(() => _statusFilter = _statusFilter == 'inactive' ? 'all' : 'inactive');
+                  _filterPlaces();
+                },
                 activeColor: _kRed.withOpacity(0.08),
                 activeTextColor: _kRed,
                 activeBorderColor: _kRed.withOpacity(0.3)),
@@ -511,6 +543,15 @@ class _PlacesListTabState extends State<PlacesListTab> {
                         if (widget.canEdit) ...[
                           _menuItem('edit',
                               Icons.edit_outlined, 'Editar', _kTextHead),
+                          const PopupMenuDivider(height: 1),
+                          _menuItem(
+                            'toggle',
+                            place.isActive
+                                ? Icons.toggle_off_outlined
+                                : Icons.toggle_on_outlined,
+                            place.isActive ? 'Desactivar lugar' : 'Activar lugar',
+                            place.isActive ? _kRed : _kGreen,
+                          ),
                           const PopupMenuDivider(height: 1),
                           _menuItem('delete',
                               Icons.delete_outline_rounded, 'Eliminar',

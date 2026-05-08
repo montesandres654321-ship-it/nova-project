@@ -35,12 +35,56 @@ class PlaceService {
     }
   }
 
-  // ── ALIAS getPlaces ───────────────────────────────────
-  static Future<List<Place>> getPlaces() async => getAllPlaces();
+  // ── ALIAS getPlaces — admin: incluye activos e inactivos ─
+  static Future<List<Place>> getPlaces() async => getAllPlacesAdmin();
 
-  // ── FILTRAR POR TIPO ──────────────────────────────────
+  // ── FILTRAR POR TIPO (admin: todos los estados) ───────
   static Future<List<Place>> getPlacesByType(String tipo) async {
-    return getAllPlaces(tipo: tipo);
+    return getAllPlacesAdmin(tipo: tipo);
+  }
+
+  // ── TODOS LOS LUGARES (admin, activos + inactivos) ────
+  static Future<List<Place>> getAllPlacesAdmin({String? tipo}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (tipo != null) queryParams['tipo'] = tipo;
+
+      final response = await ApiClient.get<dynamic>(
+        '/places/all',
+        queryParams: queryParams.isNotEmpty ? queryParams : null,
+      );
+
+      final data = response.data;
+      if (data is! List) {
+        throw ApiException('Formato inválido: esperaba List');
+      }
+
+      return data
+          .where((item) => item is Map<String, dynamic>)
+          .map((json) => Place.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('❌ Error en getAllPlacesAdmin: $e');
+      rethrow;
+    }
+  }
+
+  // ── ACTIVAR / DESACTIVAR LUGAR ────────────────────────
+  static Future<Map<String, dynamic>> togglePlaceStatus(int id, {required bool activate}) async {
+    try {
+      final response = await ApiClient.patch<dynamic>(
+        '/places/$id/status',
+        body: {'is_active': activate},
+      );
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['success'] == false) {
+        return {'success': false, 'error': data['error'] ?? 'Error'};
+      }
+      return {'success': true, 'message': data is Map ? (data['message'] ?? 'Estado actualizado') : 'Estado actualizado'};
+    } catch (e) {
+      debugPrint('❌ Error en togglePlaceStatus: $e');
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   // ── OBTENER POR ID ────────────────────────────────────

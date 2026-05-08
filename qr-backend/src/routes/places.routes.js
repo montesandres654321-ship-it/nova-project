@@ -33,6 +33,45 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /all — admin: retorna TODOS los lugares (activos e inactivos) ────────
+router.get('/all', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
+  try {
+    const { tipo } = req.query;
+    const validTypes = ['hotel', 'restaurant', 'bar'];
+    let places;
+    if (tipo && validTypes.includes(tipo.toLowerCase())) {
+      const t = tipo.toLowerCase();
+      places = await prisma.$queryRaw`SELECT * FROM places WHERE tipo = ${t} ORDER BY is_active DESC, name ASC`;
+    } else {
+      places = await prisma.$queryRaw`SELECT * FROM places ORDER BY is_active DESC, name ASC`;
+    }
+    return res.json({ success: true, data: places.map(parsePlace) });
+  } catch (error) {
+    console.error('❌ Error en GET /places/all:', error);
+    return res.status(500).json({ success: false, error: 'Error al obtener lugares' });
+  }
+});
+
+// ─── PATCH /:id/status — activar/desactivar lugar ─────────────────────────────
+router.patch('/:id/status', authenticateToken, authorize(['admin_general']), async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { is_active } = req.body;
+    if (is_active === undefined) return res.status(400).json({ success: false, error: 'Campo is_active requerido' });
+    const activeVal = is_active ? true : false;
+    const place = (await prisma.$queryRaw`SELECT id, name FROM places WHERE id = ${id}`)[0];
+    if (!place) return res.status(404).json({ success: false, error: 'Lugar no encontrado' });
+
+    await prisma.$executeRaw`UPDATE places SET is_active = ${activeVal}, updated_at = NOW() WHERE id = ${id}`;
+    const action = activeVal ? 'activado' : 'desactivado';
+    console.log(`✅ Lugar ${action}: ID:${id} — ${place.name}`);
+    return res.json({ success: true, message: `Lugar "${place.name}" ${action}` });
+  } catch (error) {
+    console.error('❌ Error en PATCH /places/:id/status:', error);
+    return res.status(500).json({ success: false, error: 'Error al actualizar estado' });
+  }
+});
+
 router.get('/type/:type', async (req, res) => {
   try {
     const { type } = req.params;

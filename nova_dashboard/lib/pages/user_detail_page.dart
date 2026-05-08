@@ -3,6 +3,7 @@
 // Lógica, endpoints y modelos sin cambios
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
+import '../services/reward_service.dart';
 import '../models/user_model.dart';
 
 class UserDetailPage extends StatefulWidget {
@@ -384,37 +385,70 @@ class _UserDetailPageState extends State<UserDetailPage> {
           ])),
         )
       else
-        ...(_rewards.take(5).map((r) => ListTile(
-          dense: true,
-          leading: Icon(
-            r['is_redeemed'] == 1
-                ? Icons.check_circle
-                : Icons.card_giftcard,
-            color: r['is_redeemed'] == 1 ? _green : _amber,
-            size: 20,
-          ),
-          title: Text(r['reward_name'] ?? 'N/A',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          subtitle: Text(r['place_name'] ?? 'N/A',
-              style: TextStyle(fontSize: 10, color: Colors.grey[600])),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: (r['is_redeemed'] == 1 ? _green : _amber).withOpacity(0.08),
-              borderRadius: BorderRadius.circular(12),
+        ...(_rewards.take(10).map((r) {
+          final isPending = r['is_redeemed'] != 1 && r['is_redeemed'] != true;
+          return ListTile(
+            dense: true,
+            leading: Icon(
+              isPending ? Icons.card_giftcard : Icons.check_circle,
+              color: isPending ? _amber : _green,
+              size: 20,
             ),
-            child: Text(
-              r['is_redeemed'] == 1 ? 'Canjeada' : 'Pendiente',
-              style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: r['is_redeemed'] == 1 ? _green : _amber),
-            ),
-          ),
-        ))),
+            title: Text(r['reward_name'] ?? 'N/A',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            subtitle: Text(r['place_name'] ?? 'N/A',
+                style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+            trailing: isPending
+                ? SizedBox(
+                    height: 28,
+                    child: ElevatedButton(
+                      onPressed: () => _deliverReward(r['id']),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _teal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                      ),
+                      child: const Text('Entregar'),
+                    ),
+                  )
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: _green.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text('Canjeada',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _green)),
+                  ),
+          );
+        })),
       const SizedBox(height: 8),
     ]),
   );
+
+  Future<void> _deliverReward(dynamic rewardId) async {
+    if (rewardId == null) return;
+    try {
+      final result = await RewardService.redeemRewardAdmin(rewardId as int);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result['success'] == true
+            ? 'Recompensa entregada correctamente'
+            : result['error'] ?? 'Error al entregar'),
+        backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+      ));
+      if (result['success'] == true) _loadUserDetail();
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'), backgroundColor: Colors.red,
+      ));
+    }
+  }
 
   // ── Helpers ────────────────────────────────────────────
   Widget _sectionHeader(String title, Color color) => Row(children: [

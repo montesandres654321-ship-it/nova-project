@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../services/admin_service.dart';
 import '../../services/place_service.dart';
 import '../../services/api_client.dart';
@@ -101,6 +102,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         _scansByDay = scansByDay;
         _lastScans  = lastScans;
         _loading    = false;
+        debugPrint('Datos de gráfica: $_scansByDay');
       });
     } catch (e) {
       if (mounted) setState(() { _error = '$e'; _loading = false; });
@@ -366,14 +368,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PLACE:${_place!.id}&format=png&margin=4',
-          width: 200, height: 200,
-          errorBuilder: (_, __, ___) => Container(
-            width: 200, height: 200,
-            color: const Color(0xFFF1F5F9),
-            child: const Icon(Icons.qr_code, size: 60, color: Color(0xFFCBD5E1)),
-          ),
+        child: QrImageView(
+          data: 'PLACE:${_place!.id}',
+          version: QrVersions.auto,
+          size: 200,
+          backgroundColor: Colors.white,
+          eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Color(0xFF0F172A)),
+          dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Color(0xFF0F172A)),
         ),
       ),
       const SizedBox(height: 10),
@@ -563,13 +564,17 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           radius: 13,
           backgroundColor: Colors.white,
           child: Text(
-            widget.userName.isNotEmpty ? widget.userName[0].toUpperCase() : 'U',
+            _place?.ownerInitials.isNotEmpty == true
+                ? _place!.ownerInitials[0]
+                : (widget.userName.isNotEmpty ? widget.userName[0].toUpperCase() : 'U'),
             style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 11),
           ),
         ),
         const SizedBox(width: 4),
-        Text(widget.userName.split(' ').first,
-            style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(
+          (_place?.ownerFirstName ?? widget.userName).split(' ').first,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+        ),
         const Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
       ]),
     ),
@@ -577,8 +582,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       PopupMenuItem(
         enabled: false,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(widget.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          Text(widget.userEmail, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+          Text(_place?.ownerFullName ?? widget.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(_place?.ownerEmail ?? widget.userEmail, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
           const Divider(),
         ]),
       ),
