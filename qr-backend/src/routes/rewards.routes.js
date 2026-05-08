@@ -123,7 +123,7 @@ router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
 });
 
 // ─── PATCH /admin/rewards/:id/redeem ─────────────────────
-router.patch('/admin/rewards/:id/redeem', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
+router.patch('/admin/rewards/:id/redeem', authenticateToken, authorize(['admin_general', 'user_general', 'user_place']), async (req, res) => {
   try {
     const { id } = req.params;
     const rewardId = parseInt(id);

@@ -31,6 +31,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
   String? _error;
   late String _tableFilter;
   String _searchQuery = '';
+  final Set<int> _loadingIds = {};
 
   final TextEditingController _searchCtrl = TextEditingController();
 
@@ -88,7 +89,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
     setState(() { _searchQuery = query; _filteredRewards = _applyFilters(_allRewards); });
   }
 
-  // ── CANJEAR RECOMPENSA ──────────────────────────────────
+  // ── ENTREGAR RECOMPENSA ─────────────────────────────────
   Future<void> _redeemReward(RewardModel reward) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -96,7 +97,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
         title: Row(children: [
           Text(reward.rewardIcon ?? '🎁', style: const TextStyle(fontSize: 24)),
           const SizedBox(width: 10),
-          const Expanded(child: Text('Canjear Recompensa', style: TextStyle(fontSize: 16))),
+          const Expanded(child: Text('Entregar Recompensa', style: TextStyle(fontSize: 16))),
         ]),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('¿Entregar esta recompensa?', style: TextStyle(color: Colors.grey[700])),
@@ -128,18 +129,27 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
 
     if (confirm != true) return;
 
-    try {
-      await RewardService.redeemReward(reward.id);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('✅ Recompensa "${reward.rewardName}" entregada exitosamente'),
+    setState(() => _loadingIds.add(reward.id));
+
+    final result = await RewardService.redeemRewardAdmin(reward.id);
+
+    if (!mounted) return;
+
+    if (result['success'] == true) {
+      setState(() {
+        _loadingIds.remove(reward.id);
+        final idx = _allRewards.indexWhere((r) => r.id == reward.id);
+        if (idx != -1) _allRewards[idx] = _allRewards[idx].copyWith(isRedeemed: 1);
+        _filteredRewards = _applyFilters(_allRewards);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('✅ Recompensa entregada correctamente'),
         backgroundColor: _green,
       ));
-      _loadData(); // Recargar lista
-    } catch (e) {
-      if (!mounted) return;
+    } else {
+      setState(() => _loadingIds.remove(reward.id));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error al canjear: $e'),
+        content: Text('Error: ${result['error'] ?? 'No se pudo entregar'}'),
         backgroundColor: Colors.red,
       ));
     }
@@ -261,6 +271,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
                   index: i,
                   isLast: i == _filteredRewards.length - 1,
                   onRedeem: () => _redeemReward(_filteredRewards[i]),
+                  isLoading: _loadingIds.contains(_filteredRewards[i].id),
                 ),
               ),
             ),
@@ -307,12 +318,14 @@ class _RewardRow extends StatefulWidget {
   final int index;
   final bool isLast;
   final VoidCallback onRedeem;
+  final bool isLoading;
 
   const _RewardRow({
     required this.r,
     required this.index,
     required this.isLast,
     required this.onRedeem,
+    this.isLoading = false,
   });
 
   @override
@@ -450,11 +463,15 @@ class _RewardRowState extends State<_RewardRow> {
               ]),
             )),
 
-            // Acción — botón Entregar
+            // Acción — botón Entregar / spinner / check
             Expanded(flex: 2, child: r.isRedeemedBool
                 ? Center(child: Icon(Icons.check_circle_rounded,
                     color: _green.withOpacity(0.5), size: 20))
-                : Center(child: ElevatedButton.icon(
+                : widget.isLoading
+                    ? const Center(child: SizedBox(
+                        width: 20, height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: _amber)))
+                    : Center(child: ElevatedButton.icon(
               onPressed: widget.onRedeem,
               icon: const Icon(Icons.card_giftcard_rounded, size: 13),
               label: const Text('Entregar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),

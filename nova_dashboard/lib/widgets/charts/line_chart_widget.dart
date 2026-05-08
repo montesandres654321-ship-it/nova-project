@@ -198,7 +198,10 @@ class LineChartWidget extends StatelessWidget {
     }).toList();
 
     final maxValue = values.reduce((a, b) => a > b ? a : b);
-    return (maxValue * 1.2).ceilToDouble();
+    if (maxValue == 0) return 5;
+    final allSame = values.every((v) => v == maxValue);
+    if (allSame) return maxValue + 2;
+    return maxValue + 1;
   }
 
   Widget _buildEmptyState() {
