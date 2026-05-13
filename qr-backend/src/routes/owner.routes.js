@@ -30,66 +30,75 @@ router.get(
         });
       }
 
-      const [kpis] = serializeRaw(await prisma.$queryRaw`
-        SELECT
-          (SELECT COUNT(*)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)                                AS "totalScans",
-          (SELECT COUNT(*)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL AND s.created_at::date = CURRENT_DATE) AS "scansToday",
-          (SELECT COUNT(DISTINCT s.user_id)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)                AS "uniqueVisitors",
-          (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId})                         AS "totalRewards",
-          (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId} AND is_redeemed = TRUE)  AS "redeemedRewards",
-          (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId} AND is_redeemed = FALSE) AS "pendingRewards",
-          ROUND(
-            (SELECT COUNT(DISTINCT s.user_id) FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)::numeric /
-            NULLIF((SELECT COUNT(*) FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL), 0) * 100
-          , 1)::float8                                                                                             AS "conversionRate"
-      `);
+      // Todas las queries en paralelo — sin filtro u.role IS NULL
+      const [placeRows, kpiRows, rwRows, scansByDayRaw, recentRaw] = await Promise.all([
 
-      const scansByDay = serializeRaw(await prisma.$queryRaw`
-        SELECT
-          gs::date                  AS date,
-          COALESCE(agg.cnt, 0)::int AS count
-        FROM generate_series(CURRENT_DATE - 6, CURRENT_DATE, INTERVAL '1 day') gs
-        LEFT JOIN (
-          SELECT s.created_at::date AS day, COUNT(*) AS cnt
-          FROM scans s INNER JOIN users u ON s.user_id = u.id
+        prisma.$queryRaw`SELECT * FROM places WHERE id = ${placeId}`,
+
+        prisma.$queryRaw`
+          SELECT
+            COUNT(*)::int                AS "totalScans",
+            COUNT(DISTINCT user_id)::int AS "totalVisitors",
+            (SELECT COUNT(*)::int FROM scans
+             WHERE place_id = ${placeId}
+               AND created_at::date = CURRENT_DATE) AS "todayScans"
+          FROM scans
+          WHERE place_id = ${placeId}
+        `,
+
+        prisma.$queryRaw`
+          SELECT
+            COUNT(*)::int                                        AS "totalRewards",
+            (COUNT(*) FILTER (WHERE is_redeemed = TRUE))::int   AS "redeemedRewards",
+            (COUNT(*) FILTER (WHERE is_redeemed = FALSE))::int  AS "pendingRewards"
+          FROM user_rewards
+          WHERE place_id = ${placeId}
+        `,
+
+        prisma.$queryRaw`
+          SELECT created_at::date::text AS date, COUNT(*)::int AS count
+          FROM scans
+          WHERE place_id = ${placeId}
+            AND created_at >= NOW() - INTERVAL '30 days'
+          GROUP BY created_at::date
+          ORDER BY date ASC
+        `,
+
+        prisma.$queryRaw`
+          SELECT
+            u.first_name || ' ' || COALESCE(u.last_name, '') AS "userName",
+            s.created_at                                      AS "timestamp",
+            EXISTS(
+              SELECT 1 FROM user_rewards
+              WHERE user_id = s.user_id AND place_id = s.place_id
+            ) AS "rewardEarned"
+          FROM scans s
+          JOIN users u ON s.user_id = u.id
           WHERE s.place_id = ${placeId}
-            AND u.role IS NULL
-            AND s.created_at >= DATE_TRUNC('day', NOW() - INTERVAL '6 days')
-          GROUP BY s.created_at::date
-        ) agg ON gs::date = agg.day
-        ORDER BY gs ASC
-      `);
+          ORDER BY s.created_at DESC
+          LIMIT 5
+        `,
+      ]);
 
-      const recentActivity = serializeRaw(await prisma.$queryRaw`
-        SELECT
-          u.first_name || ' ' || u.last_name AS "userName",
-          s.created_at                        AS timestamp,
-          CASE
-            WHEN EXISTS (
-              SELECT 1 FROM user_rewards WHERE user_id = s.user_id AND place_id = s.place_id
-            ) THEN TRUE ELSE FALSE
-          END                                 AS "rewardEarned"
-        FROM scans s
-        INNER JOIN users u ON s.user_id = u.id
-        WHERE s.place_id = ${placeId} AND u.role IS NULL
-        ORDER BY s.created_at DESC
-        LIMIT 10
-      `);
+      const [kpis] = serializeRaw(kpiRows);
+      const [rw]   = serializeRaw(rwRows);
+      const place  = serializeRaw(placeRows)[0] ?? null;
+
+      console.log(`📊 /owner/stats placeId=${placeId}: scans=${kpis.totalScans} visitors=${kpis.totalVisitors} rewards=${rw.totalRewards}`);
 
       return res.status(200).json({
         success: true,
-        data: {
+        place,
+        stats: {
           totalScans:      kpis.totalScans,
-          scansToday:      kpis.scansToday,
-          uniqueVisitors:  kpis.uniqueVisitors,
-          totalRewards:    kpis.totalRewards,
-          redeemedRewards: kpis.redeemedRewards,
-          pendingRewards:  kpis.pendingRewards,
-          conversionRate:  kpis.conversionRate ?? 0.0,
-          scansByDay,
-          recentActivity,
-          meta: { generatedAt: new Date().toISOString(), timezone: 'UTC' },
+          totalVisitors:   kpis.totalVisitors,
+          todayScans:      kpis.todayScans,
+          totalRewards:    rw.totalRewards,
+          redeemedRewards: rw.redeemedRewards,
+          pendingRewards:  rw.pendingRewards,
         },
+        scansByDay:   serializeRaw(scansByDayRaw),
+        recentVisits: serializeRaw(recentRaw),
       });
 
     } catch (error) {
