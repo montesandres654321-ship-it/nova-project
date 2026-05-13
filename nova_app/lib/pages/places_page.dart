@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../services/api_service.dart';
-import '../widgets/place_card.dart';
+import 'place_detail_page.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
@@ -186,13 +186,16 @@ class _PlacesListState extends State<_PlacesList>
       content = RefreshIndicator(
         onRefresh: _loadPlaces,
         color: AppColors.primary,
-        child: ListView.builder(
-          padding: const EdgeInsets.only(
-            top: AppSpacing.xs,
-            bottom: AppSpacing.xl,
+        child: GridView.builder(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, AppSpacing.xl),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.82,
           ),
           itemCount: _places.length,
-          itemBuilder: (_, i) => PlaceCard(place: _places[i]),
+          itemBuilder: (_, i) => _buildPlaceCard(_places[i]),
         ),
       );
       stateKey = 'list';
@@ -211,9 +214,15 @@ class _PlacesListState extends State<_PlacesList>
   Widget _buildSkeleton() {
     return FadeTransition(
       opacity: _shimmerAnimation,
-      child: ListView.builder(
+      child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: AppSpacing.xs),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, AppSpacing.xl),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.82,
+        ),
         itemCount: 4,
         itemBuilder: (_, __) => _buildSkeletonCard(),
       ),
@@ -222,7 +231,6 @@ class _PlacesListState extends State<_PlacesList>
 
   Widget _buildSkeletonCard() {
     return Container(
-      margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceVariant,
         borderRadius: AppRadius.mdAll,
@@ -232,7 +240,7 @@ class _PlacesListState extends State<_PlacesList>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            height: 170,
+            height: 100,
             decoration: const BoxDecoration(
               color: AppColors.border,
               borderRadius: BorderRadius.vertical(
@@ -240,20 +248,124 @@ class _PlacesListState extends State<_PlacesList>
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _shimmerWide(15),
-                const SizedBox(height: AppSpacing.sm),
-                _shimmerBox(12, 130),
-                const SizedBox(height: AppSpacing.sm),
-                _shimmerBox(12, 90),
-              ],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _shimmerWide(12),
+                  const SizedBox(height: 6),
+                  _shimmerBox(10, 80),
+                ],
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceCard(Place place) {
+    final type = PlaceType.fromTipo(place.tipo);
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PlaceDetailPage(place: place)),
+      ),
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppRadius.md),
+              ),
+              child: Hero(
+                tag: 'place-hero-${place.id}',
+                child: Image.network(
+                  place.imageUrl ?? type.placeholderImage,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (_, child, prog) {
+                    if (prog == null) return child;
+                    return Container(
+                      height: 100,
+                      color: AppColors.surfaceVariant,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 100,
+                    color: AppColors.surfaceVariant,
+                    child: Icon(type.icon, size: 36, color: AppColors.textHint),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      place.name,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      place.lugar,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (place.hasReward) ...[
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          place.rewardName ?? 'Recompensa',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.amber,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

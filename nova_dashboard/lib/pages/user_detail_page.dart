@@ -74,39 +74,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
       final w = constraints.maxWidth;
 
       if (w > 900) {
-        // Desktop: 3 columnas
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Col 1 — Perfil
-            SizedBox(
-              width: 260,
-              child: SingleChildScrollView(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  _buildProfileCard(),
-                  const SizedBox(height: 16),
-                  _buildCompactStats(),
-                ]),
-              ),
-            ),
-            const SizedBox(width: 16),
-            // Col 2 — Actividad
-            Expanded(child: SingleChildScrollView(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (_topPlaces.isNotEmpty) ...[
-                  _buildTopPlaces(),
-                  const SizedBox(height: 16),
-                ],
-                _buildRecentScans(),
-              ]),
-            )),
-            const SizedBox(width: 16),
-            // Col 3 — Recompensas
-            Expanded(child: SingleChildScrollView(
-              child: _buildRecentRewards(),
-            )),
-          ]),
-        );
+        // Desktop: 4 columnas
+        return _buildLayout();
       } else if (w > 600) {
         // Tablet: 2 columnas
         return Padding(
@@ -158,6 +127,104 @@ class _UserDetailPageState extends State<UserDetailPage> {
         );
       }
     });
+  }
+
+  // ── Desktop: 4 columnas con VerticalDivider ───────────
+  Widget _buildLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Col 1: Perfil + Stats — NO CAMBIAR ──────────
+        SizedBox(
+          width: 240,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildProfileCard(),
+                const SizedBox(height: 16),
+                _buildCompactStats(),
+              ],
+            ),
+          ),
+        ),
+
+        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+
+        // ── Col 2: Lugares Más Visitados ─────────────────
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Lugares Más Visitados',
+                    Icons.place_rounded, const Color(0xFF06B6A4)),
+                const SizedBox(height: 12),
+                _buildTopPlaces(),
+              ],
+            ),
+          ),
+        ),
+
+        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+
+        // ── Col 3: Recompensas Recientes ─────────────────
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Recompensas Recientes',
+                    Icons.card_giftcard_rounded, const Color(0xFFF59E0B)),
+                const SizedBox(height: 12),
+                _buildRecentRewards(),
+              ],
+            ),
+          ),
+        ),
+
+        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+
+        // ── Col 4: Últimos Escaneos ───────────────────────
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Últimos Escaneos',
+                    Icons.qr_code_scanner_rounded, const Color(0xFF3B82F6)),
+                const SizedBox(height: 12),
+                _buildRecentScans(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 4, height: 18,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(title, style: const TextStyle(
+          fontSize: 14, fontWeight: FontWeight.w600,
+          color: Color(0xFF1F2937),
+        )),
+      ],
+    );
   }
 
   // ── Col 1: Perfil ──────────────────────────────────────

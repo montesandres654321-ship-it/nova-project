@@ -19,6 +19,7 @@ class StatsDashboardPage extends StatefulWidget {
   final void Function(int index)?   onNavigate;
   final void Function(String tipo)? onNavigateToPlaces;
   final int placesIndex;
+  final int usersIndex;
   final int rewardsIndex;
   final int reportsIndex;
 
@@ -27,8 +28,9 @@ class StatsDashboardPage extends StatefulWidget {
     this.onNavigate,
     this.onNavigateToPlaces,
     this.placesIndex  = 1,
-    this.rewardsIndex = 3,
-    this.reportsIndex = 4,
+    this.usersIndex   = 3,
+    this.rewardsIndex = 4,
+    this.reportsIndex = 5,
   });
 
   @override
@@ -183,7 +185,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   // ═══════════════════════════════════════════════════════
   Widget _buildDesktopLayout() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           // Fila 1: KPIs — altura fija
@@ -248,14 +250,18 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
             mainAxisSpacing: 10,
             childAspectRatio: 2.2,
             children: [
-              _buildKpiCard('Escaneos', _totalScans,
-                  Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4)),
-              _buildKpiCard('Turistas', _totalUsers,
-                  Icons.people_rounded, const Color(0xFF3B82F6)),
-              _buildKpiCard('Lugares', _totalPlaces,
-                  Icons.place_rounded, const Color(0xFF10B981)),
-              _buildKpiCard('Recompensas', _totalRewards,
-                  Icons.card_giftcard_rounded, const Color(0xFFF59E0B)),
+              _buildClickableKpi(label: 'Escaneos', value: _totalScans,
+                  icon: Icons.qr_code_scanner_rounded, color: const Color(0xFF06B6A4),
+                  index: widget.reportsIndex),
+              _buildClickableKpi(label: 'Turistas', value: _totalUsers,
+                  icon: Icons.people_rounded, color: const Color(0xFF3B82F6),
+                  index: widget.usersIndex),
+              _buildClickableKpi(label: 'Lugares', value: _totalPlaces,
+                  icon: Icons.place_rounded, color: const Color(0xFF10B981),
+                  index: widget.placesIndex),
+              _buildClickableKpi(label: 'Recompensas', value: _totalRewards,
+                  icon: Icons.card_giftcard_rounded, color: const Color(0xFFF59E0B),
+                  index: widget.rewardsIndex),
             ],
           ),
           const SizedBox(height: 12),
@@ -277,23 +283,55 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // KPI CARDS
+  // KPI CARDS — clickeables para navegar a la sección
   // ═══════════════════════════════════════════════════════
   Widget _buildKpiRow() {
     return Row(
       children: [
-        Expanded(child: _buildKpiCard('Total Escaneos', _totalScans,
-            Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4))),
+        Expanded(child: _buildClickableKpi(
+          label: 'Total Escaneos', value: _totalScans,
+          icon: Icons.qr_code_scanner_rounded, color: const Color(0xFF06B6A4),
+          index: widget.reportsIndex,
+        )),
         const SizedBox(width: 10),
-        Expanded(child: _buildKpiCard('Turistas', _totalUsers,
-            Icons.people_rounded, const Color(0xFF3B82F6))),
+        Expanded(child: _buildClickableKpi(
+          label: 'Turistas', value: _totalUsers,
+          icon: Icons.people_rounded, color: const Color(0xFF3B82F6),
+          index: widget.usersIndex,
+        )),
         const SizedBox(width: 10),
-        Expanded(child: _buildKpiCard('Lugares Activos', _totalPlaces,
-            Icons.place_rounded, const Color(0xFF10B981))),
+        Expanded(child: _buildClickableKpi(
+          label: 'Lugares Activos', value: _totalPlaces,
+          icon: Icons.place_rounded, color: const Color(0xFF10B981),
+          index: widget.placesIndex,
+        )),
         const SizedBox(width: 10),
-        Expanded(child: _buildKpiCard('Recompensas', _totalRewards,
-            Icons.card_giftcard_rounded, const Color(0xFFF59E0B))),
+        Expanded(child: _buildClickableKpi(
+          label: 'Recompensas', value: _totalRewards,
+          icon: Icons.card_giftcard_rounded, color: const Color(0xFFF59E0B),
+          index: widget.rewardsIndex,
+        )),
       ],
+    );
+  }
+
+  // Envuelve la KPI card en InkWell si el índice es válido
+  Widget _buildClickableKpi({
+    required String  label,
+    required int     value,
+    required IconData icon,
+    required Color   color,
+    required int     index,
+  }) {
+    final card = _buildKpiCard(label, value, icon, color);
+    if (index < 0 || widget.onNavigate == null) return card;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => widget.onNavigate!(index),
+        borderRadius: BorderRadius.circular(10),
+        child: card,
+      ),
     );
   }
 
