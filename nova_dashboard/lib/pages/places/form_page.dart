@@ -268,7 +268,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                     style: const TextStyle(fontSize: 16)),
               ]))
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1000),
@@ -329,7 +329,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                             _sectionCard('🎁 Recompensa para Turistas',
                                 _buildRecompensa()),
 
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 16),
 
                             // ── Botón guardar (derecha) ───────────────
                             Row(
@@ -364,7 +364,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
                           ],
                         );
                       },
@@ -403,7 +403,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         controller: _descriptionController,
         label: 'Descripción',
         icon: Icons.description,
-        maxLines: 3,
+        maxLines: 2,
         validator: (v) => v?.isEmpty ?? true ? 'Requerido' : null),
   ];
 
@@ -503,7 +503,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                 onTap: () => setState(() => _selectedRewardIcon = item['icon']!),
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                         color: sel ? _teal.withOpacity(0.15) : Colors.grey[100],
                         borderRadius: BorderRadius.circular(8),
@@ -512,7 +512,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
                             width: 2)),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Text(item['icon']!,
-                          style: const TextStyle(fontSize: 24)),
+                          style: const TextStyle(fontSize: 18)),
                       const SizedBox(height: 2),
                       Text(item['label']!,
                           style: TextStyle(
@@ -619,7 +619,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
           child: Row(children: [
             Container(
                 width: 3, height: 16,
@@ -635,7 +635,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         ),
         const Divider(height: 1, color: Color(0xFFF1F5F9)),
         Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: children)),
@@ -669,7 +669,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
       prefixIcon: Icon(icon, size: 17, color: const Color(0xFF94A3B8)),
       isDense: true,
       contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       filled: true,
       fillColor: _bg,
       border: OutlineInputBorder(

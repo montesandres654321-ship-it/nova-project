@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../services/admin_service.dart';
 import '../../services/place_service.dart';
-import '../../services/api_client.dart';
 import '../../models/place.dart';
 import '../../utils/constants.dart';
 import '../places/qr_dialog.dart';
@@ -44,9 +43,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   String _error   = '';
   int?   _userId;
   Place? _place;
-  int    _visitors = 0, _scans = 0, _rewards = 0, _redeemed = 0;
-  List<Map<String, dynamic>> _scansByDay  = [];
-  List<Map<String, dynamic>> _lastScans   = [];
+  int    _visitors = 0, _scans = 0, _scansToday = 0, _rewards = 0;
+  List<Map<String, dynamic>> _scansByDay      = [];
+  List<Map<String, dynamic>> _recentActivity  = [];
 
   @override
   void initState() { super.initState(); _loadUserId(); _loadAll(); }
@@ -63,11 +62,14 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     }
     setState(() { _loading = true; _error = ''; });
     try {
-      final place = await PlaceService.getPlaceById(widget.placeId!);
-      final stats = await AdminService.getMyPlaceStats(placeId: widget.placeId);
+      final results = await Future.wait([
+        PlaceService.getPlaceById(widget.placeId!),
+        AdminService.getOwnerStats(),
+      ]);
+      final place = results[0] as Place;
+      final stats = results[1] as Map<String, dynamic>;
 
-      final rawScansByDay = stats['scans_by_day'] as List? ?? [];
-      final scansByDay = rawScansByDay
+      final scansByDay = (stats['scans_by_day'] as List? ?? [])
           .whereType<Map<String, dynamic>>()
           .map((item) => {
                 'date':  item['date']?.toString() ?? '',
@@ -76,33 +78,19 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           .where((item) => (item['date'] as String).isNotEmpty)
           .toList();
 
-      List<Map<String, dynamic>> lastScans = [];
-      try {
-        final r = await ApiClient.get<dynamic>(
-          '/places/my-place/scans',
-          queryParams: {'place_id': '${widget.placeId}'},
-        );
-        final d = r.data;
-        if (d is List) {
-          lastScans = d.whereType<Map<String, dynamic>>().take(5).toList();
-        } else if (d is Map<String, dynamic> && d['data'] is List) {
-          lastScans = (d['data'] as List)
-              .whereType<Map<String, dynamic>>()
-              .take(5)
-              .toList();
-        }
-      } catch (e) { debugPrint('Error cargando últimas visitas: $e'); }
+      final recentActivity = (stats['recent_activity'] as List? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .toList();
 
       if (mounted) setState(() {
-        _place      = place;
-        _visitors   = stats['unique_visitors']  as int? ?? 0;
-        _scans      = stats['total_scans']      as int? ?? 0;
-        _rewards    = stats['total_rewards']    as int? ?? 0;
-        _redeemed   = stats['redeemed_rewards'] as int? ?? 0;
-        _scansByDay = scansByDay;
-        _lastScans  = lastScans;
-        _loading    = false;
-        debugPrint('Datos de gráfica: $_scansByDay');
+        _place          = place;
+        _visitors       = stats['unique_visitors'] as int? ?? 0;
+        _scans          = stats['total_scans']     as int? ?? 0;
+        _scansToday     = stats['scans_today']     as int? ?? 0;
+        _rewards        = stats['total_rewards']   as int? ?? 0;
+        _scansByDay     = scansByDay;
+        _recentActivity = recentActivity;
+        _loading        = false;
       });
     } catch (e) {
       if (mounted) setState(() { _error = '$e'; _loading = false; });
@@ -159,7 +147,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                   ? const Center(child: Text('No se pudo cargar el lugar.'))
                   : LayoutBuilder(builder: (ctx, constraints) {
                       final isDesktop = constraints.maxWidth > 900;
-                      return Padding(
+                      return SingleChildScrollView(
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,23 +156,22 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                             const SizedBox(height: 16),
                             _buildStatsRow(),
                             const SizedBox(height: 16),
-                            Expanded(
-                              child: isDesktop
-                                  ? Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                                      Expanded(flex: 3, child: _buildBarChart()),
-                                      const SizedBox(width: 16),
-                                      Expanded(flex: 2, child: _buildRightColumn()),
-                                    ])
-                                  : SingleChildScrollView(
-                                      child: Column(children: [
-                                        SizedBox(height: 240, child: _buildBarChart()),
-                                        const SizedBox(height: 16),
-                                        _buildRightColumn(),
-                                      ]),
-                                    ),
-                            ),
+                            if (isDesktop)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(flex: 3, child: SizedBox(height: 260, child: _buildBarChart())),
+                                  const SizedBox(width: 16),
+                                  Expanded(flex: 2, child: _buildRightColumn()),
+                                ],
+                              )
+                            else ...[
+                              SizedBox(height: 240, child: _buildBarChart()),
+                              const SizedBox(height: 16),
+                              _buildRightColumn(),
+                            ],
                             const SizedBox(height: 16),
-                            SizedBox(height: 210, child: _buildLastVisitsTable()),
+                            _buildLastVisitsTable(),
                           ],
                         ),
                       );
@@ -287,13 +274,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   // ── STATS ROW ──────────────────────────────────────────────
 
   Widget _buildStatsRow() => Row(children: [
-    Expanded(child: _statCard(Icons.people_rounded,            _visitors.toString(), 'Visitantes',   _teal)),
+    Expanded(child: _statCard(Icons.people_rounded,          _visitors.toString(),   'Visitantes',  _teal)),
     const SizedBox(width: 12),
-    Expanded(child: _statCard(Icons.qr_code_scanner_rounded,   _scans.toString(),    'Escaneos',     _teal2)),
+    Expanded(child: _statCard(Icons.qr_code_scanner_rounded, _scans.toString(),      'Total scans', _teal2)),
     const SizedBox(width: 12),
-    Expanded(child: _statCard(Icons.card_giftcard_rounded,     _rewards.toString(),  'Recompensas',  _amber)),
+    Expanded(child: _statCard(Icons.today_rounded,           _scansToday.toString(), 'Hoy',         _green)),
     const SizedBox(width: 12),
-    Expanded(child: _statCard(Icons.check_circle_rounded,      _redeemed.toString(), 'Canjeadas',    _green)),
+    Expanded(child: _statCard(Icons.card_giftcard_rounded,   _rewards.toString(),    'Recompensas', _amber)),
   ]);
 
   Widget _statCard(IconData icon, String value, String label, Color color) => Container(
@@ -481,62 +468,75 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         ]),
       ),
       const Divider(height: 1),
-      Expanded(
-        child: _lastScans.isEmpty
-            ? const Center(
-                child: Text('Sin visitas registradas', style: TextStyle(color: Color(0xFF94A3B8))),
-              )
-            : ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _lastScans.length.clamp(0, 5),
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (_, i) {
-                  final s = _lastScans[i];
-                  final name = [s['first_name'], s['last_name']]
-                      .where((v) => v != null && v.toString().isNotEmpty)
-                      .join(' ')
-                      .trim();
-                  final displayName =
-                      name.isNotEmpty ? name : (s['username'] ?? s['email'] ?? 'Turista');
-                  String fecha = '—';
-                  try {
-                    fecha = DateFormat('d MMM, HH:mm', 'es')
-                        .format(DateTime.parse(s['created_at'].toString()).toLocal());
-                  } catch (_) {}
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                    child: Row(children: [
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: _teal.withOpacity(0.10),
-                        child: Text(
-                          displayName[0].toUpperCase(),
-                          style: const TextStyle(color: _teal, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(displayName,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      Text(fecha,
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: _teal.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text('Escaneo',
-                            style: TextStyle(fontSize: 10, color: _teal, fontWeight: FontWeight.w600)),
-                      ),
-                    ]),
-                  );
-                },
-              ),
-      ),
+      if (_recentActivity.isEmpty)
+        const Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(
+            child: Text('Sin visitas registradas',
+                style: TextStyle(color: Color(0xFF94A3B8))),
+          ),
+        )
+      else
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _recentActivity.length.clamp(0, 10),
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final s = _recentActivity[i];
+            final displayName = s['userName']?.toString().trim().isNotEmpty == true
+                ? s['userName'].toString().trim()
+                : 'Turista';
+            final earned = s['rewardEarned'] == true;
+            String fecha = '—';
+            try {
+              fecha = DateFormat('d MMM, HH:mm', 'es')
+                  .format(DateTime.parse(s['timestamp'].toString()).toLocal());
+            } catch (_) {}
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              child: Row(children: [
+                CircleAvatar(
+                  radius: 14,
+                  backgroundColor: _teal.withOpacity(0.10),
+                  child: Text(
+                    displayName[0].toUpperCase(),
+                    style: const TextStyle(color: _teal, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(displayName,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis),
+                ),
+                Text(fecha,
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                const SizedBox(width: 8),
+                if (earned)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: _amber.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('🎁 Premio',
+                        style: TextStyle(fontSize: 10, color: _amber, fontWeight: FontWeight.w600)),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: _teal.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('Escaneo',
+                        style: TextStyle(fontSize: 10, color: _teal, fontWeight: FontWeight.w600)),
+                  ),
+              ]),
+            );
+          },
+        ),
     ]),
   );
 

@@ -24,6 +24,11 @@ router.post('/scan', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, error: 'userId y placeId son requeridos' });
     }
 
+    // Solo turistas (role IS NULL) pueden escanear códigos QR
+    if (req.user.role !== null) {
+      return res.status(403).json({ success: false, error: 'Solo turistas pueden escanear códigos QR. Los administradores no generan visitas.' });
+    }
+
     const place = (await prisma.$queryRaw`SELECT * FROM places WHERE id = ${placeId} AND is_active = TRUE`)[0];
     if (!place) {
       return res.status(404).json({ success: false, error: 'Lugar no encontrado o inactivo' });

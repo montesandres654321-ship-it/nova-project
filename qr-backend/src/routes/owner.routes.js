@@ -32,15 +32,15 @@ router.get(
 
       const [kpis] = serializeRaw(await prisma.$queryRaw`
         SELECT
-          (SELECT COUNT(*)::int             FROM scans WHERE place_id = ${placeId})                                AS "totalScans",
-          (SELECT COUNT(*)::int             FROM scans WHERE place_id = ${placeId} AND created_at::date = CURRENT_DATE) AS "scansToday",
-          (SELECT COUNT(DISTINCT user_id)::int FROM scans WHERE place_id = ${placeId})                            AS "uniqueVisitors",
+          (SELECT COUNT(*)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)                                AS "totalScans",
+          (SELECT COUNT(*)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL AND s.created_at::date = CURRENT_DATE) AS "scansToday",
+          (SELECT COUNT(DISTINCT s.user_id)::int FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)                AS "uniqueVisitors",
           (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId})                         AS "totalRewards",
           (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId} AND is_redeemed = TRUE)  AS "redeemedRewards",
           (SELECT COUNT(*)::int             FROM user_rewards WHERE place_id = ${placeId} AND is_redeemed = FALSE) AS "pendingRewards",
           ROUND(
-            (SELECT COUNT(DISTINCT user_id) FROM scans WHERE place_id = ${placeId})::numeric /
-            NULLIF((SELECT COUNT(*) FROM scans WHERE place_id = ${placeId}), 0) * 100
+            (SELECT COUNT(DISTINCT s.user_id) FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL)::numeric /
+            NULLIF((SELECT COUNT(*) FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL), 0) * 100
           , 1)::float8                                                                                             AS "conversionRate"
       `);
 
@@ -50,11 +50,12 @@ router.get(
           COALESCE(agg.cnt, 0)::int AS count
         FROM generate_series(CURRENT_DATE - 6, CURRENT_DATE, INTERVAL '1 day') gs
         LEFT JOIN (
-          SELECT created_at::date AS day, COUNT(*) AS cnt
-          FROM scans
-          WHERE place_id = ${placeId}
-            AND created_at >= DATE_TRUNC('day', NOW() - INTERVAL '6 days')
-          GROUP BY created_at::date
+          SELECT s.created_at::date AS day, COUNT(*) AS cnt
+          FROM scans s INNER JOIN users u ON s.user_id = u.id
+          WHERE s.place_id = ${placeId}
+            AND u.role IS NULL
+            AND s.created_at >= DATE_TRUNC('day', NOW() - INTERVAL '6 days')
+          GROUP BY s.created_at::date
         ) agg ON gs::date = agg.day
         ORDER BY gs ASC
       `);
@@ -70,7 +71,7 @@ router.get(
           END                                 AS "rewardEarned"
         FROM scans s
         INNER JOIN users u ON s.user_id = u.id
-        WHERE s.place_id = ${placeId}
+        WHERE s.place_id = ${placeId} AND u.role IS NULL
         ORDER BY s.created_at DESC
         LIMIT 10
       `);

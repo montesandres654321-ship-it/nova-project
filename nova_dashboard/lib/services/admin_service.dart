@@ -194,6 +194,36 @@ class AdminService {
 
   static int _toInt(dynamic v) => v is num ? v.toInt() : 0;
 
+  // ─── ESTADÍSTICAS OWNER (user_place → /owner/stats) ───
+  static Future<Map<String, dynamic>> getOwnerStats() async {
+    try {
+      final r = await ApiClient.get<dynamic>('/owner/stats');
+      final d = r.data;
+      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
+      final inner = d['data'] as Map<String, dynamic>? ?? d;
+      return {
+        'success':          true,
+        'total_scans':      _toInt(inner['totalScans']),
+        'scans_today':      _toInt(inner['scansToday']),
+        'unique_visitors':  _toInt(inner['uniqueVisitors']),
+        'total_rewards':    _toInt(inner['totalRewards']),
+        'redeemed_rewards': _toInt(inner['redeemedRewards']),
+        'pending_rewards':  _toInt(inner['pendingRewards']),
+        'conversion_rate':  (inner['conversionRate'] as num?)?.toDouble() ?? 0.0,
+        'scans_by_day':     inner['scansByDay']     ?? [],
+        'recent_activity':  inner['recentActivity'] ?? [],
+      };
+    } catch (e) {
+      debugPrint('❌ getOwnerStats: $e');
+      return {
+        'success': false, 'error': e.toString(),
+        'total_scans': 0, 'scans_today': 0, 'unique_visitors': 0,
+        'total_rewards': 0, 'redeemed_rewards': 0, 'pending_rewards': 0,
+        'conversion_rate': 0.0, 'scans_by_day': [], 'recent_activity': [],
+      };
+    }
+  }
+
   // ─── ESTADÍSTICAS MI LUGAR (user_place) ────────────────
   static Future<Map<String, dynamic>> getMyPlaceStats({int? placeId}) async {
     try {

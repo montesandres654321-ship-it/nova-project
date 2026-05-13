@@ -518,26 +518,27 @@ class _AdminsListTabState extends State<AdminsListTab> {
     try { places = await PlaceService.getAllPlaces(); } catch (_) {}
     if (!mounted) return;
 
-    // ── Decoration base para todos los inputs ──────
-    InputDecoration inputDec() => InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14, vertical: 13),
+    // ── Decoration compacta (isDense reduce altura mínima a ~33px) ──
+    InputDecoration inputDec({Widget? suffix}) => InputDecoration(
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       filled: true,
       fillColor: Colors.white,
+      suffixIcon: suffix,
       border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(9),
           borderSide: const BorderSide(color: _kBorder)),
       enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(9),
           borderSide: const BorderSide(color: _kBorder)),
       focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(9),
           borderSide: const BorderSide(color: _kPrimary, width: 1.5)),
       errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(9),
           borderSide: const BorderSide(color: _kRed)),
       focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(9),
           borderSide: const BorderSide(color: _kRed, width: 1.5)),
     );
 
@@ -546,50 +547,59 @@ class _AdminsListTabState extends State<AdminsListTab> {
         builder: (ctx) => StatefulBuilder(
             builder: (ctx, setD) {
 
-              // ── Helper: campo con label encima ─────
-              Widget field({
+              // ── Label + widget genérico ────────────
+              Widget labelField(String label, Widget child) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: _kTextMuted)),
+                  const SizedBox(height: 4),
+                  child,
+                ],
+              );
+
+              // ── TextFormField compacto ─────────────
+              Widget textField({
                 required String label,
                 required TextEditingController ctrl,
                 bool obscureText = false,
                 Widget? suffix,
                 TextInputType? keyboard,
                 String? Function(String?)? validator,
-              }) {
-                return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text(label,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: _kTextMuted)),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: ctrl,
-                    obscureText: obscureText,
-                    keyboardType: keyboard,
-                    style: const TextStyle(
-                        fontSize: 14, color: _kTextHead),
-                    decoration: inputDec().copyWith(suffixIcon: suffix),
-                    validator: validator,
-                  ),
-                ]);
-              }
+              }) => labelField(label, TextFormField(
+                controller: ctrl,
+                obscureText: obscureText,
+                keyboardType: keyboard,
+                style: const TextStyle(fontSize: 13, color: _kTextHead),
+                decoration: inputDec(suffix: suffix),
+                validator: validator,
+              ));
 
-              // ── Helper: etiqueta de sección ────────
-              Widget sectionLabel(String text) => Padding(
-                padding: const EdgeInsets.only(bottom: 14),
+              // ── 2 campos en fila ───────────────────
+              Widget row2(Widget a, Widget b) => Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: a),
+                  const SizedBox(width: 10),
+                  Expanded(child: b),
+                ],
+              );
+
+              // ── Separador de sección ───────────────
+              Widget sectionDiv(String text) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(children: [
-                  Container(
-                    width: 3, height: 14,
-                    decoration: BoxDecoration(
-                        color: _kPrimary,
-                        borderRadius: BorderRadius.circular(2)),
-                  ),
-                  const SizedBox(width: 8),
+                  Container(width: 3, height: 12,
+                      decoration: BoxDecoration(
+                          color: _kPrimary,
+                          borderRadius: BorderRadius.circular(2))),
+                  const SizedBox(width: 7),
                   Text(text,
                       style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: _kTextMuted,
                           letterSpacing: 0.6)),
@@ -599,52 +609,51 @@ class _AdminsListTabState extends State<AdminsListTab> {
               return Dialog(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                      maxWidth: 540, maxHeight: 720),
+                      maxWidth: 560, maxHeight: 680),
                   child: Form(
                     key: formKey,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
 
-                      // ── Header del modal ───────────
+                      // ── Header ─────────────────────
                       Container(
-                        padding: const EdgeInsets.fromLTRB(22, 18, 14, 18),
+                        padding: const EdgeInsets.fromLTRB(20, 14, 14, 14),
                         decoration: const BoxDecoration(
                           border: Border(bottom: BorderSide(
                               color: _kBorder, width: 0.5)),
                         ),
                         child: Row(children: [
                           Container(
-                            width: 40, height: 40,
+                            width: 36, height: 36,
                             decoration: BoxDecoration(
                               color: _kPrimary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(9),
                             ),
                             child: const Icon(Icons.person_add_rounded,
-                                size: 18, color: _kPrimary),
+                                size: 17, color: _kPrimary),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 11),
                           const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Crear usuario',
                                     style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w700,
                                         color: _kTextHead)),
-                                SizedBox(height: 2),
                                 Text(
                                     'Nuevo acceso al panel de administración',
                                     style: TextStyle(
-                                        fontSize: 12, color: _kTextSub)),
+                                        fontSize: 11, color: _kTextSub)),
                               ],
                             ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.close_rounded,
-                                size: 20, color: _kTextMuted),
+                                size: 19, color: _kTextMuted),
                             onPressed: isCreating
                                 ? null : () => Navigator.pop(ctx),
                             padding: EdgeInsets.zero,
@@ -652,33 +661,32 @@ class _AdminsListTabState extends State<AdminsListTab> {
                         ]),
                       ),
 
-                      // ── Cuerpo del formulario ──────
+                      // ── Cuerpo ─────────────────────
                       Flexible(
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(22),
+                          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
 
-                              // Sección: Información personal
-                              sectionLabel('INFORMACIÓN PERSONAL'),
-                              Row(children: [
-                                Expanded(child: field(
+                              // — Información personal —
+                              sectionDiv('INFORMACIÓN PERSONAL'),
+                              row2(
+                                textField(
                                   label: 'Nombre *',
                                   ctrl: firstCtrl,
                                   validator: (v) => v == null || v.isEmpty
                                       ? 'Requerido' : null,
-                                )),
-                                const SizedBox(width: 12),
-                                Expanded(child: field(
+                                ),
+                                textField(
                                   label: 'Apellido *',
                                   ctrl: lastCtrl,
                                   validator: (v) => v == null || v.isEmpty
                                       ? 'Requerido' : null,
-                                )),
-                              ]),
-                              const SizedBox(height: 12),
-                              field(
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              textField(
                                 label: 'Email *',
                                 ctrl: emailCtrl,
                                 keyboard: TextInputType.emailAddress,
@@ -689,115 +697,100 @@ class _AdminsListTabState extends State<AdminsListTab> {
                                 },
                               ),
 
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 14),
 
-                              // Sección: Acceso
-                              sectionLabel('ACCESO'),
-                              field(
-                                label: 'Usuario *',
-                                ctrl: userCtrl,
-                                validator: (v) => v == null || v.isEmpty
-                                    ? 'Requerido' : null,
-                              ),
-                              const SizedBox(height: 12),
-                              field(
-                                label: 'Contraseña *',
-                                ctrl: passCtrl,
-                                obscureText: obscure,
-                                suffix: IconButton(
-                                  icon: Icon(
-                                    obscure
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    size: 18, color: _kTextSub,
-                                  ),
-                                  onPressed: () =>
-                                      setD(() => obscure = !obscure),
-                                  padding: const EdgeInsets.only(right: 4),
+                              // — Acceso —
+                              sectionDiv('ACCESO'),
+                              row2(
+                                textField(
+                                  label: 'Usuario *',
+                                  ctrl: userCtrl,
+                                  validator: (v) => v == null || v.isEmpty
+                                      ? 'Requerido' : null,
                                 ),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Requerido';
-                                  if (v.length < 6) return 'Mínimo 6 caracteres';
-                                  return null;
-                                },
+                                textField(
+                                  label: 'Contraseña *',
+                                  ctrl: passCtrl,
+                                  obscureText: obscure,
+                                  suffix: IconButton(
+                                    icon: Icon(
+                                      obscure
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                      size: 17, color: _kTextSub,
+                                    ),
+                                    onPressed: () =>
+                                        setD(() => obscure = !obscure),
+                                    padding: const EdgeInsets.only(right: 4),
+                                  ),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return 'Requerido';
+                                    if (v.length < 6) return 'Mínimo 6 caracteres';
+                                    return null;
+                                  },
+                                ),
                               ),
 
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 14),
 
-                              // Sección: Configuración
-                              sectionLabel('CONFIGURACIÓN'),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Rol *',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: _kTextMuted)),
-                                  const SizedBox(height: 6),
-                                  DropdownButtonFormField<String>(
-                                    value: selectedRole,
-                                    style: const TextStyle(
-                                        fontSize: 14, color: _kTextHead),
-                                    decoration: inputDec(),
-                                    items: const [
-                                      DropdownMenuItem(
-                                          value: 'admin_general',
-                                          child: Text('👑 Administrador General')),
-                                      DropdownMenuItem(
-                                          value: 'user_general',
-                                          child: Text('📋 Secretaría de Turismo')),
-                                      DropdownMenuItem(
-                                          value: 'user_place',
-                                          child: Text('🏪 Propietario de Lugar')),
-                                    ],
-                                    onChanged: (v) {
-                                      if (v != null) {
-                                        setD(() {
-                                          selectedRole  = v;
-                                          selectedPlace = null;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ],
+                              // — Configuración —
+                              sectionDiv('CONFIGURACIÓN'),
+                              labelField('Rol *',
+                                DropdownButtonFormField<String>(
+                                  value: selectedRole,
+                                  isDense: true,
+                                  style: const TextStyle(
+                                      fontSize: 13, color: _kTextHead),
+                                  decoration: inputDec(),
+                                  items: const [
+                                    DropdownMenuItem(
+                                        value: 'admin_general',
+                                        child: Text('👑 Administrador General')),
+                                    DropdownMenuItem(
+                                        value: 'user_general',
+                                        child: Text('📋 Secretaría de Turismo')),
+                                    DropdownMenuItem(
+                                        value: 'user_place',
+                                        child: Text('🏪 Propietario de Lugar')),
+                                  ],
+                                  onChanged: (v) {
+                                    if (v != null) {
+                                      setD(() {
+                                        selectedRole  = v;
+                                        selectedPlace = null;
+                                      });
+                                    }
+                                  },
+                                ),
                               ),
 
                               if (selectedRole == 'user_place') ...[
-                                const SizedBox(height: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Lugar asignado *',
+                                const SizedBox(height: 10),
+                                labelField('Lugar asignado *',
+                                  DropdownButtonFormField<Place>(
+                                    value: selectedPlace,
+                                    isDense: true,
+                                    style: const TextStyle(
+                                        fontSize: 13, color: _kTextHead),
+                                    decoration: inputDec(),
+                                    hint: const Text(
+                                        'Selecciona el establecimiento',
                                         style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: _kTextMuted)),
-                                    const SizedBox(height: 6),
-                                    DropdownButtonFormField<Place>(
-                                      value: selectedPlace,
-                                      style: const TextStyle(
-                                          fontSize: 14, color: _kTextHead),
-                                      decoration: inputDec(),
-                                      hint: const Text(
-                                          'Selecciona el establecimiento',
-                                          style: TextStyle(
-                                              fontSize: 13, color: _kTextSub)),
-                                      items: places
-                                          .map((p) => DropdownMenuItem(
-                                              value: p,
-                                              child: Text(
-                                                '${p.tipoEmoji} ${p.name} — ${p.lugar}',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(fontSize: 13),
-                                              )))
-                                          .toList(),
-                                      onChanged: (p) =>
-                                          setD(() => selectedPlace = p),
-                                      validator: (v) =>
-                                          v == null ? 'Selecciona un lugar' : null,
-                                    ),
-                                  ],
+                                            fontSize: 12, color: _kTextSub)),
+                                    items: places
+                                        .map((p) => DropdownMenuItem(
+                                            value: p,
+                                            child: Text(
+                                              '${p.tipoEmoji} ${p.name} — ${p.lugar}',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(fontSize: 13),
+                                            )))
+                                        .toList(),
+                                    onChanged: (p) =>
+                                        setD(() => selectedPlace = p),
+                                    validator: (v) =>
+                                        v == null ? 'Selecciona un lugar' : null,
+                                  ),
                                 ),
                               ],
                             ],
@@ -805,9 +798,9 @@ class _AdminsListTabState extends State<AdminsListTab> {
                         ),
                       ),
 
-                      // ── Footer con botones ─────────
+                      // ── Footer ─────────────────────
                       Container(
-                        padding: const EdgeInsets.fromLTRB(22, 14, 22, 20),
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
                         decoration: const BoxDecoration(
                           border: Border(top: BorderSide(
                               color: _kBorder, width: 0.5)),
@@ -821,12 +814,12 @@ class _AdminsListTabState extends State<AdminsListTab> {
                             style: TextButton.styleFrom(
                               foregroundColor: _kTextMuted,
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 10),
+                                  horizontal: 14, vertical: 9),
                             ),
                             child: const Text('Cancelar',
-                                style: TextStyle(fontSize: 14)),
+                                style: TextStyle(fontSize: 13)),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           ElevatedButton(
                             onPressed: isCreating ? null : () async {
                               if (!formKey.currentState!.validate()) return;
@@ -858,24 +851,24 @@ class _AdminsListTabState extends State<AdminsListTab> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                  borderRadius: BorderRadius.circular(9)),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 12),
+                                  horizontal: 16, vertical: 10),
                             ),
                             child: isCreating
                                 ? const SizedBox(
-                                    width: 18, height: 18,
+                                    width: 17, height: 17,
                                     child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         color: Colors.white))
                                 : const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.person_add_rounded, size: 15),
-                                      SizedBox(width: 8),
+                                      Icon(Icons.person_add_rounded, size: 14),
+                                      SizedBox(width: 7),
                                       Text('Crear usuario',
                                           style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 13,
                                               fontWeight: FontWeight.w600)),
                                     ]),
                           ),

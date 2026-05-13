@@ -203,16 +203,38 @@ class _PlacesListTabState extends State<PlacesListTab> {
                   child: CircularProgressIndicator(color: _kPrimary))
               : _filteredPlaces.isEmpty
                   ? _buildEmptyState()
-                  : RefreshIndicator(
-                      onRefresh: _loadPlaces,
-                      color: _kPrimary,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
-                        itemCount: _filteredPlaces.length,
-                        itemBuilder: (_, i) =>
-                            _buildPlaceCard(_filteredPlaces[i]),
-                      ),
-                    ),
+                  : LayoutBuilder(builder: (_, box) {
+                      final isDesktop = box.maxWidth > 700;
+                      if (isDesktop) {
+                        return RefreshIndicator(
+                          onRefresh: _loadPlaces,
+                          color: _kPrimary,
+                          child: GridView.builder(
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 0,
+                              mainAxisExtent: 140,
+                            ),
+                            itemCount: _filteredPlaces.length,
+                            itemBuilder: (_, i) =>
+                                _buildPlaceCard(_filteredPlaces[i]),
+                          ),
+                        );
+                      }
+                      return RefreshIndicator(
+                        onRefresh: _loadPlaces,
+                        color: _kPrimary,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                          itemCount: _filteredPlaces.length,
+                          itemBuilder: (_, i) =>
+                              _buildPlaceCard(_filteredPlaces[i]),
+                        ),
+                      );
+                    }),
         ),
       ]),
     );

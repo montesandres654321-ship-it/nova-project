@@ -130,7 +130,7 @@ class _DashboardPageState extends State<DashboardPage> {
       if (isDesktop) {
         // ── DESKTOP: NavigationRail permanente ──────────────
         return Scaffold(
-          appBar: _buildAppBar(showMenuButton: true),
+          appBar: _buildAppBar(showMenuButton: true, isDesktop: true),
           body: Row(children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
@@ -145,7 +145,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
       // ── MOBILE: Drawer con botón hamburguesa ────────────
       return Scaffold(
-        appBar: _buildAppBar(showMenuButton: false),
+        appBar: _buildAppBar(showMenuButton: false, isDesktop: false),
         drawer: Drawer(
           width: 220,
           child: SafeArea(child: _buildNavigationRail(forceLabels: true)),
@@ -155,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  PreferredSizeWidget _buildAppBar({required bool showMenuButton}) {
+  PreferredSizeWidget _buildAppBar({required bool showMenuButton, bool isDesktop = true}) {
     return AppBar(
       backgroundColor: _teal,
       title: Row(children: [
@@ -172,16 +172,16 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: _toggleSidebar,
           ),
         const SizedBox(width: 4),
-        const Icon(Icons.qr_code_scanner, color: Colors.white),
-        const SizedBox(width: 8),
-        const Flexible(child: Text('Nova App Dashboard',
-            style: TextStyle(color: Colors.white),
+        const Icon(Icons.qr_code_scanner, color: Colors.white, size: 20),
+        const SizedBox(width: 6),
+        const Flexible(child: Text('Nova Dashboard',
+            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
             overflow: TextOverflow.ellipsis, maxLines: 1)),
       ]),
       actions: [
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 180),
-          child: _buildUserMenu(),
+          constraints: BoxConstraints(maxWidth: isDesktop ? 200 : 56),
+          child: _buildUserMenu(compact: !isDesktop),
         ),
         const SizedBox(width: 8),
       ],
@@ -219,27 +219,40 @@ class _DashboardPageState extends State<DashboardPage> {
     ]));
   }
 
-  // FIX: menú completo con nombre, email, rol, perfil, contraseña, cerrar sesión
-  Widget _buildUserMenu() {
+  Widget _buildUserMenu({bool compact = false}) {
     final roleLabel = AppConstants.getRoleLabel(_userRole);
     final roleEmoji = AppConstants.getRoleEmoji(_userRole);
 
     return PopupMenuButton<String>(
       offset: const Offset(0, 50),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: compact ? 6 : 8),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          CircleAvatar(radius: 16, backgroundColor: Colors.white,
-              child: Text(_userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
-                  style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 14))),
-          const SizedBox(width: 8),
-          Flexible(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(_userName.split(' ').first,
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-                overflow: TextOverflow.ellipsis, maxLines: 1),
-            Text('$roleEmoji $roleLabel', style: const TextStyle(color: Colors.white70, fontSize: 10)),
-          ])),
-          const Icon(Icons.arrow_drop_down, color: Colors.white),
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: Colors.white,
+            child: Text(
+              _userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
+              style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          // En móvil solo avatar + chevron — evita overflow del AppBar
+          if (!compact) ...[
+            const SizedBox(width: 6),
+            Flexible(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(_userName.split(' ').first,
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.ellipsis, maxLines: 1),
+                Text('$roleEmoji $roleLabel',
+                    style: const TextStyle(color: Colors.white70, fontSize: 9),
+                    overflow: TextOverflow.ellipsis, maxLines: 1),
+              ],
+            )),
+          ],
+          const Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
         ]),
       ),
       itemBuilder: (_) => [

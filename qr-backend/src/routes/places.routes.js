@@ -96,15 +96,16 @@ router.get('/my-place/stats',
       const placeId = req.user.role === 'user_place' ? req.user.place_id : parseInt(req.query.place_id);
       if (!placeId) return res.status(400).json({ success: false, error: 'place_id requerido' });
 
-      const [{ c: totalScans }]     = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans WHERE place_id = ${placeId}`;
-      const [{ c: uniqueVisitors }] = await prisma.$queryRaw`SELECT COUNT(DISTINCT user_id)::int as c FROM scans WHERE place_id = ${placeId}`;
+      const [{ c: totalScans }]     = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL`;
+      const [{ c: uniqueVisitors }] = await prisma.$queryRaw`SELECT COUNT(DISTINCT s.user_id)::int as c FROM scans s INNER JOIN users u ON s.user_id = u.id WHERE s.place_id = ${placeId} AND u.role IS NULL`;
       const [{ c: totalRewards }]   = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE place_id = ${placeId}`;
       const [{ c: redeemed }]       = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards WHERE place_id = ${placeId} AND is_redeemed = TRUE`;
 
       const lastScans = await prisma.$queryRaw`
-        SELECT created_at::date AS date, COUNT(*)::int as count
-        FROM scans WHERE place_id = ${placeId}
-        GROUP BY created_at::date ORDER BY date ASC
+        SELECT s.created_at::date AS date, COUNT(*)::int as count
+        FROM scans s INNER JOIN users u ON s.user_id = u.id
+        WHERE s.place_id = ${placeId} AND u.role IS NULL
+        GROUP BY s.created_at::date ORDER BY date ASC
       `;
 
       return res.json({
@@ -134,7 +135,7 @@ router.get('/my-place/scans',
       const scans = await prisma.$queryRaw`
         SELECT s.*, u.first_name, u.last_name, u.username, u.email
         FROM scans s JOIN users u ON s.user_id = u.id
-        WHERE s.place_id = ${placeId}
+        WHERE s.place_id = ${placeId} AND u.role IS NULL
         ORDER BY s.created_at DESC LIMIT 100
       `;
       return res.json({ success: true, data: scans });
@@ -157,7 +158,7 @@ router.get('/my-place/visitors',
                COUNT(s.id)::int as visit_count,
                MAX(s.created_at) as last_visit
         FROM users u JOIN scans s ON u.id = s.user_id
-        WHERE s.place_id = ${placeId}
+        WHERE s.place_id = ${placeId} AND u.role IS NULL
         GROUP BY u.id ORDER BY visit_count DESC
       `;
       return res.json({ success: true, data: visitors, total: visitors.length });

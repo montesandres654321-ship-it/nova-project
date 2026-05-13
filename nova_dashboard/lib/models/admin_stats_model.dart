@@ -81,6 +81,8 @@ class PlaceStats {
   final int totalScans;
   final int uniqueVisitors;
   final int totalRewards;
+  // null = backend no lo envía todavía; bool = estado real del lugar
+  final bool? placeIsActive;
 
   PlaceStats({
     required this.placeName,
@@ -90,12 +92,17 @@ class PlaceStats {
     required this.totalScans,
     required this.uniqueVisitors,
     required this.totalRewards,
+    this.placeIsActive,
   });
 
   // ============================================
   // FACTORY FROM JSON
   // ============================================
   factory PlaceStats.fromJson(Map<String, dynamic> json) {
+    bool? active;
+    final raw = json['place_is_active'];
+    if (raw != null) active = raw == 1 || raw == true;
+
     return PlaceStats(
       placeName: json['place_name'] ?? '',
       placeType: json['place_tipo'] ?? json['place_type'] ?? '',
@@ -104,6 +111,7 @@ class PlaceStats {
       totalScans: json['total_scans'] ?? 0,
       uniqueVisitors: json['unique_visitors'] ?? 0,
       totalRewards: json['total_rewards'] ?? 0,
+      placeIsActive: active,
     );
   }
 
@@ -119,6 +127,7 @@ class PlaceStats {
       'total_scans': totalScans,
       'unique_visitors': uniqueVisitors,
       'total_rewards': totalRewards,
+      if (placeIsActive != null) 'place_is_active': placeIsActive! ? 1 : 0,
     };
   }
 
