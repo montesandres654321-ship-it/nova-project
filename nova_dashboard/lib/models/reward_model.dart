@@ -51,7 +51,7 @@ class RewardModel {
       rewardDescription: json['reward_description'],
       rewardIcon: json['reward_icon'],
       earnedAt: json['earned_at'] ?? '',
-      isRedeemed: json['is_redeemed'] ?? 0,
+      isRedeemed: (json['is_redeemed'] == true || json['is_redeemed'] == 1) ? 1 : 0,
       redeemedAt: json['redeemed_at'],
       firstName: json['first_name'],
       lastName: json['last_name'],

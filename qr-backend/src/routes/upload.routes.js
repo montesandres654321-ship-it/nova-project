@@ -43,7 +43,7 @@ router.post('/admin/upload-image',
         });
       } catch (e) {
         console.error('❌ Error Supabase upload:', e.message);
-        return res.status(500).json({ success: false, error: 'Error al subir imagen a Supabase' });
+        return res.status(500).json({ success: false, error: `Error al subir imagen: ${e.message}` });
       }
     });
   }

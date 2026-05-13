@@ -148,15 +148,27 @@ router.get('/rewards/by-type', async (req, res) => {
 router.get('/scans/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = serializeRaw(await prisma.$queryRaw`
-      SELECT created_at::date AS date,
-        COUNT(*)::int as count,
-        COUNT(DISTINCT user_id)::int as unique_users
-      FROM scans
-      WHERE created_at >= NOW() - make_interval(days => ${days}::int)
-      GROUP BY created_at::date ORDER BY date ASC
-    `);
-    res.json({ success: true, data, period: `${days} días` });
+    let data;
+    if (days >= 3650) {
+      // "Todo el historial" — sin filtro de fecha
+      data = serializeRaw(await prisma.$queryRaw`
+        SELECT created_at::date AS date,
+          COUNT(*)::int as count,
+          COUNT(DISTINCT user_id)::int as unique_users
+        FROM scans
+        GROUP BY created_at::date ORDER BY date ASC
+      `);
+    } else {
+      data = serializeRaw(await prisma.$queryRaw`
+        SELECT created_at::date AS date,
+          COUNT(*)::int as count,
+          COUNT(DISTINCT user_id)::int as unique_users
+        FROM scans
+        WHERE created_at >= NOW() - make_interval(days => ${days}::int)
+        GROUP BY created_at::date ORDER BY date ASC
+      `);
+    }
+    res.json({ success: true, data, period: days >= 3650 ? 'todo' : `${days} días` });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Error escaneos por día' });
   }
