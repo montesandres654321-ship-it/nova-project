@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 80" width="520" height="80">
+  <!-- Ícono cuadrado pequeño -->
+  <rect x="0" y="4" width="72" height="72" rx="16" fill="#06B6A4"/>
+
+  <!-- QR mini esquinas -->
+  <rect x="9" y="12" width="22" height="22" rx="4" fill="none" stroke="white" stroke-width="4"/>
+  <rect x="14" y="17" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="41" y="12" width="22" height="22" rx="4" fill="none" stroke="white" stroke-width="4"/>
+  <rect x="46" y="17" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="9" y="42" width="22" height="22" rx="4" fill="none" stroke="white" stroke-width="4"/>
+  <rect x="14" y="47" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="41" y="42" width="5" height="5" rx="1" fill="white"/>
+  <rect x="49" y="42" width="5" height="5" rx="1" fill="white"/>
+  <rect x="57" y="42" width="7" height="5" rx="1" fill="white"/>
+  <rect x="41" y="50" width="28" height="5" rx="1" fill="white"/>
+  <rect x="41" y="58" width="22" height="5" rx="1" fill="white"/>
+  <rect x="5" y="70" width="62" height="1" rx="0.5" fill="rgba(255,255,255,0.4)"/>
+  <text x="36" y="79" text-anchor="middle" font-family="Arial Black,Arial" font-size="11" font-weight="900" fill="white" letter-spacing="3">NOVA</text>
+
+  <!-- Separador vertical -->
+  <rect x="88" y="16" width="1.5" height="48" rx="1" fill="#E5E7EB"/>
+
+  <!-- Texto NOVA grande -->
+  <text x="104" y="46"
+    text-anchor="start"
+    font-family="Arial Black, Arial, sans-serif"
+    font-size="32"
+    font-weight="900"
+    fill="#06B6A4"
+    letter-spacing="3">NOVA</text>
+
+  <!-- Texto App -->
+  <text x="104" y="66"
+    text-anchor="start"
+    font-family="Arial, sans-serif"
+    font-size="14"
+    font-weight="400"
+    fill="#888780"
+    letter-spacing="1">App · Golfo de Morrosquillo</text>
+</svg>

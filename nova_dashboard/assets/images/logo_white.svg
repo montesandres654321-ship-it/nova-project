@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
+  <rect x="0" y="4" width="64" height="64" rx="16" fill="rgba(255,255,255,0.2)"/>
+  <rect x="8" y="11" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
+  <rect x="12" y="15" width="6" height="6" rx="1" fill="white"/>
+  <rect x="36" y="11" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
+  <rect x="40" y="15" width="6" height="6" rx="1" fill="white"/>
+  <rect x="8" y="39" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
+  <rect x="12" y="43" width="6" height="6" rx="1" fill="white"/>
+  <rect x="36" y="39" width="24" height="4" rx="1" fill="white"/>
+  <rect x="36" y="46" width="28" height="4" rx="1" fill="white"/>
+  <rect x="36" y="53" width="20" height="4" rx="1" fill="white"/>
+  <text x="82" y="38" text-anchor="start" font-family="Arial Black,Arial" font-size="28" font-weight="900" fill="white" letter-spacing="3">NOVA</text>
+  <text x="82" y="60" text-anchor="start" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="rgba(255,255,255,0.8)" letter-spacing="1">App</text>
+</svg>

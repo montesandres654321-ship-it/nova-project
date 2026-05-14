@@ -158,11 +158,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: const Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.qr_code_scanner, color: Colors.white, size: 22),
                   SizedBox(width: 8),
-                  Text('Nova Dashboard',
+                  Text('NOVA App',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,
-                          fontWeight: FontWeight.w600)),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1)),
                 ]),
               ),
               Container(width: 1, height: 56, color: Colors.white24),
@@ -236,9 +237,10 @@ class _DashboardPageState extends State<DashboardPage> {
         Icon(Icons.qr_code_scanner, color: Colors.white, size: 20),
         SizedBox(width: 8),
         Flexible(
-          child: Text('Nova Dashboard',
+          child: Text('NOVA App',
               style: TextStyle(
-                  color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                  color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700,
+                  letterSpacing: 1),
               overflow: TextOverflow.ellipsis),
         ),
       ]),
