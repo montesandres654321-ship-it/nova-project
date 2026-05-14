@@ -101,21 +101,23 @@ class AdminDetailDialog extends StatelessWidget {
         const SizedBox(width: 11),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Detalle del Administrador',
-                style: TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w700, color: _kTextHead)),
-            Text(admin.displayName,
-                style: const TextStyle(fontSize: 11, color: _kTextSub),
-                overflow: TextOverflow.ellipsis),
+            const Text(
+              'Detalle del Administrador',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _kTextHead),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 3),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              _roleBadge(admin.roleEmoji, admin.roleLabel),
+            ]),
           ]),
         ),
-        // Badge de rol en el header para ahorrar espacio en el body
-        _roleBadge(admin.roleEmoji, admin.roleLabel),
-        const SizedBox(width: 6),
         IconButton(
           icon: const Icon(Icons.close_rounded, size: 19, color: _kTextMuted),
           onPressed: () => Navigator.of(context).pop(),
           padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
         ),
       ]),
     );

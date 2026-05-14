@@ -359,24 +359,46 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   // ── KPI CARDS COMPACTAS ────────────────────────────────────
 
   Widget _buildKpiRow() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Row(
-        children: [
-          Expanded(child: _buildKpiCard('Visitantes', _visitors,
-              Icons.people_rounded, const Color(0xFF3B82F6))),
-          const SizedBox(width: 8),
-          Expanded(child: _buildKpiCard('Escaneos', _scans,
-              Icons.qr_code_scanner_rounded, _teal)),
-          const SizedBox(width: 8),
-          Expanded(child: _buildKpiCard('Recompensas', _rewards,
-              Icons.card_giftcard_rounded, _amber)),
-          const SizedBox(width: 8),
-          Expanded(child: _buildKpiCard('Hoy', _scansToday,
-              Icons.today_rounded, _green)),
-        ],
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      final isMobile = constraints.maxWidth < 600;
+      if (isMobile) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 2.0,
+            children: [
+              _buildKpiCard('Visitantes', _visitors, Icons.people_rounded, const Color(0xFF3B82F6)),
+              _buildKpiCard('Escaneos', _scans, Icons.qr_code_scanner_rounded, _teal),
+              _buildKpiCard('Recompensas', _rewards, Icons.card_giftcard_rounded, _amber),
+              _buildKpiCard('Hoy', _scansToday, Icons.today_rounded, _green),
+            ],
+          ),
+        );
+      }
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Row(
+          children: [
+            Expanded(child: _buildKpiCard('Visitantes', _visitors,
+                Icons.people_rounded, const Color(0xFF3B82F6))),
+            const SizedBox(width: 8),
+            Expanded(child: _buildKpiCard('Escaneos', _scans,
+                Icons.qr_code_scanner_rounded, _teal)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildKpiCard('Recompensas', _rewards,
+                Icons.card_giftcard_rounded, _amber)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildKpiCard('Hoy', _scansToday,
+                Icons.today_rounded, _green)),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildKpiCard(String label, int value, IconData icon, Color color) {
@@ -401,7 +423,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                 Text('$value', style: TextStyle(
                     fontSize: 20, fontWeight: FontWeight.w700, color: color)),
                 Text(label, style: TextStyle(
-                    fontSize: 10, color: Colors.grey[600])),
+                    fontSize: 10, color: Colors.grey[600]),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

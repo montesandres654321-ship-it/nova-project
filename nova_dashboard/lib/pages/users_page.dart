@@ -141,23 +141,45 @@ class _UsersPageState extends State<UsersPage> {
             content: SizedBox(width: 380, child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(children: [
-                    Expanded(child: TextField(
-                        controller: firstCtrl,
-                        decoration: const InputDecoration(
-                            labelText: 'Nombre',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
-                            isDense: true))),
-                    const SizedBox(width: 12),
-                    Expanded(child: TextField(
-                        controller: lastCtrl,
-                        decoration: const InputDecoration(
-                            labelText: 'Apellido',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person_outline),
-                            isDense: true))),
-                  ]),
+                  LayoutBuilder(builder: (ctx, constraints) {
+                    final isMobile = constraints.maxWidth < 500;
+                    if (isMobile) {
+                      return Column(children: [
+                        TextField(
+                            controller: firstCtrl,
+                            decoration: const InputDecoration(
+                                labelText: 'Nombre',
+                                border: OutlineInputBorder(),
+                                prefixIcon: Icon(Icons.person),
+                                isDense: true)),
+                        const SizedBox(height: 12),
+                        TextField(
+                            controller: lastCtrl,
+                            decoration: const InputDecoration(
+                                labelText: 'Apellido',
+                                border: OutlineInputBorder(),
+                                prefixIcon: Icon(Icons.person_outline),
+                                isDense: true)),
+                      ]);
+                    }
+                    return Row(children: [
+                      Expanded(child: TextField(
+                          controller: firstCtrl,
+                          decoration: const InputDecoration(
+                              labelText: 'Nombre',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.person),
+                              isDense: true))),
+                      const SizedBox(width: 12),
+                      Expanded(child: TextField(
+                          controller: lastCtrl,
+                          decoration: const InputDecoration(
+                              labelText: 'Apellido',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.person_outline),
+                              isDense: true))),
+                    ]);
+                  }),
                   const SizedBox(height: 12),
                   TextField(
                       controller: phoneCtrl,

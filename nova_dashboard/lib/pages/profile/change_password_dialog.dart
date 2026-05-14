@@ -85,116 +85,115 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        width: 500,
-        padding: const EdgeInsets.all(24),
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(16, 16, 8, 0),
+      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      title: Row(
+        children: [
+          const Icon(Icons.lock, color: AppTheme.primary, size: 24),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'Cambiar Contraseña',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            onPressed: () => Navigator.pop(context),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.lock, color: AppTheme.primary, size: 28),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Cambiar Contraseña',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _oldPasswordController,
+                  obscureText: _obscureOld,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña actual',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureOld ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscureOld = !_obscureOld),
                     ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const Divider(height: 32),
-              TextFormField(
-                controller: _oldPasswordController,
-                obscureText: _obscureOld,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña actual',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureOld ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscureOld = !_obscureOld),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  validator: (v) => v?.isEmpty ?? true ? 'Requerido' : null,
                 ),
-                validator: (v) => v?.isEmpty ?? true ? 'Requerido' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _newPasswordController,
-                obscureText: _obscureNew,
-                decoration: InputDecoration(
-                  labelText: 'Nueva contraseña',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureNew ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  helperText: 'Mínimo 6 caracteres',
-                ),
-                validator: (v) {
-                  if (v?.isEmpty ?? true) return 'Requerido';
-                  if (v!.length < 6) return 'Mínimo 6 caracteres';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _confirmPasswordController,
-                obscureText: _obscureConfirm,
-                decoration: InputDecoration(
-                  labelText: 'Confirmar nueva contraseña',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureConfirm ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                validator: (v) {
-                  if (v?.isEmpty ?? true) return 'Requerido';
-                  if (v != _newPasswordController.text) return 'Las contraseñas no coinciden';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: _loading ? null : () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _changePassword,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _newPasswordController,
+                  obscureText: _obscureNew,
+                  decoration: InputDecoration(
+                    labelText: 'Nueva contraseña',
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureNew ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscureNew = !_obscureNew),
                     ),
-                    child: _loading
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                        : const Text('Cambiar Contraseña'),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    helperText: 'Mínimo 6 caracteres',
                   ),
-                ],
-              ),
-            ],
+                  validator: (v) {
+                    if (v?.isEmpty ?? true) return 'Requerido';
+                    if (v!.length < 6) return 'Mínimo 6 caracteres';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirm,
+                  decoration: InputDecoration(
+                    labelText: 'Confirmar nueva contraseña',
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureConfirm ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  validator: (v) {
+                    if (v?.isEmpty ?? true) return 'Requerido';
+                    if (v != _newPasswordController.text) return 'Las contraseñas no coinciden';
+                    return null;
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: _loading ? null : () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: _loading ? null : _changePassword,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primary,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(120, 40),
+          ),
+          child: _loading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : const Text('Cambiar Contraseña'),
+        ),
+      ],
     );
   }
 }

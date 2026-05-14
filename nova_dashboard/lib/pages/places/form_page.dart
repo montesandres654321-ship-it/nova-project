@@ -331,38 +331,36 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
 
                             const SizedBox(height: 16),
 
-                            // ── Botón guardar (derecha) ───────────────
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  width: isWide ? 220 : double.infinity,
-                                  height: 48,
-                                  child: ElevatedButton.icon(
-                                    onPressed: (_loading || _uploadingImage)
-                                        ? null : _savePlace,
-                                    icon: (_loading || _uploadingImage)
-                                        ? const SizedBox(width: 18, height: 18,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2, color: Colors.white))
-                                        : const Icon(Icons.save),
-                                    label: Text(
-                                        (_loading || _uploadingImage)
-                                            ? (_uploadingImage
-                                                ? 'Subiendo imagen...'
-                                                : 'Guardando...')
-                                            : (widget.place == null
-                                                ? 'Crear Lugar'
-                                                : 'Actualizar Lugar'),
-                                        style: const TextStyle(fontSize: 15)),
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: _teal,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12))),
-                                  ),
+                            // ── Botón guardar ──────────────────────────
+                            Align(
+                              alignment: isWide ? Alignment.centerRight : Alignment.center,
+                              child: SizedBox(
+                                width: isWide ? 220.0 : double.infinity,
+                                height: 48,
+                                child: ElevatedButton.icon(
+                                  onPressed: (_loading || _uploadingImage)
+                                      ? null : _savePlace,
+                                  icon: (_loading || _uploadingImage)
+                                      ? const SizedBox(width: 18, height: 18,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2, color: Colors.white))
+                                      : const Icon(Icons.save),
+                                  label: Text(
+                                      (_loading || _uploadingImage)
+                                          ? (_uploadingImage
+                                              ? 'Subiendo imagen...'
+                                              : 'Guardando...')
+                                          : (widget.place == null
+                                              ? 'Crear Lugar'
+                                              : 'Actualizar Lugar'),
+                                      style: const TextStyle(fontSize: 15)),
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: _teal,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12))),
                                 ),
-                              ],
+                              ),
                             ),
                             const SizedBox(height: 16),
                           ],

@@ -70,22 +70,51 @@ class _RewardsPageState extends State<RewardsPage> {
     });
   }
 
-  Widget _buildHeader() => Padding(padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      child: Row(children: [
-        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: _teal.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.card_giftcard_rounded, color: _teal, size: 26)),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Recompensas', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: Colors.grey[600]))])),
-        DropdownButton<int>(value: _selectedDays, underline: const SizedBox(),
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-            items: _daysOptions.map((d) => DropdownMenuItem(value: d,
-                child: Text(d == 0 ? 'Todo el historial' : '$d días'))).toList(),
-            onChanged: (v) { if (v != null) { setState(() => _selectedDays = v); _loadData(); } }),
-        const SizedBox(width: 8),
-        IconButton(icon: const Icon(Icons.refresh_rounded, color: _teal), onPressed: _loadData, tooltip: 'Actualizar'),
-      ]));
+  Widget _buildPeriodDropdown() => DropdownButton<int>(
+    value: _selectedDays,
+    underline: const SizedBox(),
+    style: const TextStyle(fontSize: 13, color: Colors.black87),
+    items: _daysOptions.map((d) => DropdownMenuItem(value: d,
+        child: Text(d == 0 ? 'Todo el historial' : '$d días'))).toList(),
+    onChanged: (v) { if (v != null) { setState(() => _selectedDays = v); _loadData(); } },
+  );
+
+  Widget _buildHeader() => LayoutBuilder(builder: (context, constraints) {
+    final isMobile = constraints.maxWidth < 600;
+    if (isMobile) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Container(padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: _teal.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.card_giftcard_rounded, color: _teal, size: 20)),
+            const SizedBox(width: 10),
+            const Text('Recompensas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            IconButton(icon: const Icon(Icons.refresh_rounded, color: _teal, size: 20),
+                onPressed: _loadData, tooltip: 'Actualizar'),
+          ]),
+          Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          const SizedBox(height: 8),
+          _buildPeriodDropdown(),
+        ]),
+      );
+    }
+    return Padding(padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+        child: Row(children: [
+          Container(padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: _teal.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.card_giftcard_rounded, color: _teal, size: 26)),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Recompensas', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: Colors.grey[600]))])),
+          _buildPeriodDropdown(),
+          const SizedBox(width: 8),
+          IconButton(icon: const Icon(Icons.refresh_rounded, color: _teal), onPressed: _loadData, tooltip: 'Actualizar'),
+        ]));
+  });
 
   Widget _buildStatsCards(bool isWide) {
     final total = (_stats?['total_rewards'] as num?)?.toInt() ?? 0;
