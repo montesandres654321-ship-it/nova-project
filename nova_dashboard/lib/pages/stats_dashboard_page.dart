@@ -39,6 +39,9 @@ class StatsDashboardPage extends StatefulWidget {
 
 // ──────────────────────────────────────────────────────────────
 class _StatsDashboardPageState extends State<StatsDashboardPage> {
+  static const double _mobileBreak = 600;
+  static const double _tabletBreak = 900;
+
   final AnalyticsService _analytics = AnalyticsService();
 
   int _totalScans   = 0;
@@ -49,7 +52,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   List<Map<String, dynamic>> _scansByDay   = [];
   List<Map<String, dynamic>> _scansByHour  = [];
   List<Map<String, dynamic>> _topPlaces    = [];
-  List<Map<String, dynamic>> _usersByMonth = [];
   List<Map<String, dynamic>> _rewardsByDay = [];
   Map<String, dynamic>       _placesByType = {};
 
@@ -85,17 +87,15 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       final scansByDay   = results[1] as List<Map<String, dynamic>>;
       final scansByHour  = results[2] as List<Map<String, dynamic>>;
       final topPlaces    = results[3] as List<Map<String, dynamic>>;
-      final usersStats   = results[4] as Map<String, dynamic>;
+      // results[4] = usersStats (no se muestra en el layout actual)
       final rewardsByDay = results[5] as List<Map<String, dynamic>>;
       final placesStats  = results[6] as Map<String, dynamic>;
 
       if (!mounted) return;
 
-      final stats          = dashboard['stats']   as Map<String, dynamic>? ?? {};
-      final usersData      = usersStats['stats']  as Map<String, dynamic>? ?? {};
-      final byMonth        = usersData['byMonth'] as List?                 ?? [];
-      final placesData     = placesStats['stats'] as Map<String, dynamic>? ?? {};
-      final byType         = placesData['byType'] as Map<String, dynamic>? ?? {};
+      final stats      = dashboard['stats']   as Map<String, dynamic>? ?? {};
+      final placesData = placesStats['stats'] as Map<String, dynamic>? ?? {};
+      final byType     = placesData['byType'] as Map<String, dynamic>? ?? {};
 
       setState(() {
         _totalScans   = stats['scans']   as int? ?? 0;
@@ -105,7 +105,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         _scansByDay   = scansByDay;
         _scansByHour  = scansByHour;
         _topPlaces    = topPlaces;
-        _usersByMonth = List<Map<String, dynamic>>.from(byMonth);
         _rewardsByDay = rewardsByDay;
         _placesByType = byType;
         _loading      = false;
@@ -172,60 +171,46 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   Widget _buildBody() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth >= 900) {
-          return _buildDesktopLayout();
-        }
+        final w = constraints.maxWidth;
+        if (w >= _tabletBreak) return _buildDesktopLayout();
+        if (w >= _mobileBreak) return _buildTabletLayout();
         return _buildMobileLayout();
       },
     );
   }
 
   // ═══════════════════════════════════════════════════════
-  // DESKTOP — sin scroll, Column con Expanded
+  // DESKTOP (>= 900px) — sin scroll
   // ═══════════════════════════════════════════════════════
   Widget _buildDesktopLayout() {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         children: [
-          // Fila 1: KPIs — altura fija
-          SizedBox(height: 90, child: _buildKpiRow()),
-          const SizedBox(height: 12),
-
-          // Fila 2: Escaneos por día + Top lugares
+          SizedBox(height: 75, child: _buildKpiRow(columns: 4)),
+          const SizedBox(height: 10),
           Expanded(
-            flex: 5,
+            flex: 6,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(flex: 3, child: _buildScansByDayChart()),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(flex: 2, child: _buildTopPlacesChart()),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-
-          // Fila 3: Horario pico + Turistas por mes
+          const SizedBox(height: 10),
           Expanded(
             flex: 4,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _buildScansByHourChart()),
-                const SizedBox(width: 12),
-                Expanded(child: _buildUsersByMonthChart()),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Fila 4: Distribución por tipo + Recompensas por día
-          Expanded(
-            flex: 4,
-            child: Row(
-              children: [
-                Expanded(child: _buildPlacesByTypeChart()),
-                const SizedBox(width: 12),
-                Expanded(flex: 2, child: _buildRewardsByDayChart()),
+                Expanded(flex: 1, child: _buildScansByHourChart()),
+                const SizedBox(width: 10),
+                Expanded(flex: 1, child: _buildPlacesByTypeChart()),
+                const SizedBox(width: 10),
+                Expanded(flex: 1, child: _buildRewardsByDayChart()),
               ],
             ),
           ),
@@ -235,47 +220,82 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // MOBILE — con scroll
+  // TABLET (600–900px) — scroll suave
+  // ═══════════════════════════════════════════════════════
+  Widget _buildTabletLayout() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        children: [
+          _buildKpiGrid(columns: 2, aspectRatio: 2.5),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 220,
+                  child: _buildScansByDayChart(),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 220,
+                  child: _buildTopPlacesChart(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 200,
+                  child: _buildScansByHourChart(),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 200,
+                  child: _buildPlacesByTypeChart(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 200,
+            child: _buildRewardsByDayChart(),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // MÓVIL (< 600px) — scroll vertical
   // ═══════════════════════════════════════════════════════
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 2.2,
-            children: [
-              _buildClickableKpi(label: 'Escaneos', value: _totalScans,
-                  icon: Icons.qr_code_scanner_rounded, color: const Color(0xFF06B6A4),
-                  index: widget.reportsIndex),
-              _buildClickableKpi(label: 'Turistas', value: _totalUsers,
-                  icon: Icons.people_rounded, color: const Color(0xFF3B82F6),
-                  index: widget.usersIndex),
-              _buildClickableKpi(label: 'Lugares', value: _totalPlaces,
-                  icon: Icons.place_rounded, color: const Color(0xFF10B981),
-                  index: widget.placesIndex),
-              _buildClickableKpi(label: 'Recompensas', value: _totalRewards,
-                  icon: Icons.card_giftcard_rounded, color: const Color(0xFFF59E0B),
-                  index: widget.rewardsIndex),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildScansByDayChart()),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildTopPlacesChart()),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildScansByHourChart()),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildUsersByMonthChart()),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildPlacesByTypeChart()),
-          const SizedBox(height: 12),
-          SizedBox(height: 220, child: _buildRewardsByDayChart()),
+          _buildKpiGrid(columns: 2, aspectRatio: 2.0),
+          const SizedBox(height: 10),
+          SizedBox(height: 200, child: _buildScansByDayChart()),
+          const SizedBox(height: 10),
+          SizedBox(height: 200, child: _buildTopPlacesChart()),
+          const SizedBox(height: 10),
+          SizedBox(height: 180, child: _buildScansByHourChart()),
+          const SizedBox(height: 10),
+          SizedBox(height: 180, child: _buildPlacesByTypeChart()),
+          const SizedBox(height: 10),
+          SizedBox(height: 180, child: _buildRewardsByDayChart()),
           const SizedBox(height: 12),
         ],
       ),
@@ -283,97 +303,116 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // KPI CARDS — clickeables para navegar a la sección
+  // KPI — Row (desktop) y Grid (tablet/móvil)
   // ═══════════════════════════════════════════════════════
-  Widget _buildKpiRow() {
+  Widget _buildKpiRow({required int columns}) {
     return Row(
       children: [
-        Expanded(child: _buildClickableKpi(
-          label: 'Total Escaneos', value: _totalScans,
-          icon: Icons.qr_code_scanner_rounded, color: const Color(0xFF06B6A4),
-          index: widget.reportsIndex,
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _buildClickableKpi(
-          label: 'Turistas', value: _totalUsers,
-          icon: Icons.people_rounded, color: const Color(0xFF3B82F6),
-          index: widget.usersIndex,
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _buildClickableKpi(
-          label: 'Lugares Activos', value: _totalPlaces,
-          icon: Icons.place_rounded, color: const Color(0xFF10B981),
-          index: widget.placesIndex,
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _buildClickableKpi(
-          label: 'Recompensas', value: _totalRewards,
-          icon: Icons.card_giftcard_rounded, color: const Color(0xFFF59E0B),
-          index: widget.rewardsIndex,
-        )),
+        Expanded(child: _buildKpiCard('Total Escaneos', _totalScans,
+            Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4))),
+        const SizedBox(width: 8),
+        Expanded(child: _buildKpiCard('Turistas', _totalUsers,
+            Icons.people_rounded, const Color(0xFF3B82F6))),
+        const SizedBox(width: 8),
+        Expanded(child: _buildKpiCard('Lugares Activos', _totalPlaces,
+            Icons.place_rounded, const Color(0xFF10B981))),
+        const SizedBox(width: 8),
+        Expanded(child: _buildKpiCard('Recompensas', _totalRewards,
+            Icons.card_giftcard_rounded, const Color(0xFFF59E0B))),
       ],
     );
   }
 
-  // Envuelve la KPI card en InkWell si el índice es válido
-  Widget _buildClickableKpi({
-    required String  label,
-    required int     value,
-    required IconData icon,
-    required Color   color,
-    required int     index,
-  }) {
-    final card = _buildKpiCard(label, value, icon, color);
-    if (index < 0 || widget.onNavigate == null) return card;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => widget.onNavigate!(index),
-        borderRadius: BorderRadius.circular(10),
-        child: card,
-      ),
+  Widget _buildKpiGrid({required int columns, required double aspectRatio}) {
+    final cards = [
+      _buildKpiCard('Total Escaneos', _totalScans,
+          Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4)),
+      _buildKpiCard('Turistas', _totalUsers,
+          Icons.people_rounded, const Color(0xFF3B82F6)),
+      _buildKpiCard('Lugares Activos', _totalPlaces,
+          Icons.place_rounded, const Color(0xFF10B981)),
+      _buildKpiCard('Recompensas', _totalRewards,
+          Icons.card_giftcard_rounded, const Color(0xFFF59E0B)),
+    ];
+
+    return GridView.count(
+      crossAxisCount: columns,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      childAspectRatio: aspectRatio,
+      children: cards,
     );
   }
 
   Widget _buildKpiCard(String label, int value, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _navigateFromKpi(label),
         borderRadius: BorderRadius.circular(10),
-        border: Border(top: BorderSide(color: color, width: 3)),
-        boxShadow: [BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 6, offset: const Offset(0, 2))],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border(top: BorderSide(color: color, width: 3)),
+            boxShadow: [BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 6, offset: const Offset(0, 2),
+            )],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('$value',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700,
-                        color: color, height: 1.1)),
-                Text(label,
-                    style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                child: Icon(icon, color: color, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('$value',
+                        style: TextStyle(fontSize: 18,
+                            fontWeight: FontWeight.w700, color: color,
+                            height: 1.1)),
+                    Text(label,
+                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
+  }
+
+  void _navigateFromKpi(String label) {
+    if (widget.onNavigate == null) return;
+    switch (label) {
+      case 'Total Escaneos':
+        widget.onNavigate!(widget.reportsIndex);
+        break;
+      case 'Turistas':
+        widget.onNavigate!(widget.usersIndex);
+        break;
+      case 'Lugares Activos':
+        widget.onNavigate!(widget.placesIndex);
+        break;
+      case 'Recompensas':
+        widget.onNavigate!(widget.rewardsIndex);
+        break;
+    }
   }
 
   // ═══════════════════════════════════════════════════════
@@ -428,10 +467,9 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // 6 GRÁFICAS
+  // 5 GRÁFICAS
   // ═══════════════════════════════════════════════════════
 
-  // 1. Escaneos por día
   Widget _buildScansByDayChart() {
     final data = _scansByDay.map((e) => <String, dynamic>{
       'label': _formatDate(e['date']?.toString() ?? ''),
@@ -458,7 +496,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     );
   }
 
-  // 2. Top establecimientos
   Widget _buildTopPlacesChart() {
     final data = _topPlaces.map((p) => <String, dynamic>{
       'label': () {
@@ -486,7 +523,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     );
   }
 
-  // 3. Horario pico
   Widget _buildScansByHourChart() {
     final Map<int, int> hourMap = {};
     for (final e in _scansByHour) {
@@ -516,32 +552,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     );
   }
 
-  // 4. Turistas nuevos por mes
-  Widget _buildUsersByMonthChart() {
-    final data = _usersByMonth.map((e) => <String, dynamic>{
-      'label': _formatMonth(e['month']?.toString() ?? ''),
-      'value': e['count'] ?? 0,
-    }).toList();
-
-    return _buildChartContainer(
-      title: 'Turistas Nuevos',
-      subtitle: 'Registros por mes',
-      accentColor: const Color(0xFF3B82F6),
-      chart: data.isEmpty
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return LineChartWidget(
-                title: '', data: data,
-                color: const Color(0xFF3B82F6),
-                fillArea: true,
-                height: h,
-              );
-            }),
-    );
-  }
-
-  // 5. Distribución por tipo de lugar
   Widget _buildPlacesByTypeChart() {
     final hotel = (_placesByType['hotel']      as num?)?.toInt() ?? 0;
     final rest  = (_placesByType['restaurant'] as num?)?.toInt() ?? 0;
@@ -572,7 +582,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     );
   }
 
-  // 6. Recompensas por día
   Widget _buildRewardsByDayChart() {
     final data = _rewardsByDay.map((e) => <String, dynamic>{
       'label': _formatDate(e['date']?.toString() ?? ''),
@@ -648,16 +657,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     } catch (_) {
       return dateStr;
     }
-  }
-
-  String _formatMonth(String monthStr) {
-    try {
-      final parts = monthStr.split('-');
-      if (parts.length >= 2) {
-        return '${_monthShort(int.parse(parts[1]))} ${parts[0].substring(2)}';
-      }
-    } catch (_) {}
-    return monthStr;
   }
 
   String _monthShort(int m) {
