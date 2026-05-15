@@ -192,7 +192,7 @@ class _PlacesListState extends State<_PlacesList>
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.82,
+            childAspectRatio: 1.0,
           ),
           itemCount: _places.length,
           itemBuilder: (_, i) => _buildPlaceCard(_places[i]),
@@ -250,7 +250,7 @@ class _PlacesListState extends State<_PlacesList>
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(8, 5, 8, 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -288,12 +288,12 @@ class _PlacesListState extends State<_PlacesList>
                 tag: 'place-hero-${place.id}',
                 child: Image.network(
                   place.imageUrl ?? type.placeholderImage,
-                  height: 100,
+                  height: 80,
                   fit: BoxFit.cover,
                   loadingBuilder: (_, child, prog) {
                     if (prog == null) return child;
                     return Container(
-                      height: 100,
+                      height: 80,
                       color: AppColors.surfaceVariant,
                       child: const Center(
                         child: CircularProgressIndicator(
@@ -304,7 +304,7 @@ class _PlacesListState extends State<_PlacesList>
                     );
                   },
                   errorBuilder: (_, __, ___) => Container(
-                    height: 100,
+                    height: 80,
                     color: AppColors.surfaceVariant,
                     child: Icon(type.icon, size: 36, color: AppColors.textHint),
                   ),
@@ -313,14 +313,14 @@ class _PlacesListState extends State<_PlacesList>
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.fromLTRB(8, 5, 8, 6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       place.name,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -331,7 +331,7 @@ class _PlacesListState extends State<_PlacesList>
                     Text(
                       place.lugar,
                       style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         color: AppColors.textSecondary,
                       ),
                       maxLines: 1,

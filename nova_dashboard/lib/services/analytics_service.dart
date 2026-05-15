@@ -200,4 +200,32 @@ class AnalyticsService {
       throw Exception('Error ${response.statusCode}');
     } catch (e) { throw Exception('Error de red: $e'); }
   }
+
+  // ── TODOS LOS ESCANEOS (paginado) ─────────────────────
+  Future<Map<String, dynamic>> getAllScans({
+    int page = 1,
+    int limit = 50,
+    String search = '',
+  }) async {
+    try {
+      final headers = await getAuthHeaders();
+      final uri = Uri.parse(
+        '$baseUrl/admin/scans/all'
+        '?page=$page&limit=$limit&search=${Uri.encodeComponent(search)}'
+      );
+      final response = await http.get(uri, headers: headers)
+          .timeout(const Duration(seconds: 15));
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {
+          'scans': List<Map<String, dynamic>>.from(data['data'] ?? []),
+          'meta': data['meta'] ?? {},
+        };
+      }
+      throw Exception(data['error'] ?? 'Error al cargar escaneos');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 }

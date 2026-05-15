@@ -164,4 +164,81 @@ router.post('/qr/validate', async (req, res) => {
   }
 });
 
+// ─── GET /admin/scans/all ────────────────────────────────
+router.get('/admin/scans/all', authenticateToken, async (req, res) => {
+  try {
+    const page  = parseInt(req.query.page)  || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    // Total para paginación
+    const totalRaw = await prisma.$queryRaw`
+      SELECT COUNT(*)::int as total
+      FROM scans s
+      INNER JOIN users  u ON s.user_id  = u.id
+      INNER JOIN places p ON s.place_id = p.id
+      WHERE (
+        u.first_name ILIKE ${'%' + search + '%'} OR
+        u.last_name  ILIKE ${'%' + search + '%'} OR
+        u.email      ILIKE ${'%' + search + '%'} OR
+        p.name       ILIKE ${'%' + search + '%'}
+      )
+    `;
+    const total = serializeRaw(totalRaw)[0]?.total ?? 0;
+
+    // Lista completa con JOIN
+    const scansRaw = await prisma.$queryRaw`
+      SELECT
+        s.id,
+        s.created_at                              AS created_at,
+        u.id                                      AS user_id,
+        u.first_name || ' ' || u.last_name        AS user_name,
+        u.email                                   AS user_email,
+        u.first_name                              AS user_first_name,
+        p.id                                      AS place_id,
+        p.name                                    AS place_name,
+        p.tipo                                    AS place_type,
+        p.lugar                                   AS place_location,
+        p.image_url                               AS place_image,
+        CASE WHEN ur.id IS NOT NULL THEN true
+             ELSE false END                       AS got_reward,
+        ur.reward_name                            AS reward_name,
+        ur.reward_icon                            AS reward_icon
+      FROM scans s
+      INNER JOIN users  u  ON s.user_id  = u.id
+      INNER JOIN places p  ON s.place_id = p.id
+      LEFT JOIN  user_rewards ur
+             ON ur.user_id  = s.user_id
+            AND ur.place_id = s.place_id
+            AND DATE(ur.earned_at) = DATE(s.created_at)
+      WHERE (
+        u.first_name ILIKE ${'%' + search + '%'} OR
+        u.last_name  ILIKE ${'%' + search + '%'} OR
+        u.email      ILIKE ${'%' + search + '%'} OR
+        p.name       ILIKE ${'%' + search + '%'}
+      )
+      ORDER BY s.created_at DESC
+      LIMIT   ${limit}
+      OFFSET  ${offset}
+    `;
+
+    const scans = serializeRaw(scansRaw);
+
+    return res.json({
+      success: true,
+      data: scans,
+      meta: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      }
+    });
+  } catch (e) {
+    console.error('❌ GET /admin/scans/all:', e.message);
+    return res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 module.exports = router;

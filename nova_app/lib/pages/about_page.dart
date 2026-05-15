@@ -4,7 +4,6 @@ import '../core/design/app_back_button.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
-import '../core/design/app_text_styles.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -74,45 +73,114 @@ class AboutPage extends StatelessWidget {
           AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Ícono principal
             Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: AppRadius.lgAll,
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(18),
               ),
               child: const Icon(Icons.travel_explore_rounded,
-                  color: AppColors.primary, size: 32),
+                  color: Colors.white, size: 36),
             ),
-            const SizedBox(height: AppSpacing.md),
-            const Text('Nova App', style: AppTextStyles.headline),
-            const SizedBox(height: AppSpacing.xs),
-            const Text('Versión 1.0', style: AppTextStyles.bodySm),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: 16),
+
+            // Nombre y versión
             const Text(
-              'Prototipo de app para gestión de lugares con códigos QR. Desarrollada en Flutter.',
-              style: AppTextStyles.body,
+              'NOVA App',
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: 4),
+            Text(
+              'Versión 1.0.0',
+              style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+            ),
+            const SizedBox(height: 8),
+
+            // Eslogan
+            const Text(
+              'Turismo inteligente en el Golfo de Morrosquillo',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 20),
+
+            // Descripción
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDFA),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Plataforma de turismo digital que permite explorar '
+                'establecimientos del Golfo de Morrosquillo, registrar '
+                'visitas mediante códigos QR y obtener recompensas exclusivas.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 13,
+                    height: 1.5,
+                    color: Color(0xFF374151)),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Detalles del proyecto
+            _buildInfoRow(Icons.school_rounded,
+                'Corporación Universitaria Antonio José de Sucre'),
+            _buildInfoRow(Icons.business_rounded, 'Empresa aliada: Xiru'),
+            _buildInfoRow(
+                Icons.code_rounded, 'Flutter · Node.js · Supabase'),
+            _buildInfoRow(Icons.calendar_today_rounded, '2026'),
+            const SizedBox(height: 24),
+
+            // Botón
             SizedBox(
               width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () => _openLink('https://flutter.dev'),
+              child: ElevatedButton.icon(
+                onPressed: () =>
+                    _openLink('https://nova-project-wk67.vercel.app'),
+                icon: const Icon(Icons.open_in_browser_rounded),
+                label: const Text('Ver Dashboard'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
                   elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                       borderRadius: AppRadius.mdAll),
                 ),
-                child: const Text('Visitar Flutter.dev',
-                    style: AppTextStyles.labelLg),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: AppColors.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                  fontSize: 13, color: Color(0xFF374151)),
+            ),
+          ),
+        ],
       ),
     );
   }

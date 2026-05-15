@@ -63,7 +63,9 @@ class _MainNavigationPageState extends State<MainNavigationPage>
           ],
         ),
       ),
-      floatingActionButton: _buildFab(),
+      floatingActionButton: (_currentIndex == 0 || _currentIndex == 1)
+          ? _buildFab()
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),

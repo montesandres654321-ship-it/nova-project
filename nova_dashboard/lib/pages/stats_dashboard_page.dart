@@ -401,7 +401,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     if (widget.onNavigate == null) return;
     switch (label) {
       case 'Total Escaneos':
-        widget.onNavigate!(widget.reportsIndex);
+        Navigator.pushNamed(context, '/scans');
         break;
       case 'Turistas':
         widget.onNavigate!(widget.usersIndex);
