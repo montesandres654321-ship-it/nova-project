@@ -155,15 +155,25 @@ class _DashboardPageState extends State<DashboardPage> {
               // Logo
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.qr_code_scanner, color: Colors.white, size: 22),
-                  SizedBox(width: 8),
-                  Text('NOVA App',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 32, height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.travel_explore_rounded,
+                        color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text('NOVA',
+                    style: TextStyle(color: Colors.white,
+                      fontSize: 16, fontWeight: FontWeight.w700,
+                      letterSpacing: 2)),
+                  const Text(' App',
+                    style: TextStyle(color: Colors.white70,
+                      fontSize: 16, fontWeight: FontWeight.w300,
+                      letterSpacing: 1)),
                 ]),
               ),
               Container(width: 1, height: 56, color: Colors.white24),
@@ -233,16 +243,23 @@ class _DashboardPageState extends State<DashboardPage> {
   PreferredSizeWidget _buildMobileAppBar() {
     return AppBar(
       backgroundColor: _teal,
-      title: const Row(children: [
-        Icon(Icons.qr_code_scanner, color: Colors.white, size: 20),
-        SizedBox(width: 8),
-        Flexible(
-          child: Text('NOVA App',
-              style: TextStyle(
-                  color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700,
-                  letterSpacing: 1),
-              overflow: TextOverflow.ellipsis),
+      title: Row(children: [
+        Container(
+          width: 28, height: 28,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: const Icon(Icons.travel_explore_rounded,
+              color: Colors.white, size: 17),
         ),
+        const SizedBox(width: 8),
+        const Text('NOVA',
+          style: TextStyle(color: Colors.white,
+            fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 2)),
+        const Text(' App',
+          style: TextStyle(color: Colors.white70,
+            fontSize: 15, fontWeight: FontWeight.w300, letterSpacing: 1)),
       ]),
       actions: [
         ConstrainedBox(
@@ -266,14 +283,23 @@ class _DashboardPageState extends State<DashboardPage> {
             color: _teal,
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-            child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(Icons.qr_code_scanner, color: Colors.white, size: 28),
-              SizedBox(height: 8),
-              Text('Nova Dashboard',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: const Icon(Icons.travel_explore_rounded,
+                    color: Colors.white, size: 22),
+              ),
+              const SizedBox(height: 8),
+              const Row(children: [
+                Text('NOVA', style: TextStyle(color: Colors.white,
+                    fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 2)),
+                Text(' App', style: TextStyle(color: Colors.white70,
+                    fontSize: 16, fontWeight: FontWeight.w300, letterSpacing: 1)),
+              ]),
             ]),
           ),
           const SizedBox(height: 8),

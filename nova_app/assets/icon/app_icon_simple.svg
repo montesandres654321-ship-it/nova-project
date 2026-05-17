@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512" width="512" height="512">
+
+  <!-- Fondo teal -->
+  <rect width="512" height="512" rx="110" fill="#06B6A4"/>
+
+  <!-- Ola simple y limpia -->
+  <path d="M0 330 Q128 290 256 318 Q384 346 512 308
+           L512 512 L0 512 Z"
+        fill="#0369A1"/>
+
+  <!-- Base isla sólida -->
+  <ellipse cx="256" cy="310" rx="192" ry="42" fill="#134E4A"/>
+
+  <!-- 3 colinas grandes y limpias -->
+  <ellipse cx="174" cy="240" rx="100" ry="95" fill="white"/>
+  <ellipse cx="264" cy="220" rx="120" ry="112" fill="white"/>
+  <ellipse cx="346" cy="248" rx="90" ry="84" fill="white"/>
+
+  <!-- Sombra base única -->
+  <ellipse cx="256" cy="294" rx="190" ry="38"
+           fill="rgba(19,78,74,0.48)"/>
+
+  <!-- Palmera — tronco muy grueso -->
+  <path d="M348 312 Q352 255 346 204"
+        stroke="rgba(255,255,255,0.96)" stroke-width="22"
+        fill="none" stroke-linecap="round"/>
+
+  <!-- Solo 3 hojas gruesas y cortas -->
+  <path d="M346 204 Q290 148 248 166"
+        stroke="white" stroke-width="26"
+        fill="none" stroke-linecap="round"/>
+  <path d="M346 204 Q402 148 436 166"
+        stroke="white" stroke-width="26"
+        fill="none" stroke-linecap="round"/>
+  <path d="M346 204 Q350 148 344 122"
+        stroke="white" stroke-width="22"
+        fill="none" stroke-linecap="round"/>
+</svg>

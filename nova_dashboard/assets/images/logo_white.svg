@@ -1,14 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
-  <rect x="0" y="4" width="64" height="64" rx="16" fill="rgba(255,255,255,0.2)"/>
-  <rect x="8" y="11" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
-  <rect x="12" y="15" width="6" height="6" rx="1" fill="white"/>
-  <rect x="36" y="11" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
-  <rect x="40" y="15" width="6" height="6" rx="1" fill="white"/>
-  <rect x="8" y="39" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
-  <rect x="12" y="43" width="6" height="6" rx="1" fill="white"/>
-  <rect x="36" y="39" width="24" height="4" rx="1" fill="white"/>
-  <rect x="36" y="46" width="28" height="4" rx="1" fill="white"/>
-  <rect x="36" y="53" width="20" height="4" rx="1" fill="white"/>
-  <text x="82" y="38" text-anchor="start" font-family="Arial Black,Arial" font-size="28" font-weight="900" fill="white" letter-spacing="3">NOVA</text>
-  <text x="82" y="60" text-anchor="start" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="rgba(255,255,255,0.8)" letter-spacing="1">App</text>
+<svg xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 360 56" width="360" height="56">
+
+  <!-- Ícono con fondo semitransparente -->
+  <rect x="0" y="0" width="56" height="56" rx="13"
+        fill="rgba(255,255,255,0.18)"/>
+
+  <!-- Ola mini blanca -->
+  <path d="M0 36 Q14 29 28 33 Q42 38 56 31 L56 56 L0 56 Z"
+        fill="rgba(255,255,255,0.25)"/>
+
+  <!-- Base isla -->
+  <ellipse cx="28" cy="34" rx="22" ry="5" fill="rgba(255,255,255,0.4)"/>
+
+  <!-- Colinas blancas -->
+  <ellipse cx="18" cy="26" rx="11" ry="10" fill="white" opacity="0.88"/>
+  <ellipse cx="29" cy="23" rx="13" ry="12" fill="white"/>
+  <ellipse cx="39" cy="27" rx="10" ry="9" fill="white" opacity="0.88"/>
+
+  <!-- Palmera blanca -->
+  <path d="M40 34 Q41 27 39 21"
+        stroke="white" stroke-width="3"
+        fill="none" stroke-linecap="round"/>
+  <path d="M39 21 Q33 14 28 17"
+        stroke="white" stroke-width="3.5"
+        fill="none" stroke-linecap="round"/>
+  <path d="M39 21 Q45 14 50 17"
+        stroke="white" stroke-width="3.5"
+        fill="none" stroke-linecap="round"/>
+  <path d="M39 21 Q40 14 39 11"
+        stroke="white" stroke-width="3"
+        fill="none" stroke-linecap="round"/>
+
+  <!-- Texto NOVA blanco -->
+  <text x="70" y="32"
+        font-family="Arial Black, Arial, sans-serif"
+        font-size="24"
+        font-weight="900"
+        fill="white"
+        letter-spacing="3">NOVA</text>
+
+  <!-- Texto App -->
+  <text x="72" y="48"
+        font-family="Arial, sans-serif"
+        font-size="13"
+        font-weight="300"
+        fill="rgba(255,255,255,0.8)"
+        letter-spacing="2">App</text>
 </svg>
