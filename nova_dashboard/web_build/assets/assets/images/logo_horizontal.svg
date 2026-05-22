@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 480 72" width="480" height="72">
+
+  <!-- Ícono cuadrado pequeño -->
+  <rect x="0" y="0" width="72" height="72" rx="16" fill="#06B6A4"/>
+
+  <!-- Ola mini -->
+  <path d="M0 46 Q18 38 36 43 Q54 48 72 40 L72 72 L0 72 Z"
+        fill="#0369A1"/>
+
+  <!-- Base isla mini -->
+  <ellipse cx="36" cy="44" rx="28" ry="6" fill="#134E4A"/>
+
+  <!-- Colinas mini -->
+  <ellipse cx="24" cy="34" rx="14" ry="13" fill="white"/>
+  <ellipse cx="37" cy="30" rx="17" ry="16" fill="white"/>
+  <ellipse cx="49" cy="35" rx="13" ry="12" fill="white"/>
+
+  <!-- Sombra mini -->
+  <ellipse cx="36" cy="41" rx="27" ry="5" fill="rgba(19,78,74,0.45)"/>
+
+  <!-- Palmera mini — solo tronco + 3 hojas -->
+  <path d="M50 44 Q51 35 49 28"
+        stroke="rgba(255,255,255,0.95)" stroke-width="3.5"
+        fill="none" stroke-linecap="round"/>
+  <path d="M49 28 Q42 20 37 23"
+        stroke="white" stroke-width="4"
+        fill="none" stroke-linecap="round"/>
+  <path d="M49 28 Q56 20 61 23"
+        stroke="white" stroke-width="4"
+        fill="none" stroke-linecap="round"/>
+  <path d="M49 28 Q50 20 49 16"
+        stroke="white" stroke-width="3.5"
+        fill="none" stroke-linecap="round"/>
+
+  <!-- Separador vertical -->
+  <rect x="88" y="12" width="1.5" height="48" rx="1" fill="#E5E7EB"/>
+
+  <!-- Texto NOVA -->
+  <text x="106" y="44"
+        font-family="Arial Black, Arial, sans-serif"
+        font-size="30"
+        font-weight="900"
+        fill="#06B6A4"
+        letter-spacing="3">NOVA</text>
+
+  <!-- Texto App subtítulo -->
+  <text x="108" y="62"
+        font-family="Arial, sans-serif"
+        font-size="13"
+        font-weight="400"
+        fill="#888780"
+        letter-spacing="1">App · Golfo de Morrosquillo</text>
+</svg>

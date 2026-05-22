@@ -1,97 +1,90 @@
 <svg xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 1024 1024" width="1024" height="1024">
 
-  <!-- Fondo teal -->
-  <rect width="1024" height="1024" rx="220" fill="#06B6A4"/>
+  <!-- Fondo degradado teal -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0ED2C0"/>
+      <stop offset="100%" stop-color="#0891B2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="210" fill="url(#bg)"/>
 
   <!-- Ola principal -->
-  <path d="M0 680 Q120 630 256 660 Q390 690 512 650
-           Q634 610 768 640 Q890 668 1024 630
-           L1024 870 Q890 840 768 858 Q634 878 512 852
-           Q390 828 256 850 Q120 870 0 845 Z"
+  <path d="M0 700 Q128 650 256 678 Q384 706 512 670
+           Q640 634 768 660 Q896 686 1024 650
+           L1024 880 Q896 856 768 872
+           Q640 888 512 864 Q384 840 256 860
+           Q128 880 0 858 Z"
         fill="#0369A1"/>
 
-  <!-- Ola secundaria -->
-  <path d="M0 720 Q128 695 256 710 Q384 728 512 700
-           Q640 672 768 692 Q896 712 1024 690
-           L1024 900 L0 900 Z"
+  <!-- Ola secundaria suave -->
+  <path d="M0 740 Q128 718 256 732
+           Q384 748 512 720 Q640 694 768 714
+           Q896 734 1024 712 L1024 900 L0 900 Z"
         fill="#0EA5E9" opacity="0.45"/>
 
   <!-- Espuma olas -->
-  <circle cx="200" cy="668" r="18" fill="white" opacity="0.7"/>
-  <circle cx="222" cy="648" r="11" fill="white" opacity="0.5"/>
-  <circle cx="620" cy="645" r="16" fill="white" opacity="0.7"/>
-  <circle cx="644" cy="662" r="10" fill="white" opacity="0.5"/>
-  <circle cx="840" cy="655" r="14" fill="white" opacity="0.6"/>
+  <circle cx="220" cy="704" r="20" fill="white" opacity="0.65"/>
+  <circle cx="244" cy="688" r="12" fill="white" opacity="0.45"/>
+  <circle cx="720" cy="672" r="18" fill="white" opacity="0.65"/>
+  <circle cx="748" cy="690" r="11" fill="white" opacity="0.45"/>
 
   <!-- Base isla -->
-  <ellipse cx="512" cy="630" rx="360" ry="82" fill="#134E4A"/>
+  <ellipse cx="512" cy="642" rx="370" ry="78" fill="#134E4A"/>
 
-  <!-- Colina izquierda -->
-  <ellipse cx="360" cy="520" rx="168" ry="158" fill="white" opacity="0.93"/>
-  <!-- Colina central (más alta) -->
-  <ellipse cx="512" cy="478" rx="198" ry="185" fill="white"/>
-  <!-- Colina derecha -->
-  <ellipse cx="656" cy="528" rx="148" ry="138" fill="white" opacity="0.93"/>
+  <!-- Colinas blancas -->
+  <ellipse cx="370" cy="526" rx="172" ry="162" fill="white" opacity="0.96"/>
+  <ellipse cx="520" cy="492" rx="204" ry="184" fill="white"/>
+  <ellipse cx="668" cy="534" rx="144" ry="132" fill="white" opacity="0.96"/>
 
-  <!-- Sombras base colinas -->
-  <ellipse cx="360" cy="574" rx="168" ry="60" fill="rgba(19,78,74,0.4)"/>
-  <ellipse cx="512" cy="586" rx="198" ry="62" fill="rgba(19,78,74,0.38)"/>
-  <ellipse cx="656" cy="576" rx="148" ry="55" fill="rgba(19,78,74,0.4)"/>
+  <!-- Sombra base colinas -->
+  <ellipse cx="512" cy="614" rx="362" ry="58"
+           fill="rgba(19,78,74,0.42)"/>
 
-  <!-- Palmera — tronco -->
-  <path d="M672 632 Q678 554 668 476 Q663 436 672 392"
+  <!-- Palmera tronco grueso -->
+  <path d="M678 642 Q682 554 674 474 Q670 434 678 392"
         stroke="rgba(255,255,255,0.95)" stroke-width="28"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Palmera — hoja izquierda principal -->
-  <path d="M672 392 Q592 300 524 332"
-        stroke="white" stroke-width="32"
+  <!-- Hoja izquierda principal -->
+  <path d="M678 392 Q594 294 520 330"
+        stroke="white" stroke-width="36"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Palmera — hoja derecha principal -->
-  <path d="M672 392 Q756 300 818 328"
-        stroke="white" stroke-width="32"
+  <!-- Hoja derecha principal -->
+  <path d="M678 392 Q762 294 828 326"
+        stroke="white" stroke-width="36"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Palmera — hoja superior -->
-  <path d="M672 392 Q680 300 668 252"
-        stroke="white" stroke-width="28"
+  <!-- Hoja superior -->
+  <path d="M678 392 Q684 292 676 238"
+        stroke="white" stroke-width="30"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Palmera — hoja secundaria izquierda -->
-  <path d="M672 392 Q620 316 578 344"
-        stroke="rgba(255,255,255,0.72)" stroke-width="22"
+  <!-- Hoja izquierda secundaria -->
+  <path d="M678 392 Q620 310 572 340"
+        stroke="rgba(255,255,255,0.75)" stroke-width="24"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Palmera — hoja secundaria derecha -->
-  <path d="M672 392 Q730 320 774 350"
-        stroke="rgba(255,255,255,0.72)" stroke-width="22"
+  <!-- Hoja derecha secundaria -->
+  <path d="M678 392 Q738 314 784 344"
+        stroke="rgba(255,255,255,0.75)" stroke-width="24"
         fill="none" stroke-linecap="round"/>
 
-  <!-- Cocos -->
-  <circle cx="644" cy="418" r="24" fill="rgba(255,255,255,0.52)"/>
-  <circle cx="658" cy="400" r="18" fill="rgba(255,255,255,0.38)"/>
+  <!-- Coco -->
+  <circle cx="654" cy="420" r="26" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="670" cy="402" r="18" fill="rgba(255,255,255,0.35)"/>
 
-  <!-- Línea separadora sutil -->
-  <rect x="80" y="940" width="864" height="6" rx="3"
-        fill="rgba(255,255,255,0.25)"/>
+  <!-- Línea separadora -->
+  <rect x="80" y="920" width="864" height="5" rx="2.5"
+        fill="rgba(255,255,255,0.22)"/>
 
   <!-- Texto NOVA -->
-  <text x="512" y="970"
+  <text x="512" y="980"
         text-anchor="middle"
         font-family="Arial Black, Arial, sans-serif"
-        font-size="152"
-        font-weight="900"
-        fill="white"
-        letter-spacing="28">NOVA</text>
+        font-size="140" font-weight="900"
+        fill="white" letter-spacing="22">NOVA</text>
 
-  <!-- Texto App -->
-  <text x="512" y="1010"
-        text-anchor="middle"
-        font-family="Arial, sans-serif"
-        font-size="72"
-        font-weight="300"
-        fill="rgba(255,255,255,0.82)"
-        letter-spacing="18">App</text>
 </svg>

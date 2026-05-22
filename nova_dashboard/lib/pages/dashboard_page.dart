@@ -140,6 +140,63 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
+  // ── LOGO ISLA TROPICAL ──────────────────────────────────────
+  Widget _buildLogo({double iconSize = 32, double fontSize = 16}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: iconSize,
+          height: iconSize,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.18),
+            borderRadius: BorderRadius.circular(iconSize * 0.28),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(iconSize * 0.28),
+            child: Image.asset(
+              'assets/icon/app_icon_192.png',
+              width: iconSize,
+              height: iconSize,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.travel_explore_rounded,
+                color: Colors.white,
+                size: iconSize * 0.62,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: iconSize * 0.25),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'NOVA',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                height: 1.1,
+              ),
+            ),
+            Text(
+              'Dashboard',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: fontSize * 0.58,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   // ── DESKTOP: TopBar horizontal con tabs ─────────────────────
 
   PreferredSizeWidget _buildDesktopTopBar() {
@@ -155,26 +212,7 @@ class _DashboardPageState extends State<DashboardPage> {
               // Logo
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                    width: 32, height: 32,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.travel_explore_rounded,
-                        color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text('NOVA',
-                    style: TextStyle(color: Colors.white,
-                      fontSize: 16, fontWeight: FontWeight.w700,
-                      letterSpacing: 2)),
-                  const Text(' App',
-                    style: TextStyle(color: Colors.white70,
-                      fontSize: 16, fontWeight: FontWeight.w300,
-                      letterSpacing: 1)),
-                ]),
+                child: _buildLogo(iconSize: 32, fontSize: 16),
               ),
               Container(width: 1, height: 56, color: Colors.white24),
               // Nav tabs — scrollable para que no overflow con muchos items
@@ -243,24 +281,7 @@ class _DashboardPageState extends State<DashboardPage> {
   PreferredSizeWidget _buildMobileAppBar() {
     return AppBar(
       backgroundColor: _teal,
-      title: Row(children: [
-        Container(
-          width: 28, height: 28,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(7),
-          ),
-          child: const Icon(Icons.travel_explore_rounded,
-              color: Colors.white, size: 17),
-        ),
-        const SizedBox(width: 8),
-        const Text('NOVA',
-          style: TextStyle(color: Colors.white,
-            fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 2)),
-        const Text(' App',
-          style: TextStyle(color: Colors.white70,
-            fontSize: 15, fontWeight: FontWeight.w300, letterSpacing: 1)),
-      ]),
+      title: _buildLogo(iconSize: 28, fontSize: 15),
       actions: [
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 56),
@@ -284,22 +305,7 @@ class _DashboardPageState extends State<DashboardPage> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: const Icon(Icons.travel_explore_rounded,
-                    color: Colors.white, size: 22),
-              ),
-              const SizedBox(height: 8),
-              const Row(children: [
-                Text('NOVA', style: TextStyle(color: Colors.white,
-                    fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 2)),
-                Text(' App', style: TextStyle(color: Colors.white70,
-                    fontSize: 16, fontWeight: FontWeight.w300, letterSpacing: 1)),
-              ]),
+              _buildLogo(iconSize: 36, fontSize: 16),
             ]),
           ),
           const SizedBox(height: 8),
