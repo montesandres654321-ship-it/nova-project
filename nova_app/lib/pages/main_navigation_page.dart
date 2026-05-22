@@ -1,3 +1,31 @@
+/// Scaffold principal de la app móvil con navegación inferior tipo FAB central.
+///
+/// Gestiona las 4 tabs principales de la app, con un FAB central prominente
+/// para el escaneo QR que es la acción principal del sistema.
+///
+/// **Tabs principales:**
+/// - Índice 0: [HomePage] — Inicio con último escaneo y accesos rápidos
+/// - Índice 1: PlacesPage — Explorar establecimientos (hoteles, restaurantes, bares)
+/// - Índice 2: [HistoryPage] — Historial completo de visitas
+/// - Índice 3: ProfilePage — Perfil del turista, recompensas y configuración
+///
+/// **FAB central (botón QR):**
+/// El FAB solo se muestra en Inicio (índice 0) y Explorar (índice 1).
+/// En Historial, Perfil y rutas secundarias queda oculto para no
+/// interferir con la navegación de esas pantallas.
+///
+/// **Animación de transición:**
+/// Usa [AnimationController] con [FadeTransition] para suavizar el cambio
+/// entre tabs con una duración de 200ms.
+///
+/// **Barra de estado:**
+/// Configura el estilo de la barra de estado del sistema para que sea
+/// transparente y use iconos oscuros (modo claro).
+///
+/// Ver también:
+/// - [ScanPage] para la pantalla de escaneo QR (abierta desde el FAB)
+/// - [HomePage] para la pantalla de inicio
+/// - [HistoryPage] para el historial de visitas
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'home_page.dart';

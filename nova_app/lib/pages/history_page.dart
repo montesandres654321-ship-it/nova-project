@@ -1,3 +1,24 @@
+/// Página de historial de escaneos del turista autenticado.
+///
+/// Muestra todos los lugares que el turista ha visitado mediante escaneo QR,
+/// ordenados del más reciente al más antiguo.
+///
+/// **Contenido de cada ítem:**
+/// - Imagen del lugar (o placeholder por tipo: 🏨 hotel, 🍽️ restaurante, 🍺 bar)
+/// - Nombre y tipo del establecimiento
+/// - Municipio del lugar
+/// - Fecha y hora del escaneo en formato localizado
+/// - Indicador de recompensa obtenida en esa visita (si aplica)
+///
+/// Los datos se cargan desde [ApiService.getScanHistory] que llama al
+/// endpoint `GET /scans/details/:userId` del backend.
+///
+/// En caso de error de red, muestra un mensaje de error con botón de reintento.
+/// En caso de historial vacío, muestra un estado vacío con invitación a escanear.
+///
+/// Ver también:
+/// - [ScanRecord] para el modelo de datos de cada escaneo
+/// - [ApiService.getScanHistory] para la carga de datos
 import 'package:flutter/material.dart';
 import '../models/scan_record.dart';
 import '../services/api_service.dart';

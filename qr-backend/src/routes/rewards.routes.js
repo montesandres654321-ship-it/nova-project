@@ -1,9 +1,42 @@
+/**
+ * @fileoverview Rutas para gestión de recompensas del sistema NOVA App.
+ * Las recompensas se generan automáticamente al escanear el QR de un lugar
+ * que tenga `has_reward = true` y stock disponible. Una vez obtenida,
+ * la recompensa puede ser canjeada (entregada físicamente al turista)
+ * por el propietario del lugar o por un administrador.
+ *
+ * Regla de negocio: cada turista obtiene máximo una recompensa por lugar,
+ * independientemente de cuántas veces escanee el QR.
+ *
+ * @module routes/rewards
+ * @author NOVA App Team
+ * @version 1.0.0
+ * @requires express
+ * @requires ../config/prisma
+ * @requires ../middleware/auth
+ * @requires ../middleware/authorize
+ */
+
 const express   = require('express');
 const router    = express.Router();
 const prisma    = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+/**
+ * Serializa los resultados de queries $queryRaw de Prisma.
+ * Convierte tipos no serializables a JSON:
+ * - BigInt → Number (Prisma retorna COUNT(*) como BigInt en PostgreSQL)
+ * - Date → string ISO 8601
+ *
+ * @function serializeRaw
+ * @param {Array<Object>} rows - Array de filas retornadas por prisma.$queryRaw
+ * @returns {Array<Object>} Array con todos los valores convertidos a tipos serializables
+ *
+ * @example
+ * const raw = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`;
+ * const result = serializeRaw(raw); // [{ c: 15 }]
+ */
 function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
@@ -15,7 +48,18 @@ function serializeRaw(rows) {
   });
 }
 
-// ─── GET /rewards/user/:userId ────────────────────────────
+/**
+ * @route GET /rewards/user/:userId
+ * @description Obtiene todas las recompensas de un turista específico.
+ * Incluye datos del lugar donde se obtuvo cada recompensa.
+ * Un turista solo puede ver sus propias recompensas; los admins pueden ver cualquiera.
+ *
+ * @access Privado — turista (propias) | admin_general | user_general
+ *
+ * @param {number} req.params.userId - ID del turista
+ * @returns {200} { success: true, data: UserReward[], stats: { total, pending, redeemed } }
+ * @returns {403} Si un turista intenta ver las recompensas de otro usuario
+ */
 router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -51,7 +95,23 @@ router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
   }
 });
 
-// ─── GET /rewards/place/:placeId ──────────────────────────
+/**
+ * @route GET /rewards/place/:placeId
+ * @description Obtiene todas las recompensas otorgadas por un lugar específico.
+ * Incluye datos del turista que obtuvo cada recompensa.
+ * Los propietarios solo pueden ver las recompensas de su propio lugar.
+ *
+ * @access Privado — admin_general | user_general | user_place (propio lugar)
+ *
+ * @param {number} req.params.placeId - ID del lugar turístico
+ * @returns {200} {
+ *   success: true,
+ *   data: UserReward[],
+ *   pending: UserReward[],
+ *   stats: { total, pending, redeemed }
+ * }
+ * @returns {403} Si un propietario intenta ver recompensas de otro lugar
+ */
 router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
   try {
     const placeId = parseInt(req.params.placeId);
@@ -92,7 +152,21 @@ router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
   }
 });
 
-// ─── PATCH /rewards/:id/redeem ────────────────────────────
+/**
+ * @route PATCH /rewards/:id/redeem
+ * @description Marca una recompensa como canjeada (entregada físicamente al turista).
+ * Registra la fecha y hora del canje en `redeemed_at`.
+ * Pueden canjear: el turista dueño de la recompensa, el administrador general,
+ * o el propietario del lugar al que pertenece la recompensa.
+ *
+ * @access Privado — turista (propia) | admin_general | user_place (su lugar)
+ *
+ * @param {number} req.params.id - ID de la recompensa a canjear
+ * @returns {200} { success: true, message: '¡Recompensa canjeada exitosamente!' }
+ * @returns {400} Si la recompensa ya fue canjeada previamente
+ * @returns {403} Si el usuario no tiene permiso para canjear esta recompensa
+ * @returns {404} Si la recompensa no existe
+ */
 router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
   try {
     const rewardId = parseInt(req.params.id);
@@ -122,7 +196,19 @@ router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
   }
 });
 
-// ─── PATCH /admin/rewards/:id/redeem ─────────────────────
+/**
+ * @route PATCH /admin/rewards/:id/redeem
+ * @description Marca una recompensa como canjeada desde el panel administrativo.
+ * Variante del endpoint anterior con autorización por rol de administrador.
+ * Registra el canje en consola para auditoría.
+ *
+ * @access Privado — admin_general | user_general | user_place
+ *
+ * @param {number} req.params.id - ID de la recompensa a canjear
+ * @returns {200} { success: true, message: '¡Recompensa entregada exitosamente!' }
+ * @returns {400} Si la recompensa ya fue canjeada previamente
+ * @returns {404} Si la recompensa no existe
+ */
 router.patch('/admin/rewards/:id/redeem', authenticateToken, authorize(['admin_general', 'user_general', 'user_place']), async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,7 +230,20 @@ router.patch('/admin/rewards/:id/redeem', authenticateToken, authorize(['admin_g
   }
 });
 
-// ─── GET /admin/rewards ───────────────────────────────────
+/**
+ * @route GET /admin/rewards
+ * @description Lista todas las recompensas del sistema con datos del turista y lugar.
+ * Retorna hasta 500 registros ordenados por fecha de obtención (más reciente primero).
+ * Incluye estadísticas globales: total, pendientes y canjeadas.
+ *
+ * @access Privado — admin_general | user_general
+ *
+ * @returns {200} {
+ *   success: true,
+ *   data: UserReward[],
+ *   stats: { total, pending, redeemed }
+ * }
+ */
 router.get('/admin/rewards', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
     const rawRewards = await prisma.userReward.findMany({

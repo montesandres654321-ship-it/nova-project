@@ -1,6 +1,25 @@
 // lib/pages/dashboard_page.dart
 // TAREA 2: sidebar → TopBar horizontal (desktop) + Drawer (mobile)
 
+/// Scaffold principal del dashboard administrativo NOVA App.
+///
+/// Gestiona la navegación entre todas las secciones mediante una barra de
+/// navegación superior (TopBar) en pantallas desktop y un Drawer con menú
+/// lateral en dispositivos móviles.
+///
+/// **Roles soportados:**
+/// - `admin_general`: acceso total — ve todas las secciones incluyendo gestión de admins y turistas
+/// - `user_general`: secretaría de turismo — dashboard completo sin gestión de administradores
+/// - `user_place`: propietario de establecimiento — redirigido automáticamente a [OwnerDashboardPage]
+///
+/// El logo del header usa [_buildLogo] que muestra el ícono de isla tropical
+/// con [Image.asset] y fallback automático al ícono del sistema.
+///
+/// Ver también:
+/// - [StatsDashboardPage] para las gráficas de analytics
+/// - [RewardsPage] para gestión de recompensas
+/// - [ScansPage] para el historial de escaneos
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';

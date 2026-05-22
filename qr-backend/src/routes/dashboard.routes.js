@@ -1,9 +1,43 @@
+/**
+ * @fileoverview Rutas del resumen principal del dashboard administrativo.
+ * Retorna en un solo request los KPIs globales del sistema y los datos
+ * necesarios para renderizar la pantalla de inicio del dashboard:
+ * indicadores clave, top establecimientos, escaneos de los últimos 7 días
+ * y actividad reciente en tiempo real.
+ *
+ * Los datos de los últimos 7 días se generan usando `generate_series` de PostgreSQL
+ * para garantizar que todos los días aparezcan en la respuesta, incluso los días
+ * sin actividad (count = 0).
+ *
+ * @module routes/dashboard
+ * @author NOVA App Team
+ * @version 1.0.0
+ * @requires express
+ * @requires ../config/prisma
+ * @requires ../middleware/auth
+ * @requires ../middleware/authorize
+ */
+
 const express   = require('express');
 const router    = express.Router();
 const prisma    = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+/**
+ * Serializa los resultados de queries $queryRaw de Prisma.
+ * Convierte tipos no serializables a JSON:
+ * - BigInt → Number (Prisma retorna COUNT(*) como BigInt en PostgreSQL)
+ * - Date → string ISO 8601
+ *
+ * @function serializeRaw
+ * @param {Array<Object>} rows - Array de filas retornadas por prisma.$queryRaw
+ * @returns {Array<Object>} Array con todos los valores convertidos a tipos serializables
+ *
+ * @example
+ * const [kpis] = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int AS "totalUsers" FROM users`);
+ * console.log(kpis.totalUsers); // 128
+ */
 function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
@@ -15,6 +49,29 @@ function serializeRaw(rows) {
   });
 }
 
+/**
+ * @route GET /dashboard/summary
+ * @description Resumen principal del dashboard administrativo.
+ * Retorna en un solo request todos los datos necesarios para la pantalla de inicio:
+ *
+ * - **KPIs**: turistas activos, total escaneos, escaneos hoy, lugares activos, recompensas pendientes
+ * - **Top 5 lugares**: ordenados por total de escaneos, con tasa de conversión (visitantes únicos / escaneos)
+ * - **Escaneos últimos 7 días**: serie completa día a día con generate_series (incluye días sin actividad)
+ * - **Actividad reciente**: últimas 10 visitas registradas en el sistema
+ *
+ * @access Privado — admin_general | user_general
+ *
+ * @returns {200} {
+ *   success: true,
+ *   data: {
+ *     totalUsers, totalScans, scansToday, activePlaces, pendingRewards,
+ *     topPlaces: Array<{ id, name, tipo, lugar, rating, totalScans, uniqueVisitors, conversionRate }>,
+ *     scansByDay: Array<{ date, count, uniqueUsers }>,
+ *     recentActivity: Array<{ id, timestamp, userName, username, placeName, placeType, placeLocation }>,
+ *     meta: { generatedAt, timezone }
+ *   }
+ * }
+ */
 router.get(
   '/dashboard/summary',
   authenticateToken,

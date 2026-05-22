@@ -1,8 +1,42 @@
+/**
+ * @fileoverview Rutas para registro y consulta de escaneos QR.
+ * El escaneo es la acción central del sistema: un turista apunta la cámara
+ * al código QR de un establecimiento y se registra su visita en la base de datos.
+ *
+ * Si el lugar tiene recompensa activa (`has_reward = true`), el backend
+ * verifica automáticamente si el turista ya obtuvo una recompensa de ese lugar.
+ * Si no la tiene y hay stock disponible, se genera una nueva recompensa.
+ *
+ * Solo los turistas (role IS NULL) pueden registrar escaneos.
+ * Los administradores y propietarios reciben un 403 si intentan escanear.
+ *
+ * @module routes/scans
+ * @author NOVA App Team
+ * @version 1.0.0
+ * @requires express
+ * @requires ../config/prisma
+ * @requires ../middleware/auth
+ */
+
 const express = require('express');
 const router  = express.Router();
 const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 
+/**
+ * Serializa los resultados de queries $queryRaw de Prisma.
+ * Convierte tipos no serializables a JSON:
+ * - BigInt → Number (Prisma retorna COUNT(*) como BigInt en PostgreSQL)
+ * - Date → string ISO 8601
+ *
+ * @function serializeRaw
+ * @param {Array<Object>} rows - Array de filas retornadas por prisma.$queryRaw
+ * @returns {Array<Object>} Array con todos los valores convertidos a tipos serializables
+ *
+ * @example
+ * const raw = await prisma.$queryRaw`SELECT COUNT(*)::int as total FROM scans`;
+ * const result = serializeRaw(raw); // [{ total: 42 }]
+ */
 function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
@@ -14,7 +48,37 @@ function serializeRaw(rows) {
   });
 }
 
-// ─── POST /scan ───────────────────────────────────────────
+/**
+ * @route POST /scan
+ * @description Registra un nuevo escaneo QR de un turista en un lugar turístico.
+ *
+ * Flujo completo:
+ * 1. Verifica que el usuario sea turista (role IS NULL)
+ * 2. Valida que el lugar exista y esté activo
+ * 3. Inserta el registro de escaneo en la tabla `scans`
+ * 4. Si el lugar tiene recompensa activa:
+ *    a. Verifica el stock disponible (si aplica)
+ *    b. Si el turista no tiene recompensa previa de ese lugar, la crea
+ * 5. Retorna el conteo total de visitas del turista a ese lugar
+ *
+ * @access Privado — requiere JWT de turista autenticado (role IS NULL)
+ *
+ * @param {Object} req.body
+ * @param {number} req.body.placeId  - ID del lugar escaneado (también acepta place_id)
+ *
+ * @returns {200} {
+ *   success: true,
+ *   data: {
+ *     scan_id, place: { id, name, tipo, lugar, description, image_url, rating },
+ *     reward: { id, name, description, icon, is_new } | null,
+ *     visit_count,
+ *     message
+ *   }
+ * }
+ * @returns {400} Si faltan userId o placeId
+ * @returns {403} Si el usuario es administrador (no puede escanear)
+ * @returns {404} Si el lugar no existe o está inactivo
+ */
 router.post('/scan', authenticateToken, async (req, res) => {
   try {
     const userId  = req.user.id;
@@ -103,7 +167,18 @@ router.post('/scan', authenticateToken, async (req, res) => {
   }
 });
 
-// ─── GET /scans/details/:userId ───────────────────────────
+/**
+ * @route GET /scans/details/:userId
+ * @description Obtiene el historial detallado de escaneos de un turista.
+ * Incluye datos del lugar visitado y la recompensa obtenida (si aplica).
+ * Un turista solo puede ver su propio historial; los admins pueden ver cualquiera.
+ *
+ * @access Privado — turista (propio historial) | admin_general | user_general
+ *
+ * @param {number} req.params.userId - ID del turista
+ * @returns {200} { success: true, data: Array<{ scan, place, reward }> }
+ * @returns {403} Si un turista intenta ver el historial de otro usuario
+ */
 router.get('/scans/details/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -131,7 +206,21 @@ router.get('/scans/details/:userId', authenticateToken, async (req, res) => {
   }
 });
 
-// ─── POST /qr/validate ───────────────────────────────────
+/**
+ * @route POST /qr/validate
+ * @description Valida un código QR antes de registrar el escaneo.
+ * Acepta el código en varios formatos: "PLACE:1", "1", o número directo.
+ * Retorna los datos del lugar si el código es válido y el lugar está activo.
+ *
+ * @access Público — no requiere autenticación (validación previa al login)
+ *
+ * @param {Object} req.body
+ * @param {string|number} req.body.qr_data - Código QR a validar
+ *
+ * @returns {200} { success: true, valid: true, place: Place }
+ * @returns {400} Si el formato del QR es inválido
+ * @returns {404} Si el lugar no existe o está inactivo
+ */
 router.post('/qr/validate', async (req, res) => {
   try {
     const { qr_data } = req.body;
@@ -164,7 +253,24 @@ router.post('/qr/validate', async (req, res) => {
   }
 });
 
-// ─── GET /admin/scans/all ────────────────────────────────
+/**
+ * @route GET /admin/scans/all
+ * @description Lista todos los escaneos del sistema con datos del turista y lugar.
+ * Soporta paginación y búsqueda por nombre, apellido, email del turista o nombre del lugar.
+ * Incluye información de la recompensa obtenida en cada escaneo (si aplica).
+ *
+ * @access Privado — admin_general | user_general (requiere JWT con rol de admin)
+ *
+ * @param {number} [req.query.page=1]    - Número de página (inicia en 1)
+ * @param {number} [req.query.limit=50]  - Registros por página (máximo recomendado: 100)
+ * @param {string} [req.query.search=''] - Texto de búsqueda (ILIKE sobre nombre, apellido, email, lugar)
+ *
+ * @returns {200} {
+ *   success: true,
+ *   data: Scan[],
+ *   meta: { total, page, limit, pages }
+ * }
+ */
 router.get('/admin/scans/all', authenticateToken, async (req, res) => {
   try {
     const page  = parseInt(req.query.page)  || 1;

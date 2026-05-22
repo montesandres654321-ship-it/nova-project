@@ -1,3 +1,23 @@
+/// Página principal de la app NOVA App para turistas.
+///
+/// Es el índice 0 del [MainNavigationPage] y la primera pantalla
+/// que ve el turista después de iniciar sesión.
+///
+/// **Contenido:**
+/// - Saludo personalizado con el nombre del turista
+/// - Banner de bienvenida con el logo NOVA App
+/// - Botón prominente "Escanear QR" que navega a [ScanPage]
+/// - Último escaneo realizado (tarjeta con lugar visitado y fecha)
+/// - Accesos rápidos a las tabs de Historial, Explorar y Perfil
+///
+/// Los datos del usuario y el último escaneo se cargan desde
+/// [SharedPreferences] (datos locales) y [ApiService.getScanHistory] (backend).
+///
+/// [onNavigateToTab] — callback para navegar a otras tabs del [MainNavigationPage]
+///
+/// Ver también:
+/// - [ScanPage] para el escaneo QR
+/// - [MainNavigationPage] para la navegación principal
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/scan_record.dart';

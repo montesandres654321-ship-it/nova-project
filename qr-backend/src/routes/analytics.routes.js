@@ -1,9 +1,50 @@
+/**
+ * @fileoverview Rutas de analytics y estadísticas del sistema NOVA App.
+ * Provee datos agregados para los dashboards administrativos, organizados en
+ * cuatro categorías: escaneos, recompensas, usuarios y lugares.
+ *
+ * Estadísticas disponibles:
+ * - Escaneos por día (con opción de todo el historial)
+ * - Escaneos por hora del día (horario pico)
+ * - Top establecimientos por número de escaneos
+ * - Turistas nuevos por mes (últimos 6 meses)
+ * - Distribución de recompensas por tipo de lugar
+ * - Estadísticas globales de recompensas (tasa de canje, tiempo promedio)
+ *
+ * Todas las rutas requieren autenticación con rol admin_general o user_general.
+ *
+ * @note Todas las queries usan serializeRaw() para convertir BigInt a Number
+ *       antes de serializar a JSON, ya que Prisma retorna COUNT(*) como BigInt.
+ *
+ * @module routes/analytics
+ * @author NOVA App Team
+ * @version 1.0.0
+ * @requires express
+ * @requires ../config/prisma
+ * @requires ../middleware/auth
+ * @requires ../middleware/authorize
+ */
+
 const express = require('express');
 const router  = express.Router();
 const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+/**
+ * Serializa los resultados de queries $queryRaw de Prisma.
+ * Convierte tipos no serializables a JSON:
+ * - BigInt → Number (Prisma retorna COUNT(*) como BigInt en PostgreSQL)
+ * - Date → string ISO 8601
+ *
+ * @function serializeRaw
+ * @param {Array<Object>} rows - Array de filas retornadas por prisma.$queryRaw
+ * @returns {Array<Object>} Array con todos los valores convertidos a tipos serializables
+ *
+ * @example
+ * const raw = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans`;
+ * const result = serializeRaw(raw); // [{ c: 342 }]
+ */
 function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
@@ -15,10 +56,20 @@ function serializeRaw(rows) {
   });
 }
 
+// Todas las rutas de analytics requieren autenticación y rol de administrador
 router.use(authenticateToken);
 router.use(authorize(['admin_general', 'user_general']));
 
-// ── STATS GENERALES ───────────────────────────────────────
+/**
+ * @route GET /analytics/stats/general
+ * @description Retorna estadísticas generales del sistema en un solo request.
+ * Incluye: total de turistas, lugares activos, escaneos totales,
+ * recompensas generadas, usuarios activos en los últimos 30 días
+ * y distribución de lugares por tipo.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, stats: { totalUsers, totalPlaces, totalScans, totalRewards, activeUsers, placesByType } }
+ */
 router.get('/stats/general', async (req, res) => {
   try {
     const [{ c: totalUsers }]   = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`);
@@ -47,7 +98,15 @@ router.get('/stats/general', async (req, res) => {
   }
 });
 
-// ── RECOMPENSAS STATS ─────────────────────────────────────
+/**
+ * @route GET /analytics/rewards/stats
+ * @description Estadísticas detalladas de recompensas del sistema.
+ * Incluye totales, tasa de canje, actividad hoy/semana y
+ * tiempo promedio entre obtención y canje (en días).
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, stats: { total_rewards, redeemed_rewards, pending_rewards, redemption_rate, hoy, semana, tiempoPromedioCanje } }
+ */
 router.get('/rewards/stats', async (req, res) => {
   try {
     const [{ c: total }]    = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM user_rewards`);
@@ -84,7 +143,14 @@ router.get('/rewards/stats', async (req, res) => {
   }
 });
 
-// ── RECOMPENSAS POR DÍA ───────────────────────────────────
+/**
+ * @route GET /analytics/rewards/by-day
+ * @description Recompensas generadas agrupadas por día en el período indicado.
+ *
+ * @access Privado — admin_general | user_general
+ * @param {number} [req.query.days=30] - Número de días hacia atrás a consultar
+ * @returns {200} { success: true, data: Array<{ date, count }>, period: string }
+ */
 router.get('/rewards/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
@@ -100,7 +166,15 @@ router.get('/rewards/by-day', async (req, res) => {
   }
 });
 
-// ── RECOMPENSAS TOP LUGARES ───────────────────────────────
+/**
+ * @route GET /analytics/rewards/top-places
+ * @description Top lugares por número de recompensas otorgadas.
+ * Incluye desglose de canjeadas vs pendientes por lugar.
+ *
+ * @access Privado — admin_general | user_general
+ * @param {number} [req.query.limit=10] - Número máximo de lugares a retornar
+ * @returns {200} { success: true, places: Array<{ id, name, tipo, lugar, total_rewards, redeemed, pending }> }
+ */
 router.get('/rewards/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -120,7 +194,14 @@ router.get('/rewards/top-places', async (req, res) => {
   }
 });
 
-// ── RECOMPENSAS POR TIPO ──────────────────────────────────
+/**
+ * @route GET /analytics/rewards/by-type
+ * @description Distribución de recompensas por tipo de establecimiento.
+ * Retorna totales, canjeadas y pendientes para hotel, restaurant y bar.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, data: { hotel, restaurant, bar } }
+ */
 router.get('/rewards/by-type', async (req, res) => {
   try {
     const data = serializeRaw(await prisma.$queryRaw`
@@ -144,7 +225,16 @@ router.get('/rewards/by-type', async (req, res) => {
   }
 });
 
-// ── ESCANEOS POR DÍA ──────────────────────────────────────
+/**
+ * @route GET /analytics/scans/by-day
+ * @description Escaneos agrupados por día en el período indicado.
+ * Si days >= 3650, retorna todo el historial sin filtro de fecha.
+ * Incluye conteo de usuarios únicos por día.
+ *
+ * @access Privado — admin_general | user_general
+ * @param {number} [req.query.days=30] - Número de días. Usar 3650 para todo el historial.
+ * @returns {200} { success: true, data: Array<{ date, count, unique_users }>, period: string }
+ */
 router.get('/scans/by-day', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
@@ -174,7 +264,15 @@ router.get('/scans/by-day', async (req, res) => {
   }
 });
 
-// ── ESCANEOS POR HORA ─────────────────────────────────────
+/**
+ * @route GET /analytics/scans/by-hour
+ * @description Distribución de escaneos por hora del día (horario pico).
+ * Analiza los últimos 30 días para identificar las horas de mayor actividad.
+ * Útil para planificación de personal en los establecimientos.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, data: Array<{ hour: 0-23, count }> }
+ */
 router.get('/scans/by-hour', async (req, res) => {
   try {
     const data = serializeRaw(await prisma.$queryRaw`
@@ -189,7 +287,15 @@ router.get('/scans/by-hour', async (req, res) => {
   }
 });
 
-// ── ESCANEOS TOP LUGARES ──────────────────────────────────
+/**
+ * @route GET /analytics/scans/top-places
+ * @description Top establecimientos con más escaneos registrados.
+ * Incluye visitantes únicos por lugar además del total de escaneos.
+ *
+ * @access Privado — admin_general | user_general
+ * @param {number} [req.query.limit=10] - Número máximo de lugares a retornar
+ * @returns {200} { success: true, places: Array<{ id, name, tipo, lugar, rating, total_scans, unique_visitors }> }
+ */
 router.get('/scans/top-places', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -208,7 +314,14 @@ router.get('/scans/top-places', async (req, res) => {
   }
 });
 
-// ── USUARIOS STATS ────────────────────────────────────────
+/**
+ * @route GET /analytics/users/stats
+ * @description Estadísticas de turistas registrados en el sistema.
+ * Incluye: total, activos en 30 días, nuevos este mes y evolución mensual (6 meses).
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, stats: { total, active, newThisMonth, byMonth } }
+ */
 router.get('/users/stats', async (req, res) => {
   try {
     const [{ c: total }]    = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM users WHERE role IS NULL`);
@@ -230,7 +343,15 @@ router.get('/users/stats', async (req, res) => {
   }
 });
 
-// ── LUGARES STATS ─────────────────────────────────────────
+/**
+ * @route GET /analytics/places/stats
+ * @description Estadísticas de lugares turísticos activos.
+ * Incluye: total, con propietario asignado, con recompensa activa,
+ * distribución por tipo y calificación promedio.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, stats: { total, withOwner, withoutOwner, withReward, byType, avgRating } }
+ */
 router.get('/places/stats', async (req, res) => {
   try {
     const [{ c: total }]      = serializeRaw(await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM places WHERE is_active = TRUE`);
@@ -259,7 +380,16 @@ router.get('/places/stats', async (req, res) => {
   }
 });
 
-// ── ADMINS CON DETALLES ───────────────────────────────────
+/**
+ * @route GET /analytics/admins/users-with-details
+ * @description Lista todos los usuarios con rol administrativo del sistema.
+ * Incluye datos del lugar asignado (para propietarios) y estadísticas
+ * de escaneos y recompensas de su lugar.
+ * Ordenados por jerarquía: admin_general → user_general → user_place.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, data: AdminUser[], total: number }
+ */
 router.get('/admins/users-with-details', async (req, res) => {
   try {
     const users = serializeRaw(await prisma.$queryRaw`
@@ -289,7 +419,14 @@ router.get('/admins/users-with-details', async (req, res) => {
   }
 });
 
-// ── PROPIETARIOS SIN LUGAR ────────────────────────────────
+/**
+ * @route GET /analytics/admins/owners-without-place
+ * @description Lista propietarios (user_place) que no tienen lugar activo asignado.
+ * Útil para el administrador para detectar y corregir configuraciones incompletas.
+ *
+ * @access Privado — admin_general | user_general
+ * @returns {200} { success: true, data: User[], total: number }
+ */
 router.get('/admins/owners-without-place', async (req, res) => {
   try {
     const owners = serializeRaw(await prisma.$queryRaw`

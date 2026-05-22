@@ -3,6 +3,37 @@
 // Columna izq: stats + líneas + barras
 // Columna der: donut + recompensa + QR + visitantes
 
+/// Dashboard exclusivo para propietarios de establecimientos (`user_place`).
+///
+/// Muestra información específica del lugar asignado al propietario autenticado.
+/// Los datos se cargan usando `req.user.place_id` del JWT, NO el ID del usuario
+/// logueado, garantizando que cada propietario solo vea su propio establecimiento.
+///
+/// **KPIs mostrados:**
+/// - Visitantes únicos totales
+/// - Escaneos totales (todas las visitas, incluyendo repetidas)
+/// - Recompensas generadas y canjeadas
+/// - Escaneos del día de hoy
+///
+/// **Gráficas:**
+/// - Línea de escaneos por día (últimos 30 días)
+/// - Barras de actividad reciente
+/// - Donut de recompensas (canjeadas vs pendientes)
+///
+/// **Acciones disponibles:**
+/// - Ver código QR del establecimiento
+/// - Configurar/editar la recompensa activa del lugar
+/// - Ver listado de visitantes únicos
+/// - Editar información del establecimiento
+///
+/// Layout: columna izquierda (stats + gráficas) + columna derecha (donut + QR + visitantes).
+/// Sin scroll — todo visible en una pantalla para experiencia de dashboard.
+///
+/// Ver también:
+/// - [QrDialog] para mostrar el código QR del lugar
+/// - [RewardDialog] para configurar la recompensa activa
+/// - [VisitorsPage] para ver el listado completo de visitantes
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';

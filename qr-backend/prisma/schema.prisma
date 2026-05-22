@@ -1,3 +1,11 @@
+/// @fileoverview Schema de la base de datos NOVA App.
+/// Define los modelos de datos y sus relaciones en PostgreSQL (Supabase).
+/// Generado con Prisma ORM — los campos usan camelCase en Dart/JS
+/// y se mapean a snake_case en la base de datos mediante @map().
+///
+/// @author NOVA App Team
+/// @version 1.0.0
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -9,6 +17,15 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// Modelo que representa a los usuarios del sistema NOVA App.
+/// Unifica en una sola tabla todos los tipos de usuario diferenciados por el campo `role`:
+/// - `null` (sin rol): turista — solo usa la app móvil para escanear QR
+/// - `admin_general`: acceso total al dashboard, gestión de usuarios y lugares
+/// - `user_general`: secretaría de turismo, acceso al dashboard sin gestión de admins
+/// - `user_place`: propietario de establecimiento, solo ve el dashboard de su lugar
+///
+/// Los turistas creados con Google OAuth tienen el campo `googleId` poblado
+/// y pueden no tener `password` (flujo de autenticación diferente).
 model User {
   id             Int       @id @default(autoincrement())
   firstName      String?   @map("first_name")
@@ -24,17 +41,30 @@ model User {
   isActive       Boolean   @default(true) @map("is_active")
   createdAt      DateTime  @default(now()) @map("created_at")
   lastLogin      DateTime? @map("last_login")
+  /// Rol del usuario: 'admin_general' | 'user_general' | 'user_place' | null (turista)
   role           String?
+  /// ID del lugar asignado — solo aplica para propietarios (user_place)
   placeId        Int?      @map("place_id")
   scans          Scan[]
   rewards        UserReward[]
   @@map("users")
 }
 
+/// Modelo que representa un lugar turístico del Golfo de Morrosquillo.
+/// Puede ser hotel, restaurante o bar. Cada lugar tiene un código QR único
+/// que los turistas escanean para registrar su visita.
+///
+/// La configuración de recompensa (`hasReward`, `rewardName`, `rewardStock`)
+/// determina si los turistas obtienen una recompensa al escanear por primera vez.
+/// Si `rewardStock` es null, la recompensa es ilimitada.
+///
+/// El campo `amenities` almacena un array JSON serializado como string.
 model Place {
   id                Int       @id @default(autoincrement())
   name              String
+  /// Tipo de establecimiento: 'hotel' | 'restaurant' | 'bar'
   tipo              String
+  /// Municipio donde se ubica el lugar (ej: 'Tolú', 'Coveñas', 'San Antero')
   lugar             String
   description       String?
   imageUrl          String?   @map("image_url")
@@ -42,13 +72,17 @@ model Place {
   address           String?
   phone             String?
   priceRange        String?   @map("price_range")
+  /// Array de amenidades serializado como JSON string (ej: '["WiFi", "Piscina"]')
   amenities         String?
+  /// Indica si el lugar tiene recompensa QR activa
   hasReward         Boolean   @default(false) @map("has_reward")
   rewardName        String?   @map("reward_name")
   rewardDescription String?   @map("reward_description")
   rewardIcon        String?   @default("🎁") @map("reward_icon")
+  /// Stock de recompensas disponibles. null = sin límite
   rewardStock       Int?      @map("reward_stock")
   isActive          Boolean   @default(true) @map("is_active")
+  /// ID del propietario (user_place) asignado a este lugar
   ownerId           Int?      @map("owner_id")
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
@@ -57,10 +91,20 @@ model Place {
   @@map("places")
 }
 
+/// Registro de cada escaneo QR realizado por un turista en un lugar.
+/// Es la entidad central del sistema — conecta turistas con establecimientos.
+///
+/// Se crea un nuevo registro por cada escaneo, incluso si el turista
+/// ya ha visitado el lugar antes. El campo `qrCode` almacena el código
+/// escaneado en formato "PLACE:{id}" aunque no se usa en queries directas.
+///
+/// La eliminación en cascada garantiza consistencia referencial:
+/// si se elimina un usuario o lugar, sus escaneos también se eliminan.
 model Scan {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
   placeId   Int      @map("place_id")
+  /// Código QR escaneado en formato 'PLACE:{id}' (opcional, para auditoría)
   qrCode    String?  @map("qr_code")
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -68,6 +112,15 @@ model Scan {
   @@map("scans")
 }
 
+/// Recompensa obtenida por un turista al escanear el QR de un lugar con recompensa activa.
+/// Se genera automáticamente en el backend si el lugar tiene `hasReward = true`
+/// y el turista aún no tiene una recompensa de ese lugar (una por turista por lugar).
+///
+/// El ciclo de vida de una recompensa:
+/// 1. `isRedeemed = false` — obtenida pero no entregada al turista
+/// 2. `isRedeemed = true` — el propietario o admin confirmó la entrega física
+///
+/// La fecha `redeemedAt` se registra automáticamente al canjear.
 model UserReward {
   id                Int       @id @default(autoincrement())
   userId            Int       @map("user_id")
@@ -75,8 +128,10 @@ model UserReward {
   rewardName        String    @map("reward_name")
   rewardDescription String?   @map("reward_description")
   rewardIcon        String?   @default("🎁") @map("reward_icon")
+  /// true = recompensa física entregada al turista
   isRedeemed        Boolean   @default(false) @map("is_redeemed")
   earnedAt          DateTime  @default(now()) @map("earned_at")
+  /// Fecha de canje. null = pendiente de entrega
   redeemedAt        DateTime? @map("redeemed_at")
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   place             Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)

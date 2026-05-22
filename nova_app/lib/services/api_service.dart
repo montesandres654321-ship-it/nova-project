@@ -8,6 +8,38 @@
 // • Sin datos mock — muestra errores reales
 // ============================================================
 
+/// Servicio central de comunicación con el backend NOVA App.
+///
+/// Clase no instanciable (constructor privado `ApiService._()`).
+/// Todos los métodos son estáticos para simplificar su uso desde cualquier widget.
+///
+/// Gestiona todas las peticiones HTTP hacia la API REST del backend en Node.js,
+/// incluyendo autenticación, gestión de lugares, escaneos QR y recompensas.
+///
+/// La URL base se configura mediante `--dart-define` en el build:
+/// ```bash
+/// flutter build apk --dart-define=API_URL=https://nova-project-xzpe.onrender.com
+/// ```
+///
+/// **Manejo de errores:**
+/// Los métodos de red capturan excepciones de red y timeout, retornando
+/// siempre un [Map] estructurado con `success: false` y `error: mensaje`
+/// en lugar de lanzar excepciones al caller.
+///
+/// **Token JWT:**
+/// El token se almacena en [SharedPreferences] al hacer login y se
+/// incluye automáticamente en todas las peticiones autenticadas mediante
+/// el método privado `_authHeaders()`.
+///
+/// Ejemplo de uso:
+/// ```dart
+/// final result = await ApiService.login('turista@email.com', '123456');
+/// if (result['success'] == true) {
+///   final token = result['data']['token'];
+///   // Guardar token y navegar al home
+/// }
+/// ```
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -56,7 +88,22 @@ class ApiService {
   // AUTH — Login, Registro, Google
   // ═══════════════════════════════════════════════════════
 
-  /// Login con email y contraseña
+  /// Autentica un usuario con email y contraseña.
+  ///
+  /// Llama al endpoint `POST /login` del backend. Si las credenciales son válidas,
+  /// guarda el JWT y los datos del usuario en [SharedPreferences] para persistir
+  /// la sesión entre reinicios de la app.
+  ///
+  /// **Importante:** Los administradores (roles `admin_general`, `user_general`,
+  /// `user_place`) NO deben usar esta app — el backend los permite autenticarse
+  /// pero el flujo de la app está diseñado solo para turistas (role IS NULL).
+  ///
+  /// [email] — Correo electrónico del turista registrado
+  /// [password] — Contraseña del turista
+  ///
+  /// Retorna un [Map] con:
+  /// - `success: true` + `token: String` + `user: Map` si el login fue exitoso
+  /// - `success: false` + `error: String` si las credenciales son incorrectas o hay error de red
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
@@ -233,7 +280,27 @@ class ApiService {
   // SCAN — Escaneo QR
   // ═══════════════════════════════════════════════════════
 
-  /// Registrar escaneo de código QR
+  /// Registra un escaneo QR en el sistema y verifica si el turista obtiene recompensa.
+  ///
+  /// Envía el código QR al endpoint `POST /scan` del backend junto con el JWT
+  /// del turista autenticado. El backend:
+  /// 1. Valida que el lugar esté activo
+  /// 2. Registra la visita en la tabla `scans`
+  /// 3. Si el lugar tiene recompensa activa y el turista no la ha obtenido antes,
+  ///    genera automáticamente una nueva recompensa
+  ///
+  /// El código QR debe tener formato `"PLACE:{id}"` (ej: `"PLACE:5"`).
+  /// El ID del turista se obtiene de [SharedPreferences] (guardado en el login).
+  ///
+  /// [qrCode] — Código QR escaneado por la cámara (formato: `"PLACE:{placeId}"`)
+  ///
+  /// Retorna un [Map] con:
+  /// - `success: true` si el escaneo se registró correctamente
+  /// - `data.place`: datos del lugar visitado
+  /// - `data.reward`: objeto de recompensa (o null si no aplica)
+  /// - `data.visit_count`: número total de visitas del turista a ese lugar
+  /// - `data.message`: mensaje para mostrar al turista
+  /// - `success: false` + `error: String` si hubo algún problema
   static Future<Map<String, dynamic>> registerScan(String qrCode) async {
     try {
       final headers = await _authHeaders();

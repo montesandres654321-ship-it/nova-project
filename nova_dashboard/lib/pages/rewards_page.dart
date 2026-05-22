@@ -1,5 +1,22 @@
 // lib/pages/rewards_page.dart
 // FIX: Color 0xFF06B6A4 + responsive GridView (2 o 4 columnas)
+
+/// Página de gestión y análisis de recompensas del sistema NOVA App.
+///
+/// Permite a administradores y propietarios visualizar el estado de las
+/// recompensas generadas por escaneos QR en los establecimientos turísticos.
+///
+/// **Funcionalidades:**
+/// - KPIs: total de recompensas, canjeadas y pendientes con porcentaje de canje
+/// - Filtro por estado: todas / canjeadas / pendientes
+/// - Botón de canje para entregar recompensas pendientes al turista
+/// - Gráfica donut: distribución de recompensas canjeadas vs pendientes
+/// - Gráfica de línea: tendencia de recompensas generadas por día
+/// - Selector de período (7, 15, 30, 60, 90 días o todo el historial)
+/// - Grid responsive: 2 columnas en móvil, 4 columnas en desktop
+///
+/// Los datos se cargan desde [AnalyticsService.getRewardsStats] y
+/// [AnalyticsService.getRewardsByDay].
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/analytics_service.dart';

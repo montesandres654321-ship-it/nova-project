@@ -1,4 +1,22 @@
 // lib/pages/stats_dashboard_page.dart
+
+/// Página principal de estadísticas y analytics del sistema NOVA App.
+///
+/// Muestra 4 KPIs y 6 gráficas en tiempo real alimentadas por [AnalyticsService]:
+/// - **Actividad de escaneos por día** — gráfica de línea con selección de período
+/// - **Top establecimientos por escaneos** — gráfica de barras horizontal
+/// - **Horario pico** — distribución de escaneos por hora del día (0-23h)
+/// - **Turistas nuevos por mes** — evolución mensual de registros
+/// - **Distribución de establecimientos por tipo** — donut hotel/restaurante/bar
+/// - **Recompensas por día** — tendencia de recompensas generadas
+///
+/// Soporta 3 breakpoints responsive:
+/// - **Desktop** (≥900px): layout sin scroll con columnas [Expanded]
+/// - **Tablet** (600-900px): 2 columnas con scroll suave
+/// - **Móvil** (<600px): columna única con scroll vertical
+///
+/// Parámetros de navegación opcionales permiten navegar a otras secciones
+/// del [DashboardPage] al interactuar con los KPIs o gráficas.
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../services/analytics_service.dart';
@@ -15,6 +33,11 @@ const _kTextMuted = Color(0xFF64748B);
 const _kBorder    = Color(0xFFE2E8F0);
 
 // ──────────────────────────────────────────────────────────────
+
+/// Widget principal de la página de estadísticas.
+///
+/// Recibe callbacks de navegación opcionales para conectar los KPIs
+/// con las secciones correspondientes del dashboard (lugares, turistas, recompensas).
 class StatsDashboardPage extends StatefulWidget {
   final void Function(int index)?   onNavigate;
   final void Function(String tipo)? onNavigateToPlaces;

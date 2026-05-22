@@ -3,6 +3,33 @@
 // FIX: eliminado Future.delayed(1s) código muerto post-navegación
 // ============================================================
 
+/// Página de escaneo de códigos QR de establecimientos turísticos.
+///
+/// Activa la cámara del dispositivo usando [MobileScannerController] y detecta
+/// automáticamente los códigos QR de los establecimientos del Golfo de Morrosquillo.
+///
+/// **Flujo de escaneo:**
+/// 1. El turista abre esta página desde el FAB o la tab de inicio
+/// 2. La cámara se activa y detecta códigos QR en tiempo real
+/// 3. Al detectar un código válido (formato `"PLACE:{id}"`), se llama a [ApiService.registerScan]
+/// 4. Si el registro es exitoso, se navega a [SuccessPage] con los detalles
+/// 5. Si hay recompensa, [SuccessPage] muestra la celebración correspondiente
+///
+/// **Controles disponibles:**
+/// - **Flash/Linterna**: para condiciones de baja iluminación
+/// - **Zoom**: ajuste mediante slider (0.0 a 1.0)
+/// - **Cámara trasera**: usada por defecto (óptima para QR impresos y digitales)
+///
+/// **Manejo de estado:**
+/// El flag `_isProcessing` previene escaneos duplicados mientras se procesa
+/// el QR anterior, evitando peticiones redundantes al backend.
+///
+/// Soporta QR impresos en físico (menús, carteles) y digitales (pantallas).
+///
+/// Ver también:
+/// - [SuccessPage] para la pantalla de resultado del escaneo
+/// - [ApiService.registerScan] para el registro en el backend
+
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';

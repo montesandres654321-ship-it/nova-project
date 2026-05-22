@@ -1,9 +1,44 @@
+/**
+ * @fileoverview Rutas exclusivas para propietarios de establecimientos (user_place).
+ * Permite a los propietarios consultar las estadísticas de su lugar asignado,
+ * ver los escaneos recientes y gestionar las recompensas de sus visitantes.
+ *
+ * El placeId del propietario se obtiene directamente del JWT (`req.user.place_id`),
+ * NO del parámetro de la URL, garantizando que cada propietario solo acceda
+ * a los datos de su propio establecimiento.
+ *
+ * Todas las queries se ejecutan en paralelo mediante Promise.all para
+ * minimizar la latencia total de la respuesta.
+ *
+ * @module routes/owner
+ * @author NOVA App Team
+ * @version 1.0.0
+ * @requires express
+ * @requires ../config/prisma
+ * @requires ../middleware/auth
+ * @requires ../middleware/authorize
+ */
+
 const express  = require('express');
 const router   = express.Router();
 const prisma   = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
+/**
+ * Serializa los resultados de queries $queryRaw de Prisma.
+ * Convierte tipos no serializables a JSON:
+ * - BigInt → Number (Prisma retorna COUNT(*) como BigInt en PostgreSQL)
+ * - Date → string ISO 8601
+ *
+ * @function serializeRaw
+ * @param {Array<Object>} rows - Array de filas retornadas por prisma.$queryRaw
+ * @returns {Array<Object>} Array con todos los valores convertidos a tipos serializables
+ *
+ * @example
+ * const raw = await prisma.$queryRaw`SELECT COUNT(*)::int as c FROM scans WHERE place_id = ${id}`;
+ * const [{ c: total }] = serializeRaw(raw); // { c: 25 }
+ */
 function serializeRaw(rows) {
   return rows.map(row => {
     const obj = {};
@@ -15,6 +50,31 @@ function serializeRaw(rows) {
   });
 }
 
+/**
+ * @route GET /owner/stats
+ * @description Retorna estadísticas completas del lugar asignado al propietario autenticado.
+ *
+ * Ejecuta 5 queries en paralelo para minimizar latencia:
+ * 1. Datos del lugar (nombre, tipo, recompensa configurada, etc.)
+ * 2. KPIs: total escaneos, visitantes únicos, escaneos hoy
+ * 3. Estadísticas de recompensas: total, canjeadas, pendientes
+ * 4. Escaneos por día (últimos 30 días) para la gráfica de tendencia
+ * 5. Últimas 5 visitas recientes con indicador de recompensa
+ *
+ * @access Privado — user_place (requiere place_id en el JWT)
+ *
+ * @returns {200} {
+ *   success: true,
+ *   place: Place,
+ *   stats: {
+ *     totalScans, totalVisitors, todayScans,
+ *     totalRewards, redeemedRewards, pendingRewards
+ *   },
+ *   scansByDay: Array<{ date, count }>,
+ *   recentVisits: Array<{ userName, timestamp, rewardEarned }>
+ * }
+ * @returns {403} Si el propietario no tiene un lugar asignado en su cuenta
+ */
 router.get(
   '/owner/stats',
   authenticateToken,

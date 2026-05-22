@@ -1,3 +1,17 @@
+/// Página de listado completo de escaneos del sistema NOVA App.
+///
+/// Muestra todos los escaneos registrados con información del turista,
+/// lugar visitado, fecha/hora y si obtuvo recompensa en esa visita.
+///
+/// **Funcionalidades:**
+/// - Búsqueda en tiempo real por nombre de turista, email o nombre del lugar
+/// - Paginación configurable (50 registros por página por defecto)
+/// - Vista tabla en desktop, vista tarjetas en móvil
+/// - Indicador visual de recompensa obtenida por escaneo
+/// - Soporte de debounce en la búsqueda para evitar peticiones excesivas
+///
+/// Los datos se cargan desde [AnalyticsService.getAllScans] que llama al
+/// endpoint `GET /admin/scans/all` del backend.
 import 'package:flutter/material.dart';
 import '../services/analytics_service.dart';
 
