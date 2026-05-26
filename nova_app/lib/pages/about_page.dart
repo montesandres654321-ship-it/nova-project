@@ -133,15 +133,6 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Detalles del proyecto
-            _buildInfoRow(Icons.school_rounded,
-                'Corporación Universitaria Antonio José de Sucre'),
-            _buildInfoRow(Icons.business_rounded, 'Empresa aliada: Xiru'),
-            _buildInfoRow(
-                Icons.code_rounded, 'Flutter · Node.js · Supabase'),
-            _buildInfoRow(Icons.calendar_today_rounded, '2026'),
-            const SizedBox(height: 24),
-
             // Botón
             SizedBox(
               width: double.infinity,
@@ -166,22 +157,4 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: AppColors.primary),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF374151)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

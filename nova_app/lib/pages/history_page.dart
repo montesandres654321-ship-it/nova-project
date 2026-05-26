@@ -39,12 +39,18 @@ class _HistoryPageState extends State<HistoryPage> {
   bool _loading = true;
   String _error = '';
 
+  // Recompensas del turista
+  List<Map<String, dynamic>> _rewards = [];
+  bool _rewardsLoading = true;
+  String _rewardsError = '';
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
     _loadHistory();
+    _loadRewards();
   }
 
   // ── Data ───────────────────────────────────────────────────
@@ -64,6 +70,18 @@ class _HistoryPageState extends State<HistoryPage> {
       setState(() => _error = 'Error al cargar historial: $e');
     } finally {
       setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadRewards() async {
+    setState(() { _rewardsLoading = true; _rewardsError = ''; });
+    try {
+      final rewards = await ApiService.getUserRewards();
+      if (!mounted) return;
+      setState(() { _rewards = rewards; _rewardsLoading = false; });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() { _rewardsError = 'Error al cargar recompensas'; _rewardsLoading = false; });
     }
   }
 
@@ -152,44 +170,225 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        title: const Text('Historial'),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
         backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        surfaceTintColor: AppColors.surface,
-        automaticallyImplyLeading: false,
-        leadingWidth: 52,
-        leading: Navigator.canPop(context)
-            ? const Padding(
-                padding: EdgeInsets.only(left: AppSpacing.sm),
-                child: Center(child: AppBackButton()),
-              )
-            : null,
-        titleTextStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 22),
-            onPressed: _loadHistory,
-            tooltip: 'Actualizar',
-            color: AppColors.textSecondary,
+        appBar: AppBar(
+          title: const Text('Historial'),
+          backgroundColor: AppColors.surface,
+          foregroundColor: AppColors.textPrimary,
+          elevation: 0,
+          scrolledUnderElevation: 1,
+          surfaceTintColor: AppColors.surface,
+          automaticallyImplyLeading: false,
+          leadingWidth: 52,
+          leading: Navigator.canPop(context)
+              ? const Padding(
+                  padding: EdgeInsets.only(left: AppSpacing.sm),
+                  child: Center(child: AppBackButton()),
+                )
+              : null,
+          titleTextStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
           ),
-        ],
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded, size: 22),
+              onPressed: _loadHistory,
+              tooltip: 'Actualizar',
+              color: AppColors.textSecondary,
+            ),
+          ],
+          bottom: const TabBar(
+            indicatorColor: AppColors.primary,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorSize: TabBarIndicatorSize.tab,
+            tabs: [
+              Tab(text: 'Escaneos'),
+              Tab(text: 'Recompensas'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildEscaneosList(),
+            _buildRecompensasList(),
+          ],
+        ),
       ),
-      body: _loading
-          ? _buildLoadingState()
-          : _records.isNotEmpty
-              ? _buildList()
-              : _error == 'No hay escaneos registrados'
-                  ? _buildEmptyState()
-                  : _buildErrorState(),
+    );
+  }
+
+  // ── Tab 1: Escaneos ───────────────────────────────────────
+  Widget _buildEscaneosList() {
+    return _loading
+        ? _buildLoadingState()
+        : _records.isNotEmpty
+            ? _buildList()
+            : _error == 'No hay escaneos registrados'
+                ? _buildEmptyState()
+                : _buildErrorState();
+  }
+
+  // ── Tab 2: Recompensas ────────────────────────────────────
+  Widget _buildRecompensasList() {
+    if (_rewardsLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+      );
+    }
+    if (_rewardsError.isNotEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.cloud_off_rounded, size: 44, color: AppColors.error),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const Text('No se pudo cargar las recompensas',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            OutlinedButton.icon(
+              onPressed: _loadRewards,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Reintentar'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+              ),
+            ),
+          ]),
+        ),
+      );
+    }
+    if (_rewards.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceVariant,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.card_giftcard_outlined, size: 44, color: AppColors.textHint),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const Text('No tienes recompensas aún',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            const Text(
+              'Escanea QR en los establecimientos\npara ganar recompensas.',
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
+              textAlign: TextAlign.center,
+            ),
+          ]),
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _loadRewards,
+      color: AppColors.primary,
+      backgroundColor: AppColors.surface,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.xl,
+        ),
+        itemCount: _rewards.length,
+        itemBuilder: (_, i) => _buildRewardItem(_rewards[i]),
+      ),
+    );
+  }
+
+  Widget _buildRewardItem(Map<String, dynamic> r) {
+    final isRedeemed = r['is_redeemed'] == true;
+    final icon  = r['reward_icon']?.toString() ?? '🎁';
+    final name  = r['reward_name']?.toString() ?? 'Recompensa';
+    final place = r['place_name']?.toString() ?? '';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: AppRadius.mdAll,
+        border: Border.all(color: AppColors.border, width: 1),
+      ),
+      child: Row(children: [
+        // Emoji del ícono
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.08),
+            borderRadius: AppRadius.smAll,
+          ),
+          child: Center(child: Text(icon, style: const TextStyle(fontSize: 22))),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        // Nombre y lugar
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (place.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(place,
+                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        // Badge de estado
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isRedeemed
+                ? AppColors.success.withValues(alpha: 0.10)
+                : AppColors.primary.withValues(alpha: 0.08),
+            borderRadius: AppRadius.pillAll,
+          ),
+          child: Text(
+            isRedeemed ? 'Canjeada' : 'Pendiente',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isRedeemed ? AppColors.success : AppColors.primary,
+            ),
+          ),
+        ),
+      ]),
     );
   }
 
