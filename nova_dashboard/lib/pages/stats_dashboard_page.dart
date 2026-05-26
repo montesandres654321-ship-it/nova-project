@@ -421,19 +421,30 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   }
 
   void _navigateFromKpi(String label) {
-    if (widget.onNavigate == null) return;
     switch (label) {
       case 'Total Escaneos':
         Navigator.pushNamed(context, '/scans');
         break;
       case 'Turistas':
-        widget.onNavigate!(widget.usersIndex);
+        if (widget.onNavigate != null) {
+          widget.onNavigate!(widget.usersIndex);
+        } else {
+          Navigator.pushNamed(context, '/users');
+        }
         break;
       case 'Lugares Activos':
-        widget.onNavigate!(widget.placesIndex);
+        if (widget.onNavigate != null) {
+          widget.onNavigate!(widget.placesIndex);
+        } else {
+          Navigator.pushNamed(context, '/places');
+        }
         break;
       case 'Recompensas':
-        widget.onNavigate!(widget.rewardsIndex);
+        if (widget.onNavigate != null) {
+          widget.onNavigate!(widget.rewardsIndex);
+        } else {
+          Navigator.pushNamed(context, '/rewards');
+        }
         break;
     }
   }

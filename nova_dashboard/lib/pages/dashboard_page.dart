@@ -160,7 +160,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // ── LOGO ISLA TROPICAL ──────────────────────────────────────
-  Widget _buildLogo({double iconSize = 32, double fontSize = 16}) {
+  Widget _buildLogo({double iconSize = 36, double fontSize = 15}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -168,11 +168,18 @@ class _DashboardPageState extends State<DashboardPage> {
           width: iconSize,
           height: iconSize,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.18),
-            borderRadius: BorderRadius.circular(iconSize * 0.28),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(iconSize * 0.22),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(iconSize * 0.28),
+            borderRadius: BorderRadius.circular(iconSize * 0.22),
             child: Image.asset(
               'assets/icon/app_icon_192.png',
               width: iconSize,
@@ -180,33 +187,32 @@ class _DashboardPageState extends State<DashboardPage> {
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Icon(
                 Icons.travel_explore_rounded,
-                color: Colors.white,
+                color: const Color(0xFF06B6A4),
                 size: iconSize * 0.62,
               ),
             ),
           ),
         ),
-        SizedBox(width: iconSize * 0.25),
+        SizedBox(width: iconSize * 0.28),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'NOVA',
+              'NOVA App',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: fontSize,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
                 height: 1.1,
               ),
             ),
             Text(
               'Dashboard',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withOpacity(0.72),
                 fontSize: fontSize * 0.58,
-                fontWeight: FontWeight.w300,
                 letterSpacing: 1,
               ),
             ),

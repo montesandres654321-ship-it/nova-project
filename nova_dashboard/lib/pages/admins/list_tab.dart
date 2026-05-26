@@ -281,7 +281,10 @@ class _AdminsListTabState extends State<AdminsListTab> {
           onTapDetail:     widget.canEdit ? () => _showDetail(_filteredAdmins[i]) : null,
           onTapEdit:       widget.canEdit ? () => _editAdmin(_filteredAdmins[i])  : null,
           onTapReassign:   widget.canEdit ? () => _reassignPlace(_filteredAdmins[i]) : null,
-          onTapDashboard:  () => _viewDashboard(_filteredAdmins[i]),
+          // FIX 5: "Ver Dashboard" solo para propietarios de lugar
+          onTapDashboard:  _filteredAdmins[i].admin.role == 'user_place'
+              ? () => _viewDashboard(_filteredAdmins[i])
+              : null,
           // ← NUEVO: botón desactivar solo si canEdit
           onTapDeactivate: widget.canEdit ? () => _deactivateAdmin(_filteredAdmins[i]) : null,
         ));

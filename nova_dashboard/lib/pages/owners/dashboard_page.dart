@@ -35,6 +35,7 @@
 /// - [VisitorsPage] para ver el listado completo de visitantes
 
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
@@ -70,6 +71,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   bool _loading = true;
   String _error = '';
   int? _userId;
+  // FIX 2: nombre y email del usuario logueado (JWT), no del propietario del lugar
+  String _loggedUserName  = '';
+  String _loggedUserEmail = '';
   Place? _place;
   int _visitors = 0, _scans = 0, _rewards = 0, _redeemed = 0;
   List<Map<String, dynamic>> _recentScans = [];
@@ -80,7 +84,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() => _userId = prefs.getInt(AppConstants.keyUserId));
+    if (mounted) setState(() {
+      _userId          = prefs.getInt(AppConstants.keyUserId);
+      // FIX 2: leer el nombre del usuario logueado del JWT (SharedPreferences),
+      // NO del objeto _place ni de widget.userName (que puede ser el propietario)
+      _loggedUserName  = prefs.getString(AppConstants.keyUserName)  ?? widget.userName;
+      _loggedUserEmail = prefs.getString(AppConstants.keyUserEmail) ?? widget.userEmail;
+    });
   }
 
   Future<void> _loadAll() async {
@@ -143,34 +153,70 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           // Fila 1: 4 stats compactos
           _buildStatsRow(),
           const SizedBox(height: 10),
-          // Fila 2: contenido principal en 2 columnas
+          // Fila 2: 2 columnas — gráfica única | QR grande + recompensa
           Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            // Columna izquierda: gráfica líneas + gráfica barras
-            Expanded(flex: 3, child: Column(children: [
-              Expanded(child: _lineChart()),
-              const SizedBox(height: 10),
-              Expanded(child: _barChart()),
-            ])),
+            // FIX 4: columna izquierda — solo gráfica de barras (escaneos)
+            Expanded(flex: 3, child: _barChart()),
             const SizedBox(width: 10),
-            // Columna derecha: donut + recompensa/QR
-            Expanded(flex: 2, child: Column(children: [
-              // Donut
-              Expanded(child: _donutChart()),
-              const SizedBox(height: 10),
-              // Recompensa + QR en fila
-              IntrinsicHeight(child: Row(children: [
-                if (_place!.hasReward) ...[
-                  Expanded(child: _rewardMini()),
-                  const SizedBox(width: 8),
-                ],
-                _qrMini(),
-              ])),
-            ])),
+            // FIX 4: columna derecha — QR grande + tarjeta recompensa
+            Expanded(flex: 2, child: _buildRightColumn()),
           ])),
+          const SizedBox(height: 10),
+          // Actividad reciente (altura fija)
+          SizedBox(height: 160, child: _visitorsCompact()),
         ]),
       ),
     );
   }
+
+  // ── FIX 4: columna derecha — QR grande + recompensa ─
+  Widget _buildRightColumn() => Column(children: [
+    if (_place!.hasReward) ...[
+      Expanded(flex: 3, child: _qrBig()),
+      const SizedBox(height: 10),
+      Expanded(flex: 2, child: _rewardMini()),
+    ] else
+      Expanded(child: _qrBig()),
+  ]);
+
+  // ── FIX 4: QR grande con botón "Ver completo" ────────
+  Widget _qrBig() => Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
+          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('Código QR',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Center(
+            child: QrImageView(
+              data: 'PLACE:${_place!.id}',
+              version: QrVersions.auto,
+              size: 140,
+            ),
+          ),
+        ),
+        Text('PLACE:${_place!.id}',
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 9,
+                fontWeight: FontWeight.w700, color: _teal)),
+        const SizedBox(height: 6),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => showDialog(
+                context: context, builder: (_) => QRDialog(place: _place!)),
+            icon: const Icon(Icons.fullscreen_rounded, size: 14),
+            label: const Text('Ver QR completo',
+                style: TextStyle(fontSize: 11)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _teal,
+              side: const BorderSide(color: _teal),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+            ),
+          ),
+        ),
+      ]));
 
   // ── Stats row compacto ──────────────────────────────
   Widget _buildStatsRow() {
@@ -228,8 +274,18 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     ], height: double.infinity, showLegend: true);
   }
 
-  // ── Recompensa mini ─────────────────────────────────
-  Widget _rewardMini() => Container(
+  // ── FIX 3: Recompensa mini — 3 métricas: Stock / Entregadas / Disponibles
+  Widget _rewardMini() {
+    // rewardStock == null → ilimitado; rewardStock != null → stock fijo
+    final stock         = _place?.rewardStock;
+    final disponiblesNum = stock != null ? stock - _rewards : null;
+    final disponiblesStr = disponiblesNum == null ? '∞' : '$disponiblesNum';
+    // Alerta roja si quedan 3 o menos unidades (solo cuando hay stock fijo)
+    final disponiblesColor = disponiblesNum != null && disponiblesNum <= 3
+        ? const Color(0xFFEF4444)
+        : _amber;
+
+    return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
           border: Border.all(color: _amber.withOpacity(0.2))),
@@ -243,9 +299,11 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         ]),
         const SizedBox(height: 6),
         Row(children: [
-          _miniStat('$_rewards', 'dadas', _amber),
+          _miniStat(stock == null ? '∞' : '$stock', 'Stock',       _teal),
           const SizedBox(width: 6),
-          _miniStat('$_redeemed', 'canje', _green),
+          _miniStat('$_rewards',                    'Entregadas',   _amber),
+          const SizedBox(width: 6),
+          _miniStat(disponiblesStr,                 'Disponibles',  disponiblesColor),
         ]),
         const SizedBox(height: 6),
         InkWell(
@@ -261,6 +319,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           ),
         ),
       ]));
+  }
 
   Widget _miniStat(String v, String l, Color c) => Expanded(child: Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -348,19 +407,34 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         Text(msg, style: TextStyle(fontSize: 10, color: Colors.grey[400]))])));
 
   // ── User menu ───────────────────────────────────────
+  // FIX 2: usa _loggedUserName/_loggedUserEmail (del JWT/SharedPreferences),
+  // no widget.userName que puede ser el nombre del propietario del lugar.
   Widget _buildUserMenu() => PopupMenuButton<String>(offset: const Offset(0, 50),
       child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Row(mainAxisSize: MainAxisSize.min, children: [
         CircleAvatar(radius: 13, backgroundColor: Colors.white,
-            child: Text(widget.userName.isNotEmpty ? widget.userName[0].toUpperCase() : 'U',
-                style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 11))),
+            child: Text(
+              _loggedUserName.isNotEmpty ? _loggedUserName[0].toUpperCase() : 'U',
+              style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 11),
+            )),
         const SizedBox(width: 4),
-        Text(widget.userName.split(' ').first, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(
+          (_loggedUserName.isNotEmpty ? _loggedUserName : widget.userName).split(' ').first,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+        ),
         const Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
       ])),
       itemBuilder: (_) => [
         PopupMenuItem(enabled: false, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(widget.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          Text(widget.userEmail, style: TextStyle(fontSize: 11, color: Colors.grey[600])), const Divider()])),
+          Text(
+            _loggedUserName.isNotEmpty ? _loggedUserName : widget.userName,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Text(
+            _loggedUserEmail.isNotEmpty ? _loggedUserEmail : widget.userEmail,
+            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+          ),
+          const Divider(),
+        ])),
         const PopupMenuItem(value: 'profile', child: ListTile(leading: Icon(Icons.person_rounded, color: _teal), title: Text('Mi Perfil'), contentPadding: EdgeInsets.zero, dense: true)),
         const PopupMenuItem(value: 'password', child: ListTile(leading: Icon(Icons.lock_rounded, color: _teal), title: Text('Cambiar Contraseña'), contentPadding: EdgeInsets.zero, dense: true)),
         const PopupMenuItem(value: 'logout', child: ListTile(leading: Icon(Icons.logout_rounded, color: Colors.red), title: Text('Cerrar Sesión', style: TextStyle(color: Colors.red)), contentPadding: EdgeInsets.zero, dense: true)),
