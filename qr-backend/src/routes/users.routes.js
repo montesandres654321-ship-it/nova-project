@@ -20,10 +20,11 @@ function serializeRaw(rows) {
 router.patch('/users/me/profile', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { first_name, last_name, phone } = req.body;
+    const { first_name, last_name, phone, email, username } = req.body;
 
-    if (first_name === undefined && last_name === undefined && phone === undefined) {
-      return res.status(400).json({ success: false, error: 'Se requiere al menos un campo: first_name, last_name o phone' });
+    if (first_name === undefined && last_name === undefined && phone === undefined &&
+        email === undefined && username === undefined) {
+      return res.status(400).json({ success: false, error: 'Se requiere al menos un campo: first_name, last_name, phone, email o username' });
     }
 
     const user = (await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`)[0];
@@ -32,12 +33,20 @@ router.patch('/users/me/profile', authenticateToken, async (req, res) => {
     const newFirstName = first_name !== undefined ? first_name.trim() : user.first_name;
     const newLastName  = last_name  !== undefined ? last_name.trim()  : user.last_name;
     const newPhone     = phone      !== undefined ? (phone.trim() || null) : user.phone;
+    const newEmail     = email      !== undefined ? email.trim()    : user.email;
+    const newUsername  = username   !== undefined ? username.trim() : user.username;
 
     if (first_name !== undefined && !first_name.trim()) {
       return res.status(400).json({ success: false, error: 'El nombre no puede estar vacío' });
     }
+    if (email !== undefined && !email.trim()) {
+      return res.status(400).json({ success: false, error: 'El email no puede estar vacío' });
+    }
+    if (username !== undefined && !username.trim()) {
+      return res.status(400).json({ success: false, error: 'El usuario no puede estar vacío' });
+    }
 
-    await prisma.$executeRaw`UPDATE users SET first_name = ${newFirstName}, last_name = ${newLastName}, phone = ${newPhone} WHERE id = ${userId}`;
+    await prisma.$executeRaw`UPDATE users SET first_name = ${newFirstName}, last_name = ${newLastName}, phone = ${newPhone}, email = ${newEmail}, username = ${newUsername} WHERE id = ${userId}`;
 
     const updated = (await prisma.$queryRaw`
       SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active FROM users WHERE id = ${userId}
