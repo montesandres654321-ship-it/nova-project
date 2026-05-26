@@ -28,12 +28,17 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _loading = false;
   bool _isGoogleUser = false;
 
+  // Recompensas del turista
+  List<Map<String, dynamic>> _rewards = [];
+  bool _rewardsLoading = true;
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+    _loadRewards();
   }
 
   @override
@@ -69,6 +74,20 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       _showError('Error cargando perfil: $e');
+    }
+  }
+
+  Future<void> _loadRewards() async {
+    try {
+      final rewards = await ApiService.getUserRewards();
+      if (!mounted) return;
+      setState(() {
+        _rewards = rewards.take(3).toList();
+        _rewardsLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _rewardsLoading = false);
     }
   }
 
@@ -175,6 +194,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: AppSpacing.md),
                 _buildActionButtons(),
               ],
+              const SizedBox(height: AppSpacing.md),
+              _buildRewardsSection(),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -317,6 +338,144 @@ class _ProfilePageState extends State<ProfilePage> {
         if (email && !v.contains('@')) return 'Correo inválido';
         return null;
       },
+    );
+  }
+
+  // ── Recompensas ────────────────────────────────────────────
+
+  Widget _buildRewardsSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.lgAll,
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Encabezado
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
+            child: Row(children: [
+              const Icon(Icons.card_giftcard_rounded,
+                  size: 18, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.sm),
+              const Text(
+                'Mis Recompensas',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary),
+              ),
+              const Spacer(),
+              if (!_rewardsLoading && _rewards.isNotEmpty)
+                const Text('Últimas 3',
+                    style: TextStyle(
+                        fontSize: 11, color: AppColors.textSecondary)),
+            ]),
+          ),
+          _divider(),
+          // Contenido
+          if (_rewardsLoading)
+            const Padding(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              child: Center(
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primary)),
+            )
+          else if (_rewards.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(children: [
+                const Icon(Icons.card_giftcard_outlined,
+                    size: 40, color: AppColors.textSecondary),
+                const SizedBox(height: AppSpacing.sm),
+                const Text(
+                  'Aún no tienes recompensas.\n¡Escanea QR en los establecimientos!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 13, color: AppColors.textSecondary),
+                ),
+              ]),
+            )
+          else
+            ...List.generate(_rewards.length, (i) => Column(children: [
+                  _buildRewardTile(_rewards[i]),
+                  if (i < _rewards.length - 1) _divider(),
+                ])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardTile(Map<String, dynamic> r) {
+    final isRedeemed = r['is_redeemed'] == true;
+    final icon  = r['reward_icon']?.toString() ?? '🎁';
+    final name  = r['reward_name']?.toString() ?? 'Recompensa';
+    final place = r['place_name']?.toString() ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      child: Row(children: [
+        // Emoji del ícono
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.08),
+            borderRadius: AppRadius.smAll,
+          ),
+          child: Center(
+              child: Text(icon,
+                  style: const TextStyle(fontSize: 20))),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        // Nombre y lugar
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              if (place.isNotEmpty)
+                Text(place,
+                    style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        // Badge de estado
+        Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isRedeemed
+                ? AppColors.success.withOpacity(0.10)
+                : AppColors.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            isRedeemed ? 'Canjeada' : 'Pendiente',
+            style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: isRedeemed
+                    ? AppColors.success
+                    : AppColors.primary),
+          ),
+        ),
+      ]),
     );
   }
 

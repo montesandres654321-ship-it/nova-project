@@ -494,6 +494,41 @@ class ApiService {
   // REWARDS — Recompensas
   // ═══════════════════════════════════════════════════════
 
+  /// Obtener todas las recompensas del usuario autenticado.
+  ///
+  /// Llama a `GET /rewards/user/:userId`. Retorna la lista completa ordenada
+  /// por fecha de obtención (más reciente primero).
+  /// Cada elemento incluye: `reward_name`, `reward_icon`, `is_redeemed`,
+  /// `earned_at`, `place_name`, `place_tipo`, `place_lugar`.
+  ///
+  /// Retorna lista vacía si el usuario no tiene recompensas o hay error.
+  static Future<List<Map<String, dynamic>>> getUserRewards() async {
+    try {
+      final headers  = await _authHeaders();
+      final userId   = await _getUserId();
+      if (userId == null) return [];
+
+      final response = await http.get(
+        Uri.parse(AppConstants.buildUrl(
+          '${AppConstants.userRewardsEndpoint}/$userId',
+        )),
+        headers: headers,
+      ).timeout(AppConstants.timeoutNormal);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          final List<dynamic> list = data['data'] ?? [];
+          return list.whereType<Map<String, dynamic>>().toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      debugPrint('❌ Error en getUserRewards: $e');
+      return [];
+    }
+  }
+
   /// Confirmar recepción de recompensa (canjear)
   static Future<Map<String, dynamic>> redeemReward(int rewardId) async {
     try {
