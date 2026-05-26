@@ -367,7 +367,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               const Text('Últimos Visitantes', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               const Spacer(),
               InkWell(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerVisitorsPage())),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => OwnerVisitorsPage(placeId: widget.placeId))),
                 child: Text('Ver todos →', style: TextStyle(fontSize: 10, color: _teal2, fontWeight: FontWeight.w600)),
               ),
             ])),

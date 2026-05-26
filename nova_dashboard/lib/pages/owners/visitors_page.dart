@@ -8,7 +8,8 @@ import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
 
 class OwnerVisitorsPage extends StatefulWidget {
-  const OwnerVisitorsPage({super.key});
+  final int? placeId;
+  const OwnerVisitorsPage({super.key, this.placeId});
 
   @override
   State<OwnerVisitorsPage> createState() => _OwnerVisitorsPageState();
@@ -33,7 +34,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
   Future<void> _loadVisitors() async {
     setState(() { _loading = true; _error = ''; });
     try {
-      final result = await AdminService.getMyPlaceVisitors();
+      final result = await AdminService.getMyPlaceVisitors(placeId: widget.placeId);
       if (result['success'] == true) {
         final list = (result['visitors'] as List? ?? [])
             .whereType<Map<String, dynamic>>()
