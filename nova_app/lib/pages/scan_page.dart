@@ -44,14 +44,25 @@ class ScanPage extends StatefulWidget {
   State<ScanPage> createState() => _ScanPageState();
 }
 
-class _ScanPageState extends State<ScanPage> {
+class _ScanPageState extends State<ScanPage> with TickerProviderStateMixin {
   final MobileScannerController _controller = MobileScannerController();
   bool _isTorchOn = false;
   double _zoom = 0.0;
   bool _isProcessing = false;
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -127,6 +138,22 @@ class _ScanPageState extends State<ScanPage> {
             child: Stack(children: [
               MobileScanner(controller: _controller, onDetect: _handleBarcode),
               _buildScannerOverlay(),
+              Center(child: _buildAnimatedScanLine()),
+              const Positioned(
+                bottom: 80,
+                left: 0,
+                right: 0,
+                child: Text(
+                  'Apunta al código QR del establecimiento',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    shadows: [Shadow(blurRadius: 4, color: Colors.black87)],
+                  ),
+                ),
+              ),
               if (_isProcessing)
                 Container(color: Colors.black54, child: const Center(
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -163,16 +190,59 @@ class _ScanPageState extends State<ScanPage> {
     );
   }
 
+  Widget _buildAnimatedScanLine() {
+    const sq = 260.0;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (_, __) {
+        return SizedBox(
+          width: sq,
+          height: sq,
+          child: Stack(
+            children: [
+              Positioned(
+                top: _animationController.value * (sq - 4),
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        AppColors.primary.withValues(alpha: 0.8),
+                        AppColors.primary,
+                        AppColors.primary.withValues(alpha: 0.8),
+                        Colors.transparent,
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.6),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildScannerOverlay() => CustomPaint(size: Size.infinite, painter: ScannerOverlayPainter());
 }
 
 class ScannerOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black54..style = PaintingStyle.fill;
+    final paint = Paint()..color = Colors.black.withValues(alpha: 0.65)..style = PaintingStyle.fill;
     final path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
     final center = Offset(size.width / 2, size.height / 2);
-    final sq = size.width * 0.7;
+    const sq = 260.0;
     path.addRect(Rect.fromCenter(center: center, width: sq, height: sq));
     canvas.drawPath(path, paint);
 
