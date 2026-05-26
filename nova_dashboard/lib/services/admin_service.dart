@@ -256,8 +256,12 @@ class AdminService {
       final queryParam = placeId != null ? '?place_id=$placeId' : '';
       final r = await ApiClient.get<dynamic>('/places/my-place/scans$queryParam');
       final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      final list = d['data'] as List? ?? (r.data is List ? r.data as List : []);
+      // Backend devuelve { success:true, data:[...] } → ApiClient extrae `data` → d es List
+      final list = d is List
+          ? List<dynamic>.from(d)
+          : (d is Map
+              ? (d['data'] as List? ?? d['scans'] as List? ?? <dynamic>[])
+              : <dynamic>[]);
       return {'success': true, 'scans': list};
     } catch (e) {
       debugPrint('❌ getMyPlaceScans: $e');
@@ -270,8 +274,12 @@ class AdminService {
       final queryParam = placeId != null ? '?place_id=$placeId' : '';
       final r = await ApiClient.get<dynamic>('/places/my-place/visitors$queryParam');
       final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      final list = d['data'] as List? ?? [];
+      // Backend devuelve { success:true, data:[...], total:N } → ApiClient extrae `data` → d es List
+      final list = d is List
+          ? List<dynamic>.from(d)
+          : (d is Map
+              ? (d['data'] as List? ?? d['visitors'] as List? ?? <dynamic>[])
+              : <dynamic>[]);
       return {'success': true, 'visitors': list};
     } catch (e) {
       debugPrint('❌ getMyPlaceVisitors: $e');

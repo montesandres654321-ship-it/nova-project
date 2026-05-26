@@ -193,7 +193,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             child: QrImageView(
               data: 'PLACE:${_place!.id}',
               version: QrVersions.auto,
-              size: 140,
+              size: 200,
             ),
           ),
         ),
