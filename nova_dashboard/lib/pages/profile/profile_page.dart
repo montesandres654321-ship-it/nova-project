@@ -171,24 +171,48 @@ class _ProfilePageState extends State<ProfilePage> {
         final isWide = constraints.maxWidth > 700;
         return SingleChildScrollView(
           padding: EdgeInsets.all(isWide ? 28.0 : 16.0),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 640),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildProfileHeader(),
-                  const SizedBox(height: 20),
-                  _buildInfoCard(),
-                  const SizedBox(height: 16),
-                  _buildSecurityCard(),
-                  const SizedBox(height: 16),
-                  _buildDangerCard(),
-                  const SizedBox(height: 28),
-                ],
-              ),
-            ),
-          ),
+          child: isWide
+              // ── Desktop: 2 columnas — info | seguridad+peligro ──
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildProfileHeader(),
+                          const SizedBox(height: 20),
+                          _buildInfoCard(),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildSecurityCard(),
+                          const SizedBox(height: 16),
+                          _buildDangerCard(),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              // ── Mobile: 1 columna (igual que antes) ─────────────
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildProfileHeader(),
+                    const SizedBox(height: 20),
+                    _buildInfoCard(),
+                    const SizedBox(height: 16),
+                    _buildSecurityCard(),
+                    const SizedBox(height: 16),
+                    _buildDangerCard(),
+                    const SizedBox(height: 28),
+                  ],
+                ),
         );
       }),
     );

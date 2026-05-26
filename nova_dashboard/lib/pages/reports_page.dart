@@ -191,7 +191,9 @@ class _ReportsPageState extends State<ReportsPage> {
     Icons.place_rounded,
     Icons.card_giftcard_rounded,
   ];
-  static const _kpiLabels = ['Total Escaneos', 'Turistas', 'Lugares Activos', 'Recompensas'];
+  static const _kpiLabels  = ['Total Escaneos', 'Turistas', 'Lugares Activos', 'Recompensas'];
+  // Rutas de navegación para cada KPI (deben existir en main.dart)
+  static const _kpiRoutes  = ['/scans', '/users', '/places', '/rewards'];
 
   Widget _buildKpiRow(bool isWide) {
     final values = [
@@ -205,7 +207,13 @@ class _ReportsPageState extends State<ReportsPage> {
       return Row(children: List.generate(4, (i) => Expanded(
         child: Padding(
           padding: EdgeInsets.only(left: i > 0 ? 12 : 0),
-          child: _kpiCard(i, values[i]),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(context, _kpiRoutes[i]),
+              child: _kpiCard(i, values[i]),
+            ),
+          ),
         ),
       )));
     }
@@ -214,7 +222,13 @@ class _ReportsPageState extends State<ReportsPage> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 10, crossAxisSpacing: 10,
       childAspectRatio: 2.2,
-      children: List.generate(4, (i) => _kpiCard(i, values[i])),
+      children: List.generate(4, (i) => MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => Navigator.pushNamed(context, _kpiRoutes[i]),
+          child: _kpiCard(i, values[i]),
+        ),
+      )),
     );
   }
 
