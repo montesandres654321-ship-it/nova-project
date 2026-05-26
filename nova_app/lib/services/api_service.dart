@@ -483,7 +483,20 @@ class ApiService {
       ).timeout(AppConstants.timeoutNormal);
 
       final data = jsonDecode(response.body);
-      return data;
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {
+          'success': true,
+          'message': data['message']?.toString() ?? 'Contraseña actualizada correctamente',
+        };
+      } else {
+        // responseAdapter envuelve error como objeto { code, message, ... }
+        // _extractError lo normaliza a String igual que updateProfile()
+        return {
+          'success': false,
+          'error': _extractError(data['error'], 'Error al cambiar contraseña'),
+        };
+      }
     } catch (e) {
       debugPrint('❌ Error en changePassword: $e');
       return {'success': false, 'error': 'Error de conexión: $e'};
