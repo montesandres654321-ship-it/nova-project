@@ -25,16 +25,19 @@
 /// el QR anterior, evitando peticiones redundantes al backend.
 ///
 /// Soporta QR impresos en físico (menús, carteles) y digitales (pantallas).
+/// El visor (cámara + overlay + línea animada) vive en [QrScannerWidget].
 ///
 /// Ver también:
 /// - [SuccessPage] para la pantalla de resultado del escaneo
 /// - [ApiService.registerScan] para el registro en el backend
+library;
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
+import '../widgets/qr_scanner_widget.dart';
 import 'success_page.dart';
 
 class ScanPage extends StatefulWidget {
@@ -44,25 +47,14 @@ class ScanPage extends StatefulWidget {
   State<ScanPage> createState() => _ScanPageState();
 }
 
-class _ScanPageState extends State<ScanPage> with TickerProviderStateMixin {
+class _ScanPageState extends State<ScanPage> {
   final MobileScannerController _controller = MobileScannerController();
   bool _isTorchOn = false;
   double _zoom = 0.0;
   bool _isProcessing = false;
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-  }
 
   @override
   void dispose() {
-    _animationController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -135,34 +127,11 @@ class _ScanPageState extends State<ScanPage> with TickerProviderStateMixin {
       body: SafeArea(
         child: Column(children: [
           Expanded(
-            child: Stack(children: [
-              MobileScanner(controller: _controller, onDetect: _handleBarcode),
-              _buildScannerOverlay(),
-              Center(child: _buildAnimatedScanLine()),
-              const Positioned(
-                bottom: 80,
-                left: 0,
-                right: 0,
-                child: Text(
-                  'Apunta al código QR del establecimiento',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    shadows: [Shadow(blurRadius: 4, color: Colors.black87)],
-                  ),
-                ),
-              ),
-              if (_isProcessing)
-                Container(color: Colors.black54, child: const Center(
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary)),
-                    SizedBox(height: 16),
-                    Text("Procesando código QR...", style: TextStyle(color: Colors.white, fontSize: 16)),
-                  ]),
-                )),
-            ]),
+            child: QrScannerWidget(
+              controller: _controller,
+              onDetect: _handleBarcode,
+              isProcessing: _isProcessing,
+            ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -189,77 +158,4 @@ class _ScanPageState extends State<ScanPage> with TickerProviderStateMixin {
       ),
     );
   }
-
-  Widget _buildAnimatedScanLine() {
-    const sq = 260.0;
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (_, __) {
-        return SizedBox(
-          width: sq,
-          height: sq,
-          child: Stack(
-            children: [
-              Positioned(
-                top: _animationController.value * (sq - 4),
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 3,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        AppColors.primary.withValues(alpha: 0.8),
-                        AppColors.primary,
-                        AppColors.primary.withValues(alpha: 0.8),
-                        Colors.transparent,
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.6),
-                        blurRadius: 6,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildScannerOverlay() => CustomPaint(size: Size.infinite, painter: ScannerOverlayPainter());
-}
-
-class ScannerOverlayPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withValues(alpha: 0.65)..style = PaintingStyle.fill;
-    final path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    final center = Offset(size.width / 2, size.height / 2);
-    const sq = 260.0;
-    path.addRect(Rect.fromCenter(center: center, width: sq, height: sq));
-    canvas.drawPath(path, paint);
-
-    final borderPaint = Paint()..color = AppColors.primary..style = PaintingStyle.stroke..strokeWidth = 3;
-    final rect = Rect.fromCenter(center: center, width: sq, height: sq);
-    const cl = 25.0;
-
-    canvas.drawLine(Offset(rect.left, rect.top + cl), Offset(rect.left, rect.top), borderPaint);
-    canvas.drawLine(Offset(rect.left, rect.top), Offset(rect.left + cl, rect.top), borderPaint);
-    canvas.drawLine(Offset(rect.right - cl, rect.top), Offset(rect.right, rect.top), borderPaint);
-    canvas.drawLine(Offset(rect.right, rect.top), Offset(rect.right, rect.top + cl), borderPaint);
-    canvas.drawLine(Offset(rect.left, rect.bottom - cl), Offset(rect.left, rect.bottom), borderPaint);
-    canvas.drawLine(Offset(rect.left, rect.bottom), Offset(rect.left + cl, rect.bottom), borderPaint);
-    canvas.drawLine(Offset(rect.right - cl, rect.bottom), Offset(rect.right, rect.bottom), borderPaint);
-    canvas.drawLine(Offset(rect.right, rect.bottom), Offset(rect.right, rect.bottom - cl), borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
