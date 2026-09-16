@@ -73,7 +73,7 @@ class _ReportsPageState extends State<ReportsPage> {
 
   Widget _buildHeader() {
     return Container(
-      color: Colors.white,
+      color: AppTheme.surface,
       padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
       child: Row(children: [
         Container(
@@ -84,12 +84,12 @@ class _ReportsPageState extends State<ReportsPage> {
         const SizedBox(width: 10),
         const Text('Reportes',
             style: TextStyle(
-                fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.textHead)),
         const Spacer(),
         // Period selector
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppTheme.border),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -97,8 +97,8 @@ class _ReportsPageState extends State<ReportsPage> {
             value: _selectedDays,
             underline: const SizedBox(),
             isDense: true,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
-            icon: const Icon(Icons.expand_more, size: 16, color: Color(0xFF9CA3AF)),
+            style: const TextStyle(fontSize: 12, color: AppTheme.textBody),
+            icon: const Icon(Icons.expand_more, size: 16, color: AppTheme.textMuted),
             items: _daysOptions.map((d) => DropdownMenuItem<int>(
               value: d,
               child: Text(d == 0 ? 'Todo' : '$d días',
@@ -117,7 +117,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary)))
             : IconButton(
-                icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+                icon: const Icon(Icons.refresh_rounded, size: 18, color: AppTheme.textMuted),
                 tooltip: 'Actualizar',
                 onPressed: _refresh,
                 padding: const EdgeInsets.all(6),
@@ -179,11 +179,15 @@ class _ReportsPageState extends State<ReportsPage> {
 
   // ─── KPI CARDS (compactas) ────────────────────────────────────
 
+  // Antes: [blue, green, amber, purple] — el morado no existe en la paleta
+  // oficial y esta pantalla usaba un orden distinto al de stats_dashboard_page
+  // para los mismos 4 KPIs. Alineado aquí para que "Turistas"/"Recompensas"/etc.
+  // tengan el mismo color en toda la app (hallazgo de la auditoría).
   static const _kpiColors = [
-    Color(0xFF3B82F6),
-    Color(0xFF10B981),
-    Color(0xFFF59E0B),
-    Color(0xFF7C3AED),
+    AppTheme.primary,
+    AppTheme.info,
+    AppTheme.success,
+    AppTheme.warning,
   ];
   static const _kpiIcons = [
     Icons.qr_code_scanner_rounded,
@@ -235,17 +239,10 @@ class _ReportsPageState extends State<ReportsPage> {
   Widget _kpiCard(int index, String value) {
     final color = _kpiColors[index];
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border(left: BorderSide(color: color, width: 3)),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
-        ],
-      ),
+      // Antipatrón corregido: antes tenía border izquierdo de color + boxShadow
+      // a la vez. Ahora solo sombra (nova-design 4bis) — se pierde la franja
+      // de color como distinción, el ícono y el valor siguen coloreados.
+      decoration: AppTheme.cardDecoration(),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(children: [
         Container(
@@ -264,9 +261,9 @@ class _ReportsPageState extends State<ReportsPage> {
             Text(value,
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A), height: 1.1)),
+                    color: AppTheme.textHead, height: 1.1)),
             Text(_kpiLabels[index],
-                style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
+                style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
                 overflow: TextOverflow.ellipsis),
           ],
         )),
@@ -340,16 +337,7 @@ class _ReportsPageState extends State<ReportsPage> {
     Widget? trailing,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.grey.withOpacity(0.07),
-              blurRadius: 10,
-              offset: const Offset(0, 2)),
-        ],
-      ),
+      decoration: AppTheme.cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -362,16 +350,18 @@ class _ReportsPageState extends State<ReportsPage> {
                   decoration: BoxDecoration(
                       color: AppTheme.primary,
                       borderRadius: BorderRadius.circular(2))),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(title,
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A))),
+                      color: AppTheme.textHead)),
               const Spacer(),
               if (trailing != null) trailing,
             ]),
           ),
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          // Divisor: nova-design reserva AppTheme.border para inputs y
+          // divisores — antes usaba un gris suelto (#F1F5F9).
+          const Divider(height: 1, color: AppTheme.border),
           // Chart area
           Expanded(
             child: Padding(
@@ -388,36 +378,36 @@ class _ReportsPageState extends State<ReportsPage> {
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
     decoration: BoxDecoration(
       color: subtle
-          ? const Color(0xFFF8FAFC)
+          ? AppTheme.bgPage
           : AppTheme.primary.withOpacity(0.06),
       borderRadius: BorderRadius.circular(20),
       border: Border.all(
         color: subtle
-            ? const Color(0xFFE2E8F0)
+            ? AppTheme.border
             : AppTheme.primary.withOpacity(0.15),
       ),
     ),
     child: Text(text,
         style: TextStyle(
             fontSize: 9,
-            color: subtle ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+            color: subtle ? AppTheme.textMuted : AppTheme.textBody,
             fontWeight: FontWeight.w500)),
   );
 
   Widget _emptyChart(IconData icon, String text) => Center(
     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(icon, size: 36, color: Colors.grey[300]),
+      Icon(icon, size: 36, color: AppTheme.textMuted),
       const SizedBox(height: 10),
-      Text(text, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+      Text(text, style: AppTheme.textCaption),
     ]),
   );
 
   Widget _buildError() => Center(
     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const Icon(Icons.error_outline_rounded, size: 52, color: Color(0xFFEF4444)),
+      const Icon(Icons.error_outline_rounded, size: 52, color: AppTheme.error),
       const SizedBox(height: 14),
       Text(_error, textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
+          style: const TextStyle(fontSize: 13, color: AppTheme.textMuted)),
       const SizedBox(height: 20),
       ElevatedButton.icon(
         onPressed: _loadData,
@@ -425,7 +415,7 @@ class _ReportsPageState extends State<ReportsPage> {
         label: const Text('Reintentar'),
         style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.primary,
-            foregroundColor: Colors.white,
+            foregroundColor: AppTheme.onPrimary,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
       ),
     ]),

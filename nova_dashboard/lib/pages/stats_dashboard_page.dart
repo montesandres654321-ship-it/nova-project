@@ -20,17 +20,18 @@
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../services/analytics_service.dart';
+import '../utils/app_theme.dart';
 import '../widgets/common/loading_indicator.dart';
 import '../widgets/charts/line_chart_widget.dart';
 import '../widgets/charts/bar_chart_widget.dart';
 import '../widgets/charts/donut_chart_widget.dart';
 
-// ── Design tokens ──────────────────────────────────────────────
-const _kPrimary   = Color(0xFF06B6A4);
-const _kBgPage    = Color(0xFFF1F5F9);
-const _kTextHead  = Color(0xFF0F172A);
-const _kTextMuted = Color(0xFF64748B);
-const _kBorder    = Color(0xFFE2E8F0);
+// Design tokens locales eliminados (Paso 2, Lote 3) — migrados a AppTheme:
+//   AppTheme.primary   (#06B6A4) → AppTheme.primary   (match exacto)
+//   AppTheme.bgPage    (#F1F5F9) → AppTheme.bgPage    (sin match exacto — consolidado)
+//   AppTheme.textHead  (#0F172A) → AppTheme.textHead  (sin match exacto — consolidado)
+//   AppTheme.textMuted (#64748B) → AppTheme.textMuted (sin match exacto — consolidado)
+//   AppTheme.border    (#E2E8F0) → AppTheme.border    (match casi exacto)
 
 // ──────────────────────────────────────────────────────────────
 
@@ -144,7 +145,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     if (_error.isNotEmpty) return _buildError();
 
     return ColoredBox(
-      color: _kBgPage,
+      color: AppTheme.bgPage,
       child: Column(
         children: [
           _buildHeader(),
@@ -159,15 +160,15 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: _kBorder)),
+        color: AppTheme.surface,
+        border: Border(bottom: BorderSide(color: AppTheme.border)),
       ),
       child: Row(
         children: [
           const Expanded(
             child: Text('Estadísticas del Sistema',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                    color: _kTextHead)),
+                    color: AppTheme.textHead)),
           ),
           _PeriodDropdown(
             value: _selectedDays,
@@ -332,16 +333,16 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     return Row(
       children: [
         Expanded(child: _buildKpiCard('Total Escaneos', _totalScans,
-            Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4))),
+            Icons.qr_code_scanner_rounded, AppTheme.primary)),
         const SizedBox(width: 8),
         Expanded(child: _buildKpiCard('Turistas', _totalUsers,
-            Icons.people_rounded, const Color(0xFF3B82F6))),
+            Icons.people_rounded, AppTheme.info)),
         const SizedBox(width: 8),
         Expanded(child: _buildKpiCard('Lugares Activos', _totalPlaces,
-            Icons.place_rounded, const Color(0xFF10B981))),
+            Icons.place_rounded, AppTheme.success)),
         const SizedBox(width: 8),
         Expanded(child: _buildKpiCard('Recompensas', _totalRewards,
-            Icons.card_giftcard_rounded, const Color(0xFFF59E0B))),
+            Icons.card_giftcard_rounded, AppTheme.warning)),
       ],
     );
   }
@@ -349,13 +350,13 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   Widget _buildKpiGrid({required int columns, required double aspectRatio}) {
     final cards = [
       _buildKpiCard('Total Escaneos', _totalScans,
-          Icons.qr_code_scanner_rounded, const Color(0xFF06B6A4)),
+          Icons.qr_code_scanner_rounded, AppTheme.primary),
       _buildKpiCard('Turistas', _totalUsers,
-          Icons.people_rounded, const Color(0xFF3B82F6)),
+          Icons.people_rounded, AppTheme.info),
       _buildKpiCard('Lugares Activos', _totalPlaces,
-          Icons.place_rounded, const Color(0xFF10B981)),
+          Icons.place_rounded, AppTheme.success),
       _buildKpiCard('Recompensas', _totalRewards,
-          Icons.card_giftcard_rounded, const Color(0xFFF59E0B)),
+          Icons.card_giftcard_rounded, AppTheme.warning),
     ];
 
     return GridView.count(
@@ -376,15 +377,11 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
         onTap: () => _navigateFromKpi(label),
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border(top: BorderSide(color: color, width: 3)),
-            boxShadow: [BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 6, offset: const Offset(0, 2),
-            )],
-          ),
+          // Antipatrón corregido: antes tenía border (franja superior de color)
+          // + boxShadow a la vez. Ahora usa AppTheme.cardDecoration() — solo
+          // sombra (nova-design 4bis). Se pierde la franja de color superior
+          // como método de distinción; el ícono y el número siguen coloreados.
+          decoration: AppTheme.cardDecoration(),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Row(
             children: [
@@ -407,7 +404,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
                             fontWeight: FontWeight.w700, color: color,
                             height: 1.1)),
                     Text(label,
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis),
                   ],
@@ -458,14 +455,13 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     required Color  accentColor,
     required Widget chart,
   }) {
+    // Este contenedor sigue siendo la ÚNICA capa de decoración de la gráfica:
+    // LineChartWidget y BarChartWidget ya no se auto-decoran (Lote 3), así que
+    // el problema de doble-tarjeta queda resuelto para esas 2. DonutChartWidget
+    // todavía se auto-decora (fuera del alcance de este lote) — la gráfica
+    // "Distribución por Tipo" sigue con doble tarjeta hasta un próximo lote.
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8, offset: const Offset(0, 2))],
-      ),
+      decoration: AppTheme.cardDecoration(),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,7 +473,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
                   color: accentColor,
                   borderRadius: BorderRadius.circular(2)),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,7 +483,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
                           fontWeight: FontWeight.w600),
                       maxLines: 1, overflow: TextOverflow.ellipsis),
                   Text(subtitle,
-                      style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                      style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
                       maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
               ),
@@ -515,14 +511,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       subtitle: _selectedDays == 0
           ? 'Todo el historial'
           : 'Últimos $_selectedDays días',
-      accentColor: const Color(0xFF06B6A4),
+      accentColor: AppTheme.primary,
       chart: data.isEmpty
           ? _buildEmptyState()
           : LayoutBuilder(builder: (ctx, c) {
               final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
               return LineChartWidget(
                 title: '', data: data,
-                color: const Color(0xFF06B6A4),
+                color: AppTheme.primary,
                 fillArea: true,
                 height: h,
               );
@@ -542,14 +538,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     return _buildChartContainer(
       title: 'Top Establecimientos',
       subtitle: 'Por número de escaneos',
-      accentColor: const Color(0xFFD97706),
+      accentColor: AppTheme.warning,
       chart: data.isEmpty
           ? _buildEmptyState()
           : LayoutBuilder(builder: (ctx, c) {
               final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
               return BarChartWidget(
                 title: '', data: data,
-                color: const Color(0xFFD97706),
+                color: AppTheme.warning,
                 height: h,
                 showValues: true,
               );
@@ -571,14 +567,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     return _buildChartContainer(
       title: 'Horario Pico',
       subtitle: 'Escaneos por hora del día',
-      accentColor: const Color(0xFF8B5CF6),
+      accentColor: AppTheme.info,
       chart: data.every((e) => (e['value'] as int) == 0)
           ? _buildEmptyState()
           : LayoutBuilder(builder: (ctx, c) {
               final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
               return BarChartWidget(
                 title: '', data: data,
-                color: const Color(0xFF8B5CF6),
+                color: AppTheme.info,
                 height: h,
                 showValues: false,
               );
@@ -593,15 +589,15 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     final total = hotel + rest + bar;
 
     final List<Map<String, dynamic>> chartData = [
-      {'label': 'Hoteles',      'value': hotel, 'color': const Color(0xFF3B82F6)},
-      {'label': 'Restaurantes', 'value': rest,  'color': const Color(0xFF10B981)},
-      {'label': 'Bares',        'value': bar,   'color': const Color(0xFFF59E0B)},
+      {'label': 'Hoteles',      'value': hotel, 'color': AppTheme.info},
+      {'label': 'Restaurantes', 'value': rest,  'color': AppTheme.success},
+      {'label': 'Bares',        'value': bar,   'color': AppTheme.warning},
     ].where((e) => (e['value'] as int) > 0).toList();
 
     return _buildChartContainer(
       title: 'Distribución por Tipo',
       subtitle: 'Establecimientos registrados',
-      accentColor: const Color(0xFF10B981),
+      accentColor: AppTheme.success,
       chart: total == 0
           ? _buildEmptyState()
           : LayoutBuilder(builder: (ctx, c) {
@@ -627,14 +623,14 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       subtitle: _selectedDays == 0
           ? 'Todo el historial'
           : 'Últimos $_selectedDays días',
-      accentColor: const Color(0xFFEC4899),
+      accentColor: AppTheme.primaryDark,
       chart: data.isEmpty
           ? _buildEmptyState()
           : LayoutBuilder(builder: (ctx, c) {
               final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
               return LineChartWidget(
                 title: '', data: data,
-                color: const Color(0xFFEC4899),
+                color: AppTheme.primaryDark,
                 fillArea: true,
                 height: h,
               );
@@ -647,14 +643,13 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
   // ═══════════════════════════════════════════════════════
 
   Widget _buildEmptyState() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bar_chart_rounded, size: 32, color: Colors.grey[300]),
-          const SizedBox(height: 6),
-          Text('Sin datos disponibles',
-              style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+          Icon(Icons.bar_chart_rounded, size: 32, color: AppTheme.textMuted),
+          SizedBox(height: 6),
+          Text('Sin datos disponibles', style: AppTheme.textCaption),
         ],
       ),
     );
@@ -665,7 +660,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
           const SizedBox(height: 12),
           Text(_error,
               textAlign: TextAlign.center,
@@ -676,8 +671,8 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
             icon: const Icon(Icons.refresh),
             label: const Text('Reintentar'),
             style: ElevatedButton.styleFrom(
-                backgroundColor: _kPrimary,
-                foregroundColor: Colors.white),
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.onPrimary),
           ),
         ],
       ),
@@ -720,16 +715,16 @@ class _PeriodDropdown extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: _kBorder),
+      border: Border.all(color: AppTheme.border),
     ),
     child: DropdownButtonHideUnderline(
       child: DropdownButton<int>(
         value: value,
         isDense: true,
-        icon: const Icon(Icons.expand_more_rounded, size: 15, color: _kTextMuted),
-        style: const TextStyle(fontSize: 12, color: _kTextHead),
+        icon: const Icon(Icons.expand_more_rounded, size: 15, color: AppTheme.textMuted),
+        style: const TextStyle(fontSize: 12, color: AppTheme.textHead),
         items: options.map((d) => DropdownMenuItem(
           value: d,
           child: Text(
@@ -764,13 +759,13 @@ class _DashIconButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(AppTheme.space8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _kBorder),
+          border: Border.all(color: AppTheme.border),
         ),
-        child: Icon(icon, size: 16, color: _kTextMuted),
+        child: Icon(icon, size: 16, color: AppTheme.textMuted),
       ),
     ),
   );

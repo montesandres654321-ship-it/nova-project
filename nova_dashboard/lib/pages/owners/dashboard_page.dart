@@ -42,6 +42,7 @@ import '../../services/admin_service.dart';
 import '../../services/place_service.dart';
 import '../../models/place.dart';
 import '../../utils/constants.dart';
+import '../../utils/app_theme.dart';
 import '../places/qr_dialog.dart';
 import '../profile/profile_page.dart';
 import '../profile/change_password_dialog.dart';
@@ -63,10 +64,11 @@ class OwnerDashboardPage extends StatefulWidget {
 }
 
 class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
-  static const _teal = Color(0xFF06B6A4);
-  static const _teal2 = Color(0xFF0891B2);
-  static const _amber = Color(0xFFD97706);
-  static const _green = Color(0xFF059669);
+  // Constantes locales eliminadas (Paso 2, Lote 2) — migradas a AppTheme:
+  //   _teal   (#06B6A4) → AppTheme.primary      (match exacto)
+  //   _teal2  (#0891B2) → AppTheme.primaryDark  (sin match exacto — consolidado)
+  //   _amber  (#D97706) → AppTheme.warning      (match exacto)
+  //   _green  (#059669) → AppTheme.success      (sin match exacto — consolidado)
 
   bool _loading = true;
   String _error = '';
@@ -122,13 +124,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDFA),
+      backgroundColor: AppTheme.primaryLight,
       appBar: AppBar(
-        backgroundColor: _teal, foregroundColor: Colors.white,
+        backgroundColor: AppTheme.primary, foregroundColor: AppTheme.onPrimary,
         title: Row(children: [
           if (_place != null) ...[
             Text(_place!.tipoEmoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
           ],
           Expanded(child: Text(_place?.name ?? 'Mi Establecimiento',
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -141,18 +143,18 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               onPressed: () => showDialog(context: context, builder: (_) => QRDialog(place: _place!))),
           IconButton(icon: const Icon(Icons.refresh_rounded, size: 20), tooltip: 'Actualizar', onPressed: _loadAll),
           _buildUserMenu(),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppTheme.space4),
         ],
       ),
-      body: _loading ? const Center(child: CircularProgressIndicator(color: _teal))
+      body: _loading ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
           : _error.isNotEmpty ? _buildError()
           : _place == null ? const Center(child: Text('No se pudo cargar el lugar.'))
           : Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppTheme.space16),
         child: Column(children: [
           // Fila 1: 4 stats compactos
           _buildStatsRow(),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space8),
           // Fila 2: 2 columnas — gráfica única | QR grande + recompensa
           Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             // FIX 4: columna izquierda — solo gráfica de barras (escaneos)
@@ -161,7 +163,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             // FIX 4: columna derecha — QR grande + tarjeta recompensa
             Expanded(flex: 2, child: _buildRightColumn()),
           ])),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space8),
           // Actividad reciente (altura fija)
           SizedBox(height: 160, child: _visitorsCompact()),
         ]),
@@ -173,7 +175,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   Widget _buildRightColumn() => Column(children: [
     if (_place!.hasReward) ...[
       Expanded(flex: 3, child: _qrBig()),
-      const SizedBox(height: 10),
+      const SizedBox(height: AppTheme.space8),
       Expanded(flex: 2, child: _rewardMini()),
     ] else
       Expanded(child: _qrBig()),
@@ -181,13 +183,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
   // ── FIX 4: QR grande con botón "Ver completo" ────────
   Widget _qrBig() => Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
+      padding: const EdgeInsets.all(AppTheme.space16),
+      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
           boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         const Text('Código QR',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Expanded(
           child: Center(
             child: QrImageView(
@@ -199,7 +201,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         ),
         Text('PLACE:${_place!.id}',
             style: const TextStyle(fontFamily: 'monospace', fontSize: 9,
-                fontWeight: FontWeight.w700, color: _teal)),
+                fontWeight: FontWeight.w700, color: AppTheme.primary)),
         const SizedBox(height: 6),
         SizedBox(
           width: double.infinity,
@@ -210,8 +212,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             label: const Text('Ver QR completo',
                 style: TextStyle(fontSize: 11)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: _teal,
-              side: const BorderSide(color: _teal),
+              foregroundColor: AppTheme.primary,
+              side: const BorderSide(color: AppTheme.primary),
               padding: const EdgeInsets.symmetric(vertical: 6),
             ),
           ),
@@ -221,29 +223,30 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   // ── Stats row compacto ──────────────────────────────
   Widget _buildStatsRow() {
     return Row(children: [
-      _stat('Visitantes', _visitors, Icons.people_rounded, _teal),
-      const SizedBox(width: 8),
-      _stat('Escaneos', _scans, Icons.qr_code_scanner_rounded, _teal2),
-      const SizedBox(width: 8),
-      _stat('Otorgadas', _rewards, Icons.card_giftcard_rounded, _amber),
-      const SizedBox(width: 8),
-      _stat('Canjeadas', _redeemed, Icons.check_circle_rounded, _green),
+      _stat('Visitantes', _visitors, Icons.people_rounded, AppTheme.primary),
+      const SizedBox(width: AppTheme.space8),
+      _stat('Escaneos', _scans, Icons.qr_code_scanner_rounded, AppTheme.primaryDark),
+      const SizedBox(width: AppTheme.space8),
+      _stat('Otorgadas', _rewards, Icons.card_giftcard_rounded, AppTheme.warning),
+      const SizedBox(width: AppTheme.space8),
+      _stat('Canjeadas', _redeemed, Icons.check_circle_rounded, AppTheme.success),
     ]);
   }
 
   Widget _stat(String t, int v, IconData i, Color c) => Expanded(child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: c.withOpacity(0.2)),
-          boxShadow: [BoxShadow(color: c.withOpacity(0.06), blurRadius: 6, offset: const Offset(0, 2))]),
+      // Antipatrón corregido: antes tenía border: Border.all(c.withOpacity(0.2))
+      // Y boxShadow a la vez. Ahora usa AppTheme.cardDecoration() — solo sombra
+      // (nova-design 4bis). Efecto secundario: el radio pasa de 10 a 12 (cardRadius).
+      decoration: AppTheme.cardDecoration(),
       child: Row(children: [
         Container(width: 32, height: 32, decoration: BoxDecoration(
-            color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
             child: Icon(i, color: c, size: 16)),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppTheme.space8),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text(v.toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: c)),
-          Text(t, style: TextStyle(fontSize: 9, color: Colors.grey[600])),
+          Text(t, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted)),
         ])),
       ])));
 
@@ -253,7 +256,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     final d = _scansByDay.map((i) { String l = i['date']?.toString() ?? '';
     try { l = DateFormat('d MMM', 'es').format(DateTime.parse(l)); } catch (_) {}
     return {'label': l, 'value': i['count'] ?? 0}; }).toList();
-    return LineChartWidget(title: 'Visitas por Día', data: d, color: _teal, height: double.infinity, fillArea: true);
+    return LineChartWidget(title: 'Visitas por Día', data: d, color: AppTheme.primary, height: double.infinity, fillArea: true);
   }
 
   // ── Gráfica de barras ───────────────────────────────
@@ -262,15 +265,15 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     final d = _scansByDay.map((i) { String l = i['date']?.toString() ?? '';
     try { l = DateFormat('d MMM', 'es').format(DateTime.parse(l)); } catch (_) {}
     return {'label': l, 'value': i['count'] ?? 0}; }).toList();
-    return BarChartWidget(title: 'Escaneos por Día', data: d, color: _teal, height: double.infinity, showValues: true);
+    return BarChartWidget(title: 'Escaneos por Día', data: d, color: AppTheme.primary, height: double.infinity, showValues: true);
   }
 
   // ── Donut compacto ──────────────────────────────────
   Widget _donutChart() {
     if (_rewards == 0) return _emptyBox(Icons.donut_large, 'Sin recompensas');
     return DonutChartWidget(title: 'Recompensas', subtitle: '', data: [
-      {'label': 'Canjeadas', 'value': _redeemed, 'color': _green},
-      {'label': 'Pendientes', 'value': _rewards - _redeemed, 'color': _amber},
+      {'label': 'Canjeadas', 'value': _redeemed, 'color': AppTheme.success},
+      {'label': 'Pendientes', 'value': _rewards - _redeemed, 'color': AppTheme.warning},
     ], height: double.infinity, showLegend: true);
   }
 
@@ -282,26 +285,26 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     final disponiblesStr = disponiblesNum == null ? '∞' : '$disponiblesNum';
     // Alerta roja si quedan 3 o menos unidades (solo cuando hay stock fijo)
     final disponiblesColor = disponiblesNum != null && disponiblesNum <= 3
-        ? const Color(0xFFEF4444)
-        : _amber;
+        ? AppTheme.error
+        : AppTheme.warning;
 
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _amber.withOpacity(0.2))),
+      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppTheme.warning.withOpacity(0.2))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
         Row(children: [
           Text(_place?.rewardIcon ?? '🎁', style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(child: Text(_place?.rewardName ?? 'Recompensa',
               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
               maxLines: 1, overflow: TextOverflow.ellipsis)),
         ]),
         const SizedBox(height: 6),
         Row(children: [
-          _miniStat(stock == null ? '∞' : '$stock', 'Stock',       _teal),
+          _miniStat(stock == null ? '∞' : '$stock', 'Stock',       AppTheme.primary),
           const SizedBox(width: 6),
-          _miniStat('$_rewards',                    'Entregadas',   _amber),
+          _miniStat('$_rewards',                    'Entregadas',   AppTheme.warning),
           const SizedBox(width: 6),
           _miniStat(disponiblesStr,                 'Disponibles',  disponiblesColor),
         ]),
@@ -312,73 +315,73 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               currentDescription: _place?.rewardDescription, currentStock: _place?.rewardStock, onSaved: _loadAll)),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: BoxDecoration(color: _amber.withOpacity(0.08), borderRadius: BorderRadius.circular(6)),
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
+            decoration: BoxDecoration(color: AppTheme.warning.withOpacity(0.08), borderRadius: BorderRadius.circular(6)),
             child: const Text('Editar', textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: _amber, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 10, color: AppTheme.warning, fontWeight: FontWeight.w600)),
           ),
         ),
       ]));
   }
 
   Widget _miniStat(String v, String l, Color c) => Expanded(child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
       decoration: BoxDecoration(color: c.withOpacity(0.06), borderRadius: BorderRadius.circular(6)),
       child: Column(children: [
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-        Text(l, style: TextStyle(fontSize: 8, color: Colors.grey[600])),
+        Text(l, style: const TextStyle(fontSize: 8, color: AppTheme.textMuted)),
       ])));
 
   // ── QR mini ─────────────────────────────────────────
   Widget _qrMini() => Container(
       width: 100,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _teal.withOpacity(0.2))),
+      padding: const EdgeInsets.all(AppTheme.space8),
+      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppTheme.primary.withOpacity(0.2))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ClipRRect(borderRadius: BorderRadius.circular(4), child: Image.network(
             'https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=PLACE:${_place!.id}&format=png&margin=2',
             width: 60, height: 60, errorBuilder: (_, __, ___) => Container(width: 60, height: 60,
-            color: Colors.grey[100], child: const Icon(Icons.qr_code, size: 24, color: Colors.grey)))),
-        const SizedBox(height: 4),
-        Text('PLACE:${_place!.id}', style: const TextStyle(fontFamily: 'monospace', fontSize: 9, fontWeight: FontWeight.w700, color: _teal)),
-        const SizedBox(height: 4),
+            color: AppTheme.bgPage, child: const Icon(Icons.qr_code, size: 24, color: AppTheme.textMuted)))),
+        const SizedBox(height: AppTheme.space4),
+        Text('PLACE:${_place!.id}', style: const TextStyle(fontFamily: 'monospace', fontSize: 9, fontWeight: FontWeight.w700, color: AppTheme.primary)),
+        const SizedBox(height: AppTheme.space4),
         InkWell(
           onTap: () => showDialog(context: context, builder: (_) => QRDialog(place: _place!)),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: BoxDecoration(color: _teal, borderRadius: BorderRadius.circular(6)),
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
+            decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(6)),
             child: const Text('Descargar', textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 9, color: AppTheme.onPrimary, fontWeight: FontWeight.w600)),
           ),
         ),
       ]));
 
   // ── Visitantes compacto ─────────────────────────────
   Widget _visitorsCompact() => Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
+      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
           boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
             child: Row(children: [
-              Container(width: 3, height: 14, decoration: BoxDecoration(color: _teal2, borderRadius: BorderRadius.circular(2))),
+              Container(width: 3, height: 14, decoration: BoxDecoration(color: AppTheme.primaryDark, borderRadius: BorderRadius.circular(2))),
               const SizedBox(width: 6),
               const Text('Últimos Visitantes', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               const Spacer(),
               InkWell(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => OwnerVisitorsPage(placeId: widget.placeId))),
-                child: Text('Ver todos →', style: TextStyle(fontSize: 10, color: _teal2, fontWeight: FontWeight.w600)),
+                child: const Text('Ver todos →', style: TextStyle(fontSize: 10, color: AppTheme.primaryDark, fontWeight: FontWeight.w600)),
               ),
             ])),
         Expanded(child: _recentScans.isEmpty
-            ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(Icons.people_outline, size: 28, color: Colors.grey[300]),
-          const SizedBox(height: 4),
-          Text('Sin visitantes aún', style: TextStyle(fontSize: 10, color: Colors.grey[400])),
+            ? const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(Icons.people_outline, size: 28, color: AppTheme.textMuted),
+          SizedBox(height: AppTheme.space4),
+          Text('Sin visitantes aún', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
         ]))
             : ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.space8),
           itemCount: _recentScans.length,
           itemBuilder: (_, i) {
             final s = _recentScans[i];
@@ -387,41 +390,41 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             String dl = ''; try { dl = DateFormat('d MMM, HH:mm', 'es').format(DateTime.parse(d)); } catch (_) { dl = d; }
             return ListTile(
               dense: true, visualDensity: const VisualDensity(vertical: -3),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-              leading: CircleAvatar(radius: 14, backgroundColor: _teal.withOpacity(0.1),
+              contentPadding: const EdgeInsets.symmetric(horizontal: AppTheme.space4),
+              leading: CircleAvatar(radius: 14, backgroundColor: AppTheme.primary.withOpacity(0.1),
                   child: Text(n.isNotEmpty ? n[0].toUpperCase() : '?',
-                      style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 10))),
+                      style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 10))),
               title: Text(n.isNotEmpty ? n : 'Turista',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
-              trailing: Text(dl, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+              trailing: Text(dl, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted)),
             );
           },
         )),
       ]));
 
   Widget _emptyBox(IconData icon, String msg) => Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10),
+      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
           boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
       child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(icon, size: 28, color: Colors.grey[300]), const SizedBox(height: 4),
-        Text(msg, style: TextStyle(fontSize: 10, color: Colors.grey[400]))])));
+        Icon(icon, size: 28, color: AppTheme.textMuted), const SizedBox(height: AppTheme.space4),
+        Text(msg, style: const TextStyle(fontSize: 10, color: AppTheme.textMuted))])));
 
   // ── User menu ───────────────────────────────────────
   // FIX 2: usa _loggedUserName/_loggedUserEmail (del JWT/SharedPreferences),
   // no widget.userName que puede ser el nombre del propietario del lugar.
   Widget _buildUserMenu() => PopupMenuButton<String>(offset: const Offset(0, 50),
       child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Row(mainAxisSize: MainAxisSize.min, children: [
-        CircleAvatar(radius: 13, backgroundColor: Colors.white,
+        CircleAvatar(radius: 13, backgroundColor: AppTheme.surface,
             child: Text(
               _loggedUserName.isNotEmpty ? _loggedUserName[0].toUpperCase() : 'U',
-              style: const TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 11),
+              style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 11),
             )),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppTheme.space4),
         Text(
           (_loggedUserName.isNotEmpty ? _loggedUserName : widget.userName).split(' ').first,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: AppTheme.onPrimary, fontSize: 12),
         ),
-        const Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
+        const Icon(Icons.arrow_drop_down, color: AppTheme.onPrimary, size: 18),
       ])),
       itemBuilder: (_) => [
         PopupMenuItem(enabled: false, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
@@ -431,13 +434,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           ),
           Text(
             _loggedUserEmail.isNotEmpty ? _loggedUserEmail : widget.userEmail,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
           ),
           const Divider(),
         ])),
-        const PopupMenuItem(value: 'profile', child: ListTile(leading: Icon(Icons.person_rounded, color: _teal), title: Text('Mi Perfil'), contentPadding: EdgeInsets.zero, dense: true)),
-        const PopupMenuItem(value: 'password', child: ListTile(leading: Icon(Icons.lock_rounded, color: _teal), title: Text('Cambiar Contraseña'), contentPadding: EdgeInsets.zero, dense: true)),
-        const PopupMenuItem(value: 'logout', child: ListTile(leading: Icon(Icons.logout_rounded, color: Colors.red), title: Text('Cerrar Sesión', style: TextStyle(color: Colors.red)), contentPadding: EdgeInsets.zero, dense: true)),
+        const PopupMenuItem(value: 'profile', child: ListTile(leading: Icon(Icons.person_rounded, color: AppTheme.primary), title: Text('Mi Perfil'), contentPadding: EdgeInsets.zero, dense: true)),
+        const PopupMenuItem(value: 'password', child: ListTile(leading: Icon(Icons.lock_rounded, color: AppTheme.primary), title: Text('Cambiar Contraseña'), contentPadding: EdgeInsets.zero, dense: true)),
+        const PopupMenuItem(value: 'logout', child: ListTile(leading: Icon(Icons.logout_rounded, color: AppTheme.error), title: Text('Cerrar Sesión', style: TextStyle(color: AppTheme.error)), contentPadding: EdgeInsets.zero, dense: true)),
       ],
       onSelected: (v) {
         switch (v) {
@@ -447,11 +450,11 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         }
       });
 
-  Widget _buildError() => Center(child: Padding(padding: const EdgeInsets.all(24),
+  Widget _buildError() => Center(child: Padding(padding: const EdgeInsets.all(AppTheme.space24),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Icon(Icons.store_mall_directory_outlined, size: 60, color: _teal), const SizedBox(height: 16),
-        Text(_error, textAlign: TextAlign.center), const SizedBox(height: 24),
+        const Icon(Icons.store_mall_directory_outlined, size: 60, color: AppTheme.primary), const SizedBox(height: AppTheme.space16),
+        Text(_error, textAlign: TextAlign.center), const SizedBox(height: AppTheme.space24),
         ElevatedButton.icon(onPressed: _loadAll, icon: const Icon(Icons.refresh), label: const Text('Reintentar'),
-            style: ElevatedButton.styleFrom(backgroundColor: _teal, foregroundColor: Colors.white)),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: AppTheme.onPrimary)),
       ])));
 }

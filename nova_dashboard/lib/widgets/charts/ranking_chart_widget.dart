@@ -102,7 +102,9 @@ class RankingChartWidget extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: _getRankColor(index),
+                  // _getRankColor ahora espera el puesto en base 1 (1º/2º/3º),
+                  // no el índice base 0 de la lista — de ahí el +1.
+                  color: _getRankColor(index + 1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Center(
@@ -151,16 +153,24 @@ class RankingChartWidget extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // Barra de progreso
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: percentage,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                color.withOpacity(0.7 + (0.3 * (1 - index / 10))),
+          // Barra de progreso — Container + FractionallySizedBox en vez de
+          // LinearProgressIndicator de Material, para consistencia visual
+          // con el resto de gráficas fl_chart del dashboard.
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              color: AppTheme.border,
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: percentage.toDouble(),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  color: _getRankColor(index + 1),
+                ),
               ),
-              minHeight: 8,
             ),
           ),
         ],
@@ -168,11 +178,21 @@ class RankingChartWidget extends StatelessWidget {
     );
   }
 
-  Color _getRankColor(int index) {
-    if (index == 0) return Colors.amber; // Oro
-    if (index == 1) return Colors.grey;  // Plata
-    if (index == 2) return Colors.brown; // Bronce
-    return color;
+  // rank en base 1 (1º, 2º, 3º...). Antes usaba Colors.amber/grey/brown
+  // (medallas fuera de la paleta NOVA) — ahora usa tokens oficiales.
+  // NOTA: el parámetro `color` del widget deja de usarse en el fallback;
+  // ver reporte de la migración.
+  Color _getRankColor(int rank) {
+    switch (rank) {
+      case 1:
+        return AppTheme.primary; // oro → teal
+      case 2:
+        return AppTheme.textBody; // plata → gris
+      case 3:
+        return AppTheme.warning; // bronce → ámbar oficial
+      default:
+        return AppTheme.textMuted;
+    }
   }
 
   double _getMaxValue() {

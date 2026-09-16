@@ -31,18 +31,9 @@ class StatCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          // Antipatrón corregido: antes tenía border + boxShadow a la vez.
+          // La tarjeta ahora se separa del fondo SOLO por sombra (nova-design 4bis).
+          decoration: AppTheme.cardDecoration(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -67,7 +58,7 @@ class StatCard extends StatelessWidget {
                       children: [
                         // Icono
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(AppTheme.space8),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.10),
                             borderRadius: BorderRadius.circular(AppTheme.radiusSM),
@@ -114,21 +105,19 @@ class StatCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.gray900,
+                        color: AppTheme.textHead,
                         height: 1.1,
                       ),
                     ),
 
                     const SizedBox(height: AppTheme.spaceXS),
 
-                    // Título
+                    // Título — usa la jerarquía tipográfica de nova-design
+                    // (fontSize:12/w500/textMuted, igual que el ejemplo del skill
+                    // "Total escaneos" en tenue debajo del número).
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.gray500,
-                      ),
+                      style: AppTheme.textCaption,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -143,7 +132,7 @@ class StatCard extends StatelessWidget {
   }
 
   Color _getTrendColor() {
-    if (isPositive == null) return AppTheme.gray500;
+    if (isPositive == null) return AppTheme.textMuted;
     return isPositive! ? AppTheme.success : AppTheme.error;
   }
 

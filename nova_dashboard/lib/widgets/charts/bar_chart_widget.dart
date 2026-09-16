@@ -1,6 +1,7 @@
 // lib/widgets/charts/bar_chart_widget.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../utils/app_theme.dart';
 
 class BarChartWidget extends StatelessWidget {
   final String title;
@@ -14,7 +15,7 @@ class BarChartWidget extends StatelessWidget {
     Key? key,
     required this.title,
     required this.data,
-    this.color = const Color(0xFF06B6A4),
+    this.color = AppTheme.primary,
     this.subtitle,
     this.height,
     this.showValues = false,
@@ -92,7 +93,8 @@ class BarChartWidget extends StatelessWidget {
           barTouchData: BarTouchData(
             enabled: true,
             touchTooltipData: BarTouchTooltipData(
-              tooltipBgColor: const Color(0xFF1E293B),
+              // Igual que line_chart_widget: consistencia entre gráficas (nova-charts §8)
+              tooltipBgColor: AppTheme.textHead,
               tooltipRoundedRadius: 8,
               tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               getTooltipItem: (g, gi, rod, _) {
@@ -121,7 +123,7 @@ class BarChartWidget extends StatelessWidget {
                       ? '${(v / 1000).toStringAsFixed(1)}k'
                       : v.toInt().toString();
                   return Text(s,
-                      style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8)));
+                      style: const TextStyle(fontSize: 9, color: AppTheme.textMuted));
                 },
               ),
             ),
@@ -141,7 +143,7 @@ class BarChartWidget extends StatelessWidget {
                       child: Text(l,
                         style: TextStyle(
                           fontSize: barW < 28 ? 7.5 : 9.0,
-                          color: const Color(0xFF64748B),
+                          color: AppTheme.textMuted,
                           fontWeight: FontWeight.w500),
                         textAlign: TextAlign.center,
                         maxLines: 2,
@@ -163,8 +165,8 @@ class BarChartWidget extends StatelessWidget {
           borderData: FlBorderData(
             show: true,
             border: const Border(
-              bottom: BorderSide(color: Color(0xFFE2E8F0)),
-              left:   BorderSide(color: Color(0xFFE2E8F0)),
+              bottom: BorderSide(color: AppTheme.border),
+              left:   BorderSide(color: AppTheme.border),
             ),
           ),
           barGroups: data.asMap().entries.map((e) {
@@ -204,12 +206,11 @@ class BarChartWidget extends StatelessWidget {
 
   Widget _emptyState() => SizedBox(
     height: (height != null && !height!.isInfinite) ? height : 200,
-    child: Center(
+    child: const Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(Icons.bar_chart_rounded, size: 36, color: Colors.grey[300]),
-        const SizedBox(height: 8),
-        Text('Sin datos disponibles',
-            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+        Icon(Icons.bar_chart_rounded, size: 36, color: AppTheme.textMuted),
+        SizedBox(height: 8),
+        Text('Sin datos disponibles', style: AppTheme.textCaption),
       ]),
     ),
   );

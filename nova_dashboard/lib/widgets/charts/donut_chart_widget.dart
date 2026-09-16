@@ -267,13 +267,15 @@ class DonutChartWidget extends StatelessWidget {
   }
 
   Color _getColor(int index) {
-    final colors = [
-      Colors.green,
-      Colors.orange,
-      Colors.blue,
-      Colors.red,
-      Colors.purple,
-      AppTheme.primary,
+    // Antes: arcoíris de librería (Colors.green/orange/blue/red/purple).
+    // Ahora: variantes de teal/verde de la paleta NOVA (nova-charts §3).
+    const colors = [
+      Color(0xFF06B6A4), // primary teal
+      Color(0xFF048577), // primaryDark
+      Color(0xFF5EEAD4), // teal 300
+      Color(0xFF0891B2), // cyan 600
+      Color(0xFF2563EB), // info blue
+      Color(0xFF94A9A7), // textMuted (neutro)
     ];
     return colors[index % colors.length];
   }
@@ -289,10 +291,15 @@ class DonutChartWidget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Center(
-        child: Text(
-          'No hay datos disponibles',
-          style: TextStyle(color: Colors.grey[600]),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.donut_large_rounded, size: 32, color: AppTheme.textMuted),
+            SizedBox(height: 8),
+            Text('Sin datos', style: AppTheme.textCaption),
+          ],
         ),
       ),
     );

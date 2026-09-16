@@ -1,6 +1,7 @@
 // lib/widgets/charts/line_chart_widget.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../utils/app_theme.dart';
 
 class LineChartWidget extends StatelessWidget {
   final String title;
@@ -25,7 +26,7 @@ class LineChartWidget extends StatelessWidget {
     if (data.isEmpty) return _emptyState();
 
     final useFixed = !height.isInfinite;
-    final effectiveColor = color ?? const Color(0xFF06B6A4);
+    final effectiveColor = color ?? AppTheme.primary;
 
     final maxY       = _computeMaxY();
     final yInterval  = _computeYInterval(maxY);
@@ -37,11 +38,11 @@ class LineChartWidget extends StatelessWidget {
         if (title.isNotEmpty) ...[
           Text(title,
               style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                  fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textHead)),
           if (subtitle != null) ...[
             const SizedBox(height: 3),
             Text(subtitle!,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
           ],
           const SizedBox(height: 12),
         ],
@@ -70,7 +71,7 @@ class LineChartWidget extends StatelessWidget {
                         : v.toInt().toString();
                     return Text(s,
                         style: const TextStyle(
-                            fontSize: 9, color: Color(0xFF94A3B8)));
+                            fontSize: 9, color: AppTheme.textMuted));
                   },
                 ),
               ),
@@ -86,7 +87,7 @@ class LineChartWidget extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 5),
                       child: Text(
                         data[i]['label']?.toString() ?? '',
-                        style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8)),
+                        style: const TextStyle(fontSize: 9, color: AppTheme.textMuted),
                       ),
                     );
                   },
@@ -96,8 +97,8 @@ class LineChartWidget extends StatelessWidget {
             borderData: FlBorderData(
               show: true,
               border: const Border(
-                bottom: BorderSide(color: Color(0xFFE2E8F0)),
-                left:   BorderSide(color: Color(0xFFE2E8F0)),
+                bottom: BorderSide(color: AppTheme.border),
+                left:   BorderSide(color: AppTheme.border),
               ),
             ),
             minX: 0,
@@ -137,7 +138,8 @@ class LineChartWidget extends StatelessWidget {
             lineTouchData: LineTouchData(
               enabled: true,
               touchTooltipData: LineTouchTooltipData(
-                tooltipBgColor: const Color(0xFF1E293B),
+                // Pedido explícito del Lote 3: #1E293B (slate oscuro) → AppTheme.textHead
+                tooltipBgColor: AppTheme.textHead,
                 tooltipRoundedRadius: 8,
                 tooltipPadding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -160,21 +162,13 @@ class LineChartWidget extends StatelessWidget {
       ],
     );
 
-    final dec = BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-            color: Colors.grey.withOpacity(0.07),
-            blurRadius: 8,
-            offset: const Offset(0, 2)),
-      ],
-    );
-
+    // Lote 3: se eliminó la decoración propia (fondo+sombra+radio) — el widget
+    // de gráfica ya NO se decora a sí mismo. La decoración la pone el
+    // contenedor padre (ver _buildChartContainer / _chartCard).
     if (useFixed) {
-      return Container(height: height, padding: const EdgeInsets.all(14), decoration: dec, child: chart);
+      return Container(height: height, padding: const EdgeInsets.all(14), child: chart);
     }
-    return Container(padding: const EdgeInsets.all(14), decoration: dec, child: chart);
+    return Container(padding: const EdgeInsets.all(14), child: chart);
   }
 
   List<FlSpot> _getSpots() => List.generate(data.length, (i) {
@@ -211,22 +205,11 @@ class LineChartWidget extends StatelessWidget {
   Widget _emptyState() => Container(
         height: height.isInfinite ? null : height,
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.withOpacity(0.07),
-                blurRadius: 8,
-                offset: const Offset(0, 2)),
-          ],
-        ),
-        child: Center(
+        child: const Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.show_chart_rounded, size: 36, color: Colors.grey[300]),
-            const SizedBox(height: 10),
-            Text('Sin datos de actividad',
-                style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+            Icon(Icons.show_chart_rounded, size: 36, color: AppTheme.textMuted),
+            SizedBox(height: 10),
+            Text('Sin datos de actividad', style: AppTheme.textCaption),
           ]),
         ),
       );

@@ -36,37 +36,34 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.space32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 80,
-              color: iconColor ?? Colors.grey[300],
+              size: 80, // sin token — nova-design recomienda 32px para íconos de estado vacío, ver nota
+              color: iconColor ?? AppTheme.textMuted,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.space24),
             Text(
               title,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: AppTheme.textHead,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: AppTheme.textBodyStyle,
               textAlign: TextAlign.center,
             ),
             if (onActionPressed != null && actionLabel != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.space24),
               ElevatedButton.icon(
                 onPressed: onActionPressed,
                 icon: const Icon(Icons.add),
@@ -75,11 +72,11 @@ class EmptyState extends StatelessWidget {
                   backgroundColor: AppTheme.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
+                    horizontal: AppTheme.space24,
+                    vertical: AppTheme.spaceSM,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                   ),
                 ),
               ),

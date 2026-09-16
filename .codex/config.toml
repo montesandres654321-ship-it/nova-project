@@ -1,0 +1,6 @@
+[mcp_servers.TestSprite]
+command = "npx"
+args = ["@testsprite/testsprite-mcp@latest"]
+
+[mcp_servers.TestSprite.env]
+API_KEY = "your_api_key"
