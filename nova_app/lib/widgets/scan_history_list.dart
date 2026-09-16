@@ -2,25 +2,38 @@
 // ============================================================
 // LISTA DE ESCANEOS DEL HISTORIAL — Nova App Móvil
 // ============================================================
-// Extraído de history_page.dart (FASE 3, PASO 3.1 del refactor).
-// Widget de presentación puro: recibe el estado (loading/error/records)
-// ya cargado por history_page y renderiza skeleton, estado vacío,
-// estado de error o la lista agrupada por fecha. No llama a
-// ApiService — history_page sigue siendo dueño de la carga de datos.
+// FASE 1, PASO 1.4 del refactor de widgets: dividido en
+// ScanHistoryCard, ScanHistoryFilters y ScanHistoryEmptyState.
+// Ahora es StatefulWidget porque mantiene el estado local del filtro
+// de búsqueda (antes era StatelessWidget puro).
+//
+// CAMBIO DE COMPORTAMIENTO EXPLÍCITO (pedido en el PASO 1.4): la
+// lista ya no agrupa los escaneos por fecha (Hoy/Ayer/Esta semana/...)
+// — ahora es un ListView plano de ScanHistoryCard. Si se quiere
+// recuperar el agrupado, avisar para revertir esta parte.
+//
+// `onScanTap` es opcional y nuevo: no existe pantalla de detalle de
+// escaneo en la app, así que si no se provee, el tap no hace nada.
+// history_page.dart no lo pasa todavía (no se modificó su llamada).
 // ============================================================
 
 import 'package:flutter/material.dart';
 import '../models/scan_record.dart';
+import '../pages/places_page.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
 import 'history_empty_state.dart';
+import 'scan_history_card.dart';
+import 'scan_history_filters.dart';
+import 'scan_history_empty_state.dart';
 
-class ScanHistoryList extends StatelessWidget {
+class ScanHistoryList extends StatefulWidget {
   final bool loading;
   final String error;
   final List<ScanRecord> records;
   final Future<void> Function() onRefresh;
+  final void Function(ScanRecord)? onScanTap;
 
   const ScanHistoryList({
     super.key,
@@ -28,100 +41,96 @@ class ScanHistoryList extends StatelessWidget {
     required this.error,
     required this.records,
     required this.onRefresh,
+    this.onScanTap,
   });
 
-  // ── Helpers de formato ─────────────────────────────────────
+  @override
+  State<ScanHistoryList> createState() => _ScanHistoryListState();
+}
 
-  IconData _typeIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'hotel':
-        return Icons.hotel_rounded;
-      case 'restaurant':
-        return Icons.restaurant_rounded;
-      case 'bar':
-        return Icons.local_bar_rounded;
-      default:
-        return Icons.place_rounded;
-    }
+class _ScanHistoryListState extends State<ScanHistoryList> {
+  String? _searchQuery;
+
+  List<ScanRecord> get _filteredRecords {
+    final query = _searchQuery?.trim().toLowerCase();
+    if (query == null || query.isEmpty) return widget.records;
+    return widget.records
+        .where((r) =>
+            r.local.toLowerCase().contains(query) ||
+            r.place.toLowerCase().contains(query))
+        .toList();
   }
 
-  Color _typeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'hotel':
-        return AppColors.primaryLight;
-      case 'restaurant':
-        return AppColors.warning;
-      case 'bar':
-        return AppColors.error;
-      default:
-        return AppColors.textHint;
-    }
+  void _handleSearchChange(String? value) {
+    setState(() => _searchQuery = value);
   }
 
-  String _typeLabel(String type) {
-    switch (type.toLowerCase()) {
-      case 'hotel':
-        return 'Hotel';
-      case 'restaurant':
-        return 'Restaurante';
-      case 'bar':
-        return 'Bar';
-      default:
-        return type;
-    }
+  void _handleReset() {
+    setState(() => _searchQuery = null);
   }
 
-  String _formatDateTime(DateTime dt) {
-    final d = dt.toLocal();
-    final day = d.day.toString().padLeft(2, '0');
-    final month = d.month.toString().padLeft(2, '0');
-    final hour = d.hour.toString().padLeft(2, '0');
-    final min = d.minute.toString().padLeft(2, '0');
-    return '$day/$month/${d.year}  $hour:$min';
-  }
-
-  String _timeAgo(DateTime dt) {
-    final localDt = dt.toLocal();
-    final diff = DateTime.now().difference(localDt);
-
-    if (diff.isNegative || diff.inSeconds < 60) return 'Ahora';
-    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'Hace ${diff.inHours}h';
-    if (diff.inDays == 1) return 'Ayer';
-    if (diff.inDays < 7) return 'Hace ${diff.inDays} días';
-    if (diff.inDays < 30) return 'Hace ${(diff.inDays / 7).floor()} sem';
-    if (diff.inDays < 365) {
-      final m = (diff.inDays / 30).floor();
-      return 'Hace $m mes${m > 1 ? 'es' : ''}';
-    }
-    final y = (diff.inDays / 365).floor();
-    return 'Hace $y año${y > 1 ? 's' : ''}';
-  }
-
-  String _dateGroup(DateTime dt) {
-    final now = DateTime.now();
-    final local = dt.toLocal();
-    final today = DateTime(now.year, now.month, now.day);
-    final day = DateTime(local.year, local.month, local.day);
-    final diff = today.difference(day).inDays;
-    if (diff == 0) return 'Hoy';
-    if (diff == 1) return 'Ayer';
-    if (diff < 7) return 'Esta semana';
-    if (diff < 30) return 'Este mes';
-    return 'Anteriores';
+  void _handleExplore() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PlacesPage()),
+    );
   }
 
   // ── Build ──────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    if (loading) return _buildLoadingState();
-    if (records.isNotEmpty) return _buildList();
-    if (error == 'No hay escaneos registrados') return _buildEmptyState();
-    return _buildErrorState();
+    if (widget.loading) return _buildLoadingState();
+
+    if (widget.records.isEmpty) {
+      if (widget.error == 'No hay escaneos registrados') {
+        return ScanHistoryEmptyState(onExplore: _handleExplore);
+      }
+      return _buildErrorState();
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+            AppSpacing.xs,
+          ),
+          child: ScanHistoryFilters(
+            onSearchChange: _handleSearchChange,
+            onReset: _handleReset,
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: widget.onRefresh,
+            color: AppColors.primary,
+            backgroundColor: AppColors.surface,
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(
+                0,
+                AppSpacing.xs,
+                0,
+                AppSpacing.xl,
+              ),
+              itemCount: _filteredRecords.length,
+              itemBuilder: (_, i) {
+                final scan = _filteredRecords[i];
+                return ScanHistoryCard(
+                  scan: scan,
+                  onTap: () => widget.onScanTap?.call(scan),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  // ── Estados ────────────────────────────────────────────────
+  // ── Estados (sin cambios respecto al original) ──────────────
 
   Widget _buildLoadingState() {
     return ListView.builder(
@@ -193,315 +202,20 @@ class ScanHistoryList extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return const HistoryEmptyState(
-      icon: Icons.history_toggle_off_rounded,
-      iconColor: AppColors.textHint,
-      iconBackgroundColor: AppColors.surfaceVariant,
-      title: 'Aún no has escaneado lugares',
-      message: 'Cuando escanees un código QR, el registro aparecerá aquí.',
-    );
-  }
-
   Widget _buildErrorState() {
     return HistoryEmptyState(
       icon: Icons.cloud_off_rounded,
       iconColor: AppColors.error,
       iconBackgroundColor: AppColors.error.withValues(alpha: 0.08),
       title: 'No se pudo cargar el historial',
-      message: error,
+      message: widget.error,
       messageStyle: const TextStyle(
         fontSize: 13,
         color: AppColors.textSecondary,
         height: 1.4,
       ),
       messageMaxLines: 3,
-      onRetry: onRefresh,
+      onRetry: widget.onRefresh,
     );
   }
-
-  // ── Lista ──────────────────────────────────────────────────
-
-  Widget _buildList() {
-    final groups = <String, List<ScanRecord>>{};
-    final groupOrder = <String>[];
-    for (final r in records) {
-      final key = _dateGroup(r.time);
-      if (!groups.containsKey(key)) {
-        groups[key] = [];
-        groupOrder.add(key);
-      }
-      groups[key]!.add(r);
-    }
-
-    final items = <_ListItem>[];
-    for (final group in groupOrder) {
-      items.add(_ListItem.header(group));
-      for (final r in groups[group]!) {
-        items.add(_ListItem.record(r));
-      }
-    }
-
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      color: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.xs,
-              bottom: AppSpacing.xl,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (_, i) {
-                  final item = items[i];
-                  return item.isHeader
-                      ? _buildGroupHeader(item.label!)
-                      : _buildScanItem(item.record!);
-                },
-                childCount: items.length,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTypeIconBox(Color color, String type) {
-    return Container(
-      width: 48,
-      height: 48,
-      color: color.withValues(alpha: 0.12),
-      child: Icon(_typeIcon(type), color: color, size: 22),
-    );
-  }
-
-  Widget _buildGroupHeader(String label) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.xs,
-      ),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          const Expanded(
-            child: Divider(
-              color: AppColors.border,
-              height: 1,
-              thickness: 1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScanItem(ScanRecord r) {
-    final color = _typeColor(r.type);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
-      ),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: AppRadius.mdAll,
-        border: Border.all(color: AppColors.border, width: 1),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Imagen del lugar o ícono del tipo
-          ClipRRect(
-            borderRadius: AppRadius.smAll,
-            child: r.image != null && r.image!.isNotEmpty
-                ? Image.network(
-                    r.image!,
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildTypeIconBox(color, r.type),
-                  )
-                : _buildTypeIconBox(color, r.type),
-          ),
-          const SizedBox(width: AppSpacing.md),
-
-          // Contenido principal
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  r.local,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    _TypePill(label: _typeLabel(r.type), color: color),
-                    if (r.place.isNotEmpty) ...[
-                      const SizedBox(width: AppSpacing.xs),
-                      const Text(
-                        '·',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textHint,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Expanded(
-                        child: Text(
-                          r.place,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  _formatDateTime(r.time),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textHint,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-
-          // Columna derecha: tiempo relativo + badge de recompensa
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                _timeAgo(r.time),
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textHint,
-                ),
-              ),
-              if (r.hasReward) ...[
-                const SizedBox(height: AppSpacing.xs),
-                _RewardBadge(name: r.rewardName),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Sub-widgets ────────────────────────────────────────────
-
-class _TypePill extends StatelessWidget {
-  const _TypePill({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
-        borderRadius: AppRadius.pillAll,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
-
-class _RewardBadge extends StatelessWidget {
-  const _RewardBadge({this.name});
-
-  final String? name;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 90),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
-        borderRadius: AppRadius.pillAll,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.card_giftcard_rounded,
-            size: 10,
-            color: AppColors.warning,
-          ),
-          const SizedBox(width: 3),
-          Flexible(
-            child: Text(
-              name ?? 'Premio',
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.warning,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Tipo interno para la lista flat de headers + records
-class _ListItem {
-  final bool isHeader;
-  final String? label;
-  final ScanRecord? record;
-
-  const _ListItem._({required this.isHeader, this.label, this.record});
-
-  factory _ListItem.header(String label) =>
-      _ListItem._(isHeader: true, label: label);
-
-  factory _ListItem.record(ScanRecord r) =>
-      _ListItem._(isHeader: false, record: r);
 }
