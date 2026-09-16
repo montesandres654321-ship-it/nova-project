@@ -9,19 +9,30 @@
 // (controllers, isRegistering, gender, countryCode, obscure, acceptTos)
 // y de la lógica de registro y selección de fecha.
 //
-// El campo de contraseña y el de confirmar comparten una sola bandera
-// de visibilidad (igual que el original): el primero muestra el ícono
-// de ojo y controla [obscurePassword]; el segundo (confirmar) no tiene
-// ícono propio y solo refleja ese mismo valor.
+// FASE 2, PASO 2.6 del refactor de widgets: los campos de nombre,
+// correo, contraseña, confirmar contraseña y el botón de envío ahora
+// delegan en RegisterNameField/RegisterEmailField/RegisterPasswordField/
+// RegisterConfirmPasswordField/RegisterSubmitButton. Apellido, usuario,
+// fecha de nacimiento, género, teléfono/código de país y el checkbox
+// de términos quedan intactos (no había widgets nuevos para ellos).
+//
+// CAMBIO DE COMPORTAMIENTO: antes, el campo "Confirmar contraseña" no
+// tenía ícono propio y reflejaba la misma bandera de visibilidad que
+// "Contraseña". RegisterConfirmPasswordField no soporta ese modo
+// compartido — ahora tiene su propio ícono de ojo y su propio estado
+// de visibilidad, independiente del campo de contraseña.
 // ============================================================
 
 import 'package:flutter/material.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
-import 'email_input.dart';
-import 'password_input.dart';
 import 'terms_checkbox.dart';
+import 'register_name_field.dart';
+import 'register_email_field.dart';
+import 'register_password_field.dart';
+import 'register_confirm_password_field.dart';
+import 'register_submit_button.dart';
 
 class RegisterForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -106,10 +117,9 @@ class RegisterForm extends StatelessWidget {
             children: [
               // ── Datos personales ──────────────────────────────
               _buildSectionLabel('Datos personales'),
-              _buildInput(
+              RegisterNameField(
                 controller: firstNameController,
-                label: 'Nombre',
-                icon: Icons.person_outline_rounded,
+                hintText: 'Nombre',
                 validator: _reqValidator('nombre'),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -187,9 +197,8 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              EmailInput(
+              RegisterEmailField(
                 controller: emailController,
-                verticalPadding: AppSpacing.md,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Requerido';
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
@@ -203,10 +212,11 @@ class RegisterForm extends StatelessWidget {
 
               // ── Seguridad ──────────────────────────────────────
               _buildSectionLabel('Seguridad'),
-              PasswordInput(
+              RegisterPasswordField(
                 controller: passwordController,
                 obscureText: obscurePassword,
-                onToggleVisibility: onTogglePasswordObscure,
+                onToggleVisibility: () =>
+                    onTogglePasswordObscure(!obscurePassword),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Requerido';
                   if (v.length < 6) return 'Mínimo 6 caracteres';
@@ -214,17 +224,9 @@ class RegisterForm extends StatelessWidget {
                 },
               ),
               const SizedBox(height: AppSpacing.md),
-              PasswordInput(
-                controller: confirmController,
-                label: 'Confirmar contraseña',
-                showToggle: false,
-                obscureText: obscurePassword,
-                validator: (v) {
-                  if (v != passwordController.text) {
-                    return 'Las contraseñas no coinciden';
-                  }
-                  return null;
-                },
+              RegisterConfirmPasswordField(
+                confirmController: confirmController,
+                passwordController: passwordController,
               ),
               const SizedBox(height: AppSpacing.xl),
 
@@ -238,33 +240,9 @@ class RegisterForm extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
 
               // ── Botón principal ───────────────────────────────
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: isRegistering ? null : onRegisterPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.onPrimary,
-                    disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.55),
-                    elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
-                  ),
-                  child: isRegistering
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColors.onPrimary),
-                        )
-                      : const Text(
-                          'Crear cuenta',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                ),
+              RegisterSubmitButton(
+                onPressed: onRegisterPressed,
+                isLoading: isRegistering,
               ),
               const SizedBox(height: AppSpacing.md),
 
