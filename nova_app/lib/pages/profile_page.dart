@@ -8,6 +8,8 @@ import '../core/design/app_back_button.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
+import '../widgets/user_profile_header.dart';
+import '../widgets/profile_actions.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -168,72 +170,26 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildAvatarSection(),
+              UserProfileHeader(
+                firstName: _firstNameCtrl.text,
+                lastName: _lastNameCtrl.text,
+                email: _emailCtrl.text,
+              ),
               const SizedBox(height: AppSpacing.lg),
               _buildFormCard(),
               if (_editing) ...[
                 const SizedBox(height: AppSpacing.md),
-                _buildActionButtons(),
+                ProfileActions(
+                  loading: _loading,
+                  onCancel: () => setState(() => _editing = false),
+                  onSave: _save,
+                ),
               ],
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  // ── Avatar ─────────────────────────────────────────────────
-
-  Widget _buildAvatarSection() {
-    final initial = _firstNameCtrl.text.isNotEmpty
-        ? _firstNameCtrl.text[0].toUpperCase()
-        : '?';
-    final fullName =
-        '${_firstNameCtrl.text} ${_lastNameCtrl.text}'.trim();
-
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: const BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(
-              initial,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.onPrimary,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        if (fullName.isNotEmpty)
-          Text(
-            fullName,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        const SizedBox(height: AppSpacing.xs),
-        if (_emailCtrl.text.isNotEmpty)
-          Text(
-            _emailCtrl.text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-      ],
     );
   }
 
@@ -317,52 +273,6 @@ class _ProfilePageState extends State<ProfilePage> {
         if (email && !v.contains('@')) return 'Correo inválido';
         return null;
       },
-    );
-  }
-
-  // ── Acciones ───────────────────────────────────────────────
-
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed:
-                _loading ? null : () => setState(() => _editing = false),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.textSecondary,
-              side: const BorderSide(color: AppColors.border),
-              shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.mdAll),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: const Text('Cancelar'),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: _loading ? null : _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.onPrimary,
-              shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.mdAll),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: _loading
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.onPrimary,
-                    ),
-                  )
-                : const Text('Guardar'),
-          ),
-        ),
-      ],
     );
   }
 }
