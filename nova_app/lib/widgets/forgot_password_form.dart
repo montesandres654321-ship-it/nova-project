@@ -92,6 +92,8 @@ class ForgotPasswordForm extends StatelessWidget {
           EmailInput(
             controller: emailController,
             verticalPadding: AppSpacing.md,
+            enabled: !isLoading,
+            hintText: 'ejemplo@correo.com',
             validator: Validators.email,
           ),
           const SizedBox(height: AppSpacing.lg),

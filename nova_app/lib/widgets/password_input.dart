@@ -12,6 +12,10 @@
 // de contraseña y el de confirmación comparten una sola bandera de
 // visibilidad. [showToggle] permite ocultar el ícono de ojo (el campo
 // de confirmar contraseña original no tiene uno propio).
+//
+// [enabled]/[verticalPadding] (usados por change_password_page en el
+// PASO 2.4) reproducen el estado deshabilitado durante la carga y el
+// padding vertical (AppSpacing.md) de esa pantalla.
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -26,6 +30,8 @@ class PasswordInput extends StatefulWidget {
   final bool showToggle;
   final bool? obscureText;
   final ValueChanged<bool>? onToggleVisibility;
+  final bool enabled;
+  final double verticalPadding;
 
   const PasswordInput({
     super.key,
@@ -35,6 +41,8 @@ class PasswordInput extends StatefulWidget {
     this.showToggle = true,
     this.obscureText,
     this.onToggleVisibility,
+    this.enabled = true,
+    this.verticalPadding = 12,
   });
 
   @override
@@ -59,6 +67,7 @@ class _PasswordInputState extends State<PasswordInput> {
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscure,
+      enabled: widget.enabled,
       style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
       decoration: InputDecoration(
         labelText: widget.label,
@@ -79,9 +88,9 @@ class _PasswordInputState extends State<PasswordInput> {
             : null,
         filled: true,
         fillColor: AppColors.surfaceVariant,
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: 12,
+          vertical: widget.verticalPadding,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.mdAll,
@@ -90,6 +99,10 @@ class _PasswordInputState extends State<PasswordInput> {
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.mdAll,
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.mdAll,
+          borderSide: BorderSide.none,
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppRadius.mdAll,
