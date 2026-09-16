@@ -3,8 +3,15 @@
 // CAMPO DE CONTRASEÑA REUTILIZABLE — Nova App Móvil
 // ============================================================
 // Extraído de login_page.dart (FASE 2, PASO 2.1 del refactor).
-// Mantiene internamente el estado de "mostrar/ocultar" contraseña,
-// con estilo idéntico al campo original de login_page.
+// Por defecto mantiene internamente el estado de "mostrar/ocultar"
+// contraseña, con estilo idéntico al campo original de login_page.
+//
+// Modo controlado (usado por register_page en el PASO 2.2): si se
+// provee [obscureText], el widget deja de manejar su propio estado y
+// usa el valor externo — necesario porque en register_page el campo
+// de contraseña y el de confirmación comparten una sola bandera de
+// visibilidad. [showToggle] permite ocultar el ícono de ojo (el campo
+// de confirmar contraseña original no tiene uno propio).
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -16,12 +23,18 @@ class PasswordInput extends StatefulWidget {
   final TextEditingController controller;
   final String label;
   final String? Function(String?)? validator;
+  final bool showToggle;
+  final bool? obscureText;
+  final ValueChanged<bool>? onToggleVisibility;
 
   const PasswordInput({
     super.key,
     required this.controller,
     this.label = 'Contraseña',
     this.validator,
+    this.showToggle = true,
+    this.obscureText,
+    this.onToggleVisibility,
   });
 
   @override
@@ -29,7 +42,17 @@ class PasswordInput extends StatefulWidget {
 }
 
 class _PasswordInputState extends State<PasswordInput> {
-  bool _obscure = true;
+  bool _internalObscure = true;
+
+  bool get _obscure => widget.obscureText ?? _internalObscure;
+
+  void _handleToggle() {
+    if (widget.onToggleVisibility != null) {
+      widget.onToggleVisibility!(!_obscure);
+    } else {
+      setState(() => _internalObscure = !_internalObscure);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +65,18 @@ class _PasswordInputState extends State<PasswordInput> {
         labelStyle: const TextStyle(fontSize: 14, color: AppColors.textHint),
         prefixIcon: const Icon(Icons.lock_outline_rounded,
             size: 20, color: AppColors.textHint),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-            color: AppColors.textHint,
-            size: 20,
-          ),
-          onPressed: () => setState(() => _obscure = !_obscure),
-        ),
+        suffixIcon: widget.showToggle
+            ? IconButton(
+                icon: Icon(
+                  _obscure
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: AppColors.textHint,
+                  size: 20,
+                ),
+                onPressed: _handleToggle,
+              )
+            : null,
         filled: true,
         fillColor: AppColors.surfaceVariant,
         contentPadding: const EdgeInsets.symmetric(

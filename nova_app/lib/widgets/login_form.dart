@@ -16,6 +16,7 @@ import '../core/design/app_radius.dart';
 import '../utils/validators.dart';
 import '../pages/register_page.dart';
 import '../pages/forgot_password_page.dart';
+import 'email_input.dart';
 import 'password_input.dart';
 
 class LoginForm extends StatelessWidget {
@@ -79,7 +80,10 @@ class LoginForm extends StatelessWidget {
               const SizedBox(height: 10),
 
               // Email
-              _buildEmailField(),
+              EmailInput(
+                controller: emailController,
+                validator: Validators.email,
+              ),
               const SizedBox(height: 10),
 
               // Contraseña
@@ -289,43 +293,6 @@ class LoginForm extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildEmailField() {
-    return TextFormField(
-      controller: emailController,
-      keyboardType: TextInputType.emailAddress,
-      style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
-      decoration: InputDecoration(
-        labelText: 'Correo electrónico',
-        labelStyle: const TextStyle(fontSize: 14, color: AppColors.textHint),
-        prefixIcon: const Icon(Icons.email_outlined,
-            size: 20, color: AppColors.textHint),
-        filled: true,
-        fillColor: AppColors.surfaceVariant,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: 12,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdAll,
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdAll,
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdAll,
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdAll,
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
-        ),
-      ),
-      validator: Validators.email,
     );
   }
 
