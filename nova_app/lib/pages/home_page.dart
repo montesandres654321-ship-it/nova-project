@@ -3,21 +3,14 @@
 /// Es el índice 0 del [MainNavigationPage] y la primera pantalla
 /// que ve el turista después de iniciar sesión.
 ///
-/// **Contenido:**
-/// - Saludo personalizado con el nombre del turista
-/// - Banner de bienvenida con el logo NOVA App
-/// - Botón prominente "Escanear QR" que navega a [ScanPage]
-/// - Último escaneo realizado (tarjeta con lugar visitado y fecha)
-/// - Accesos rápidos a las tabs de Historial, Explorar y Perfil
-///
 /// Los datos del usuario y el último escaneo se cargan desde
 /// [SharedPreferences] (datos locales) y [ApiService.getScanHistory] (backend).
+/// La presentación vive en [WelcomeCard], [StatsCard] y [ActionButtons]
+/// (widgets/).
 ///
 /// [onNavigateToTab] — callback para navegar a otras tabs del [MainNavigationPage]
-///
-/// Ver también:
-/// - [ScanPage] para el escaneo QR
-/// - [MainNavigationPage] para la navegación principal
+library;
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/scan_record.dart';
@@ -28,6 +21,9 @@ import '../utils/constants.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
+import '../widgets/welcome_card.dart';
+import '../widgets/stats_card.dart';
+import '../widgets/action_buttons.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -191,38 +187,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Helpers ────────────────────────────────────────────────
-
-  IconData _getPlaceIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'hotel':
-        return Icons.hotel;
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'bar':
-        return Icons.local_bar;
-      default:
-        return Icons.place;
-    }
-  }
-
-  String _timeAgo(DateTime dt) {
-    final localDt = dt.toLocal();
-    final diff = DateTime.now().difference(localDt);
-    if (diff.isNegative || diff.inSeconds < 60) return 'Ahora';
-    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'Hace ${diff.inHours}h';
-    if (diff.inDays == 1) return 'Ayer';
-    if (diff.inDays < 7) return 'Hace ${diff.inDays} días';
-    if (diff.inDays < 30) {
-      return 'Hace ${(diff.inDays / 7).floor()} sem';
-    }
-    if (diff.inDays < 365) {
-      return 'Hace ${(diff.inDays / 30).floor()} meses';
-    }
-    return 'Hace ${(diff.inDays / 365).floor()} año(s)';
-  }
-
   // ── Build ──────────────────────────────────────────────────
 
   @override
@@ -232,7 +196,11 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            WelcomeCard(
+              userName: _userName,
+              userEmail: _userEmail,
+              onLogout: _logout,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -250,11 +218,15 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: AppSpacing.lg),
 
                     // [2] Último escaneo
-                    _buildLastScanSection(),
+                    StatsCard(
+                      loading: _loading,
+                      lastScan: _lastScan,
+                      totalScans: _totalScans,
+                    ),
                     const SizedBox(height: AppSpacing.lg),
 
                     // [3] Accesos rápidos
-                    _buildQuickGrid(),
+                    ActionButtons(onNavigateToTab: widget.onNavigateToTab),
                   ],
                 ),
               ),
@@ -265,60 +237,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Secciones principales ──────────────────────────────────
-
-  // Header: saludo + botón de logout
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hola, $_userName',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  _userEmail.isNotEmpty
-                      ? _userEmail
-                      : 'Bienvenido a Nova',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: _logout,
-            icon: const Icon(Icons.logout_rounded, size: 22),
-            color: AppColors.textSecondary,
-            tooltip: 'Cerrar sesión',
-          ),
-        ],
-      ),
-    );
-  }
-
-  // [1] Botón principal de escaneo QR
+  // Botón principal de escaneo QR
   Widget _buildScanCTA() {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/scan'),
@@ -374,234 +293,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  // [2] Último escaneo registrado
-  Widget _buildLastScanSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          'Último escaneo',
-          trailing: _totalScans > 0 ? '$_totalScans en total' : null,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (_loading)
-          ClipRRect(
-            borderRadius: AppRadius.pillAll,
-            child: const LinearProgressIndicator(
-              color: AppColors.primary,
-              backgroundColor: AppColors.surfaceVariant,
-              minHeight: 3,
-            ),
-          )
-        else if (_lastScan != null)
-          _buildLastScanCard()
-        else
-          _buildEmptyState(),
-      ],
-    );
-  }
-
-  Widget _buildLastScanCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: AppRadius.mdAll,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: AppRadius.smAll,
-            ),
-            child: Icon(
-              _getPlaceIcon(_lastScan!.type),
-              color: AppColors.primary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _lastScan!.local,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _lastScan!.place,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            _timeAgo(_lastScan!.time),
-            style: const TextStyle(
-                fontSize: 12, color: AppColors.textHint),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.lg,
-        horizontal: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: AppRadius.mdAll,
-      ),
-      child: const Column(
-        children: [
-          Icon(Icons.qr_code_outlined,
-              size: 32, color: AppColors.textHint),
-          SizedBox(height: AppSpacing.sm),
-          Text(
-            'Aún no tienes escaneos',
-            style: TextStyle(
-                fontSize: 14, color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 2),
-          Text(
-            'Escanea tu primer código QR',
-            style: TextStyle(
-                fontSize: 12, color: AppColors.textHint),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // [3] Grid 2×2 de accesos secundarios
-  Widget _buildQuickGrid() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Accesos rápidos'),
-        const SizedBox(height: AppSpacing.sm),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: AppSpacing.sm,
-          mainAxisSpacing: AppSpacing.sm,
-          childAspectRatio: 1.7,
-          children: [
-            _buildGridItem(
-              Icons.history_rounded,
-              'Historial',
-              () => widget.onNavigateToTab(2),
-            ),
-            _buildGridItem(
-              Icons.explore_rounded,
-              'Lugares',
-              () => widget.onNavigateToTab(1),
-            ),
-            _buildGridItem(
-              Icons.person_outline_rounded,
-              'Mi Perfil',
-              () => widget.onNavigateToTab(3),
-            ),
-            _buildGridItem(
-              Icons.settings_outlined,
-              'Ajustes',
-              () => Navigator.pushNamed(context, '/settings'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // ── Widgets privados ───────────────────────────────────────
-
-  Widget _buildSectionHeader(String title, {String? trailing}) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        if (trailing != null) ...[
-          const Spacer(),
-          Text(
-            trailing,
-            style: const TextStyle(
-                fontSize: 12, color: AppColors.textSecondary),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildGridItem(
-      IconData icon, String label, VoidCallback onTap) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: AppRadius.mdAll,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.mdAll,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.mdAll,
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: AppRadius.smAll,
-                ),
-                child: Icon(icon,
-                    color: AppColors.primary, size: 22),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
