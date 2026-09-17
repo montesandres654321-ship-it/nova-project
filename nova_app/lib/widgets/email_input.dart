@@ -14,6 +14,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
@@ -26,6 +27,12 @@ class EmailInput extends StatelessWidget {
   final bool enabled;
   final String? hintText;
 
+  /// Cuando no es null, renderiza el estilo Figma (label arriba en texto
+  /// aparte, sin ícono, fondo plano) en vez del InputDecoration flotante
+  /// por defecto — usado solo por login/register (pantallas 06/07).
+  final String? figmaLabel;
+  final Color figmaFillColor;
+
   const EmailInput({
     super.key,
     required this.controller,
@@ -34,10 +41,60 @@ class EmailInput extends StatelessWidget {
     this.verticalPadding = 12,
     this.enabled = true,
     this.hintText,
+    this.figmaLabel,
+    this.figmaFillColor = AppColors.bienvenidaFondoInput,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (figmaLabel != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            figmaLabel!,
+            style: GoogleFonts.openSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.bienvenidaTextoMedio,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: figmaFillColor,
+              border: Border.all(color: AppColors.bienvenidaBorde),
+              borderRadius: AppRadius.mdAll,
+            ),
+            child: TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.emailAddress,
+              enabled: enabled,
+              style: GoogleFonts.openSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.bienvenidaTextoFuerte,
+              ),
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: GoogleFonts.openSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textHint,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: verticalPadding,
+                ),
+                border: InputBorder.none,
+              ),
+              validator: validator,
+            ),
+          ),
+        ],
+      );
+    }
+
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.emailAddress,

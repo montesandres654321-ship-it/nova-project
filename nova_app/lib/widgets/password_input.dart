@@ -19,6 +19,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
@@ -32,6 +34,18 @@ class PasswordInput extends StatefulWidget {
   final ValueChanged<bool>? onToggleVisibility;
   final bool enabled;
   final double verticalPadding;
+  final String? placeholder;
+
+  /// Cuando es true, renderiza el estilo Figma (label arriba en texto
+  /// aparte, ícono de ojo en SVG local, fondo configurable) en vez del
+  /// InputDecoration flotante por defecto — usado por login/register/
+  /// cambiar-contraseña (pantallas 06/07/08).
+  final bool figmaStyle;
+  final Color figmaFillColor;
+  final bool figmaBoldLabel;
+  final Color figmaLabelColor;
+  final String figmaEyeIconAsset;
+  final double figmaEyeIconSize;
 
   const PasswordInput({
     super.key,
@@ -43,6 +57,13 @@ class PasswordInput extends StatefulWidget {
     this.onToggleVisibility,
     this.enabled = true,
     this.verticalPadding = 12,
+    this.placeholder,
+    this.figmaStyle = false,
+    this.figmaFillColor = AppColors.bienvenidaFondoInput,
+    this.figmaBoldLabel = false,
+    this.figmaLabelColor = AppColors.bienvenidaTextoMedio,
+    this.figmaEyeIconAsset = 'assets/icons/ic-ojo.svg',
+    this.figmaEyeIconSize = 20,
   });
 
   @override
@@ -64,6 +85,67 @@ class _PasswordInputState extends State<PasswordInput> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.figmaStyle) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.label,
+            style: GoogleFonts.openSans(
+              fontSize: 13,
+              fontWeight: widget.figmaBoldLabel ? FontWeight.w700 : FontWeight.w600,
+              color: widget.figmaLabelColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: widget.figmaFillColor,
+              border: Border.all(color: AppColors.bienvenidaBorde),
+              borderRadius: AppRadius.mdAll,
+            ),
+            child: TextFormField(
+              controller: widget.controller,
+              obscureText: _obscure,
+              enabled: widget.enabled,
+              style: GoogleFonts.openSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.bienvenidaTextoFuerte,
+              ),
+              decoration: InputDecoration(
+                hintText: widget.placeholder,
+                hintStyle: GoogleFonts.openSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textHint,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: widget.verticalPadding,
+                ),
+                border: InputBorder.none,
+                suffixIcon: widget.showToggle
+                    ? GestureDetector(
+                        onTap: _handleToggle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SvgPicture.asset(
+                            widget.figmaEyeIconAsset,
+                            width: widget.figmaEyeIconSize,
+                            height: widget.figmaEyeIconSize,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              validator: widget.validator,
+            ),
+          ),
+        ],
+      );
+    }
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscure,

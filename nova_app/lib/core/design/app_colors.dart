@@ -43,4 +43,10 @@ class AppColors {
   static const Color bienvenidaBorde   = Color(0xFFE3E8EE);
   // Dot inactivo del onboarding: azul distinto a bienvenidaAzul, exacto del Figma.
   static const Color bienvenidaDotInactivo = Color(0xFF1A87C4);
+
+  // Pantallas de autenticación (Login/Registro/Cambiar contraseña) — mismo
+  // Figma que el flujo bienvenida, tokens adicionales usados solo ahí.
+  static const Color bienvenidaRojo      = Color(0xFFBD0412); // Requisitos de seguridad
+  static const Color bienvenidaAzulClaro = Color(0xFFEAF7FF); // Fondo botón atrás circular
+  static const Color bienvenidaFondoInput = Color(0xFFF7F9FB); // Fondo input login/registro
 }
