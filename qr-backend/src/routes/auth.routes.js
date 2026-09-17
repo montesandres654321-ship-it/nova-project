@@ -40,6 +40,7 @@ const loginResponse = (user, token) => ({
     username:   user.username,
     first_name: user.first_name,
     last_name:  user.last_name,
+    residence:  user.residence  || null,
     role:       user.role       || null,
     place_id:   user.place_id   || null,
     is_active:  user.is_active,
@@ -52,6 +53,7 @@ const loginResponse = (user, token) => ({
       username:   user.username,
       first_name: user.first_name,
       last_name:  user.last_name,
+      residence:  user.residence  || null,
       role:       user.role       || null,
       place_id:   user.place_id   || null,
       is_active:  user.is_active,
@@ -141,6 +143,7 @@ router.post('/login', async (req, res) => {
  * @param {string} [req.body.phone]   - Teléfono de contacto (opcional)
  * @param {string} [req.body.dob]     - Fecha de nacimiento (opcional)
  * @param {string} [req.body.gender]  - Género (opcional)
+ * @param {string} [req.body.residence] - Lugar de residencia (opcional)
  *
  * @returns {201} { success: true, token, user, data: { token, user } }
  * @returns {400} Si faltan campos requeridos o el email tiene formato inválido
@@ -152,7 +155,7 @@ router.post('/users/register', async (req, res) => {
       firstName, first_name,
       lastName,  last_name,
       username, email, password,
-      phone, dob, gender,
+      phone, dob, gender, residence,
     } = req.body;
 
     const fName = firstName || first_name;
@@ -191,18 +194,19 @@ router.post('/users/register', async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const phoneVal  = phone  || null;
-    const dobVal    = dob    || null;
-    const genderVal = gender || null;
+    const phoneVal     = phone     || null;
+    const dobVal       = dob       || null;
+    const genderVal    = gender    || null;
+    const residenceVal = residence || null;
 
     const inserted = await prisma.$queryRaw`
       INSERT INTO users (
         first_name, last_name, username,
-        email, password, phone, dob, gender,
+        email, password, phone, dob, gender, residence,
         role, is_active, accepted_terms
       )
       VALUES (${fName || ''}, ${lName || ''}, ${username}, ${email}, ${hashed},
-              ${phoneVal}, ${dobVal}, ${genderVal}, ${null}, TRUE, TRUE)
+              ${phoneVal}, ${dobVal}, ${genderVal}, ${residenceVal}, ${null}, TRUE, TRUE)
       RETURNING id
     `;
     const userId = inserted[0].id;

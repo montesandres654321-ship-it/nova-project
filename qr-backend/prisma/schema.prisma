@@ -36,6 +36,8 @@ model User {
   phone          String?
   dob            String?
   gender         String?
+  /// Lugar de residencia del turista (ciudad/municipio) — capturado en el registro
+  residence      String?
   googleId       String?   @unique @map("google_id")
   acceptedTerms  Int       @default(0) @map("accepted_terms")
   isActive       Boolean   @default(true) @map("is_active")

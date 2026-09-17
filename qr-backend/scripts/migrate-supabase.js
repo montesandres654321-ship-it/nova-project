@@ -45,6 +45,10 @@ async function migrate() {
     `);
     console.log('   ✓  users');
 
+    // ── Columnas agregadas después de la creación inicial ────
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS residence TEXT`);
+    console.log('   ✓  users.residence');
+
     // ── Tabla places ─────────────────────────────────────────
     await client.query(`
       CREATE TABLE IF NOT EXISTS places (
