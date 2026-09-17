@@ -18,6 +18,7 @@ import '../../services/place_service.dart';
 import '../../widgets/common/empty_state.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/common/pagination_controls.dart';
 import 'admin_card.dart';
 import 'admin_detail_dialog.dart';
 import 'admin_tokens.dart';
@@ -43,6 +44,17 @@ class _AdminsListTabState extends State<AdminsListTab> {
   String  _filterRole  = 'all';
   String  _searchQuery = '';
 
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+
+  List<AdminStats> get _pagedAdmins {
+    final start = (_currentPage - 1) * _pageSize;
+    if (start >= _filteredAdmins.length) return [];
+    return _filteredAdmins.skip(start).take(_pageSize).toList();
+  }
+
+  int get _totalPages => (_filteredAdmins.length / _pageSize).ceil().clamp(1, 999999);
+
   @override
   void initState() { super.initState(); _loadAdmins(); }
 
@@ -50,7 +62,7 @@ class _AdminsListTabState extends State<AdminsListTab> {
     setState(() { _isLoading = true; _error = null; });
     try {
       final admins = await AdminService.getUsersWithDetails();
-      setState(() { _allAdmins = admins; _applyFilters(); _isLoading = false; });
+      setState(() { _allAdmins = admins; _currentPage = 1; _applyFilters(); _isLoading = false; });
     } catch (e) {
       setState(() { _error = e.toString(); _isLoading = false; });
     }
@@ -68,7 +80,7 @@ class _AdminsListTabState extends State<AdminsListTab> {
           a.admin.email.toLowerCase().contains(q)       ||
           (a.admin.placeName?.toLowerCase().contains(q) ?? false)).toList();
     }
-    setState(() => _filteredAdmins = filtered);
+    setState(() { _filteredAdmins = filtered; _currentPage = 1; });
   }
 
   @override
@@ -106,20 +118,29 @@ class _AdminsListTabState extends State<AdminsListTab> {
               ? 'Sin resultados para "$_searchQuery"'
               : 'No hay administradores registrados');
     }
-    return ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
-        itemCount: _filteredAdmins.length,
-        itemBuilder: (_, i) => AdminCard(
-          adminStats:      _filteredAdmins[i],
-          onTapDetail:     widget.canEdit ? () => _showDetail(_filteredAdmins[i]) : null,
-          onTapEdit:       widget.canEdit ? () => _editAdmin(_filteredAdmins[i])  : null,
-          onTapReassign:   widget.canEdit ? () => _reassignPlace(_filteredAdmins[i]) : null,
-          // FIX 5: "Ver Dashboard" solo para propietarios de lugar
-          onTapDashboard:  _filteredAdmins[i].admin.role == 'user_place'
-              ? () => _viewDashboard(_filteredAdmins[i])
-              : null,
-          onTapDeactivate: widget.canEdit ? () => _deactivateAdmin(_filteredAdmins[i]) : null,
-        ));
+    return Column(children: [
+      Expanded(
+        child: ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+            itemCount: _pagedAdmins.length,
+            itemBuilder: (_, i) => AdminCard(
+              adminStats:      _pagedAdmins[i],
+              onTapDetail:     widget.canEdit ? () => _showDetail(_pagedAdmins[i]) : null,
+              onTapEdit:       widget.canEdit ? () => _editAdmin(_pagedAdmins[i])  : null,
+              onTapReassign:   widget.canEdit ? () => _reassignPlace(_pagedAdmins[i]) : null,
+              // FIX 5: "Ver Dashboard" solo para propietarios de lugar
+              onTapDashboard:  _pagedAdmins[i].admin.role == 'user_place'
+                  ? () => _viewDashboard(_pagedAdmins[i])
+                  : null,
+              onTapDeactivate: widget.canEdit ? () => _deactivateAdmin(_pagedAdmins[i]) : null,
+            )),
+      ),
+      PaginationControls(
+        currentPage: _currentPage,
+        totalPages: _totalPages,
+        onPageChanged: (p) => setState(() => _currentPage = p),
+      ),
+    ]);
   }
 
   // ── Acciones ───────────────────────────────────────────

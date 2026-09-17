@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../models/user_model.dart';
+import '../widgets/common/pagination_controls.dart';
 import 'user_detail_page.dart';
 import 'users/dialogs/edit_user_dialog.dart';
 import 'users/dialogs/toggle_user_status_dialog.dart';
@@ -31,6 +32,17 @@ class _UsersPageState extends State<UsersPage> {
   String _error        = '';
   String _searchQuery  = '';
   String? _currentRole;
+
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+
+  List<UserModel> get _pagedUsers {
+    final start = (_currentPage - 1) * _pageSize;
+    if (start >= _filteredUsers.length) return [];
+    return _filteredUsers.skip(start).take(_pageSize).toList();
+  }
+
+  int get _totalPages => (_filteredUsers.length / _pageSize).ceil().clamp(1, 999999);
 
   @override
   void initState() {
@@ -57,6 +69,7 @@ class _UsersPageState extends State<UsersPage> {
         if (mounted) setState(() {
           _users         = users;
           _filteredUsers = users;
+          _currentPage   = 1;
           _loading       = false;
         });
       } else {
@@ -70,6 +83,7 @@ class _UsersPageState extends State<UsersPage> {
   void _filterUsers(String query) {
     setState(() {
       _searchQuery = query;
+      _currentPage = 1;
       if (query.isEmpty) {
         _filteredUsers = _users;
       } else {
@@ -165,13 +179,23 @@ class _UsersPageState extends State<UsersPage> {
                     : 'No hay turistas registrados',
                     style: TextStyle(fontSize: 14, color: Colors.grey[500])),
               ]))
-              : RefreshIndicator(
-              onRefresh: _loadUsers,
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                itemCount: _filteredUsers.length,
-                itemBuilder: (_, i) => _buildUserCard(_filteredUsers[i]),
-              ))),
+              : Column(children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _loadUsers,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                        itemCount: _pagedUsers.length,
+                        itemBuilder: (_, i) => _buildUserCard(_pagedUsers[i]),
+                      ),
+                    ),
+                  ),
+                  PaginationControls(
+                    currentPage: _currentPage,
+                    totalPages: _totalPages,
+                    onPageChanged: (p) => setState(() => _currentPage = p),
+                  ),
+                ])),
         ]);
   }
 

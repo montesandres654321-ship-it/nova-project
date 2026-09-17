@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import '../../models/place.dart';
 import '../../services/place_service.dart';
+import '../../widgets/common/pagination_controls.dart';
 import 'form_page.dart';
 import 'places_tokens.dart';
 import 'qr_dialog.dart';
@@ -43,6 +44,17 @@ class _PlacesListTabState extends State<PlacesListTab> {
 
   // Filtro de estado (UI-only, no toca servicios)
   String _statusFilter  = 'all'; // 'all' | 'active' | 'inactive'
+
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+
+  List<Place> get _pagedPlaces {
+    final start = (_currentPage - 1) * _pageSize;
+    if (start >= _filteredPlaces.length) return [];
+    return _filteredPlaces.skip(start).take(_pageSize).toList();
+  }
+
+  int get _totalPages => (_filteredPlaces.length / _pageSize).ceil().clamp(1, 999999);
 
   final List<Map<String, dynamic>> _filters = [
     {'value': 'all',        'label': '🗺️ Todos'},
@@ -86,7 +98,7 @@ class _PlacesListTabState extends State<PlacesListTab> {
     }
     if (_statusFilter == 'active')   { list = list.where((p) =>  p.isActive).toList(); }
     if (_statusFilter == 'inactive') { list = list.where((p) => !p.isActive).toList(); }
-    setState(() => _filteredPlaces = list);
+    setState(() { _filteredPlaces = list; _currentPage = 1; });
   }
 
   Future<void> _togglePlaceStatus(Place place) async {
@@ -212,41 +224,48 @@ class _PlacesListTabState extends State<PlacesListTab> {
                     )
                   : LayoutBuilder(builder: (_, box) {
                       final isDesktop = box.maxWidth > 700;
-                      if (isDesktop) {
-                        return RefreshIndicator(
-                          onRefresh: _loadPlaces,
-                          color: kPlacesPrimary,
-                          child: GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 0,
-                              mainAxisExtent: 140,
-                            ),
-                            itemCount: _filteredPlaces.length,
-                            itemBuilder: (_, i) => PlaceCard(
-                                place: _filteredPlaces[i],
-                                canEdit: widget.canEdit,
-                                canViewInfo: widget.canViewInfo,
-                                onAction: _handleAction),
-                          ),
-                        );
-                      }
-                      return RefreshIndicator(
-                        onRefresh: _loadPlaces,
-                        color: kPlacesPrimary,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
-                          itemCount: _filteredPlaces.length,
-                          itemBuilder: (_, i) => PlaceCard(
-                              place: _filteredPlaces[i],
-                              canEdit: widget.canEdit,
-                              canViewInfo: widget.canViewInfo,
-                              onAction: _handleAction),
+                      final list = isDesktop
+                          ? RefreshIndicator(
+                              onRefresh: _loadPlaces,
+                              color: kPlacesPrimary,
+                              child: GridView.builder(
+                                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 0,
+                                  mainAxisExtent: 140,
+                                ),
+                                itemCount: _pagedPlaces.length,
+                                itemBuilder: (_, i) => PlaceCard(
+                                    place: _pagedPlaces[i],
+                                    canEdit: widget.canEdit,
+                                    canViewInfo: widget.canViewInfo,
+                                    onAction: _handleAction),
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: _loadPlaces,
+                              color: kPlacesPrimary,
+                              child: ListView.builder(
+                                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                                itemCount: _pagedPlaces.length,
+                                itemBuilder: (_, i) => PlaceCard(
+                                    place: _pagedPlaces[i],
+                                    canEdit: widget.canEdit,
+                                    canViewInfo: widget.canViewInfo,
+                                    onAction: _handleAction),
+                              ),
+                            );
+                      return Column(children: [
+                        Expanded(child: list),
+                        PaginationControls(
+                          currentPage: _currentPage,
+                          totalPages: _totalPages,
+                          onPageChanged: (p) => setState(() => _currentPage = p),
                         ),
-                      );
+                      ]);
                     }),
         ),
       ]),
