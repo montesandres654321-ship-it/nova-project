@@ -3,8 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../utils/constants.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_spacing.dart';
-import '../core/design/app_radius.dart';
 import '../widgets/login_form.dart';
 import 'main_navigation_page.dart';
 
@@ -21,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
   final _passCtrl = TextEditingController();
 
   bool _isLoading = false;
-  bool _rememberMe = false;
+  // Figma muestra el checkbox "Recordarme" ya marcado por defecto;
+  // _loadSaved() lo corrige según la preferencia real guardada.
+  bool _rememberMe = true;
 
   // ── Lifecycle ──────────────────────────────────────────────
 
@@ -136,92 +136,23 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final padding = MediaQuery.paddingOf(context);
-    final screenH = MediaQuery.sizeOf(context).height;
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: screenH - padding.top - padding.bottom,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  children: [
-                    _buildHero(),
-                    Expanded(
-                      child: LoginForm(
-                        formKey: _formKey,
-                        emailController: _emailCtrl,
-                        passwordController: _passCtrl,
-                        rememberMe: _rememberMe,
-                        onRememberMeChanged: (val) =>
-                            setState(() => _rememberMe = val),
-                        isLoading: _isLoading,
-                        onLoginPressed: _login,
-                        onGooglePressed: _loginWithGoogle,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
+          child: LoginForm(
+            formKey: _formKey,
+            emailController: _emailCtrl,
+            passwordController: _passCtrl,
+            rememberMe: _rememberMe,
+            onRememberMeChanged: (val) => setState(() => _rememberMe = val),
+            isLoading: _isLoading,
+            onLoginPressed: _login,
+            onGooglePressed: _loginWithGoogle,
           ),
         ),
-      ),
-    );
-  }
-
-  // Sección superior: logo + nombre de la app
-  Widget _buildHero() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: 12,
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: AppRadius.lgAll,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-            ),
-            child: const Icon(
-              Icons.travel_explore_rounded,
-              size: 26,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'NOVA',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: 6,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Tu pasaporte digital de viajes',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.white.withValues(alpha: 0.8),
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
       ),
     );
   }
