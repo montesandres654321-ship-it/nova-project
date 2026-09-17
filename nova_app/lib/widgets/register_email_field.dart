@@ -2,17 +2,11 @@
 // ============================================================
 // CAMPO DE CORREO DE REGISTRO — Nova App Móvil
 // ============================================================
-// FASE 2, PASO 2.2 del refactor de widgets. A diferencia de
-// register_name_field.dart (PASO 2.1), aquí sí se reutiliza
-// directamente email_input.dart (mismo ícono Icons.email_outlined,
-// mismo estilo filled/bordes redondeados) en vez de reimplementar la
-// decoración — es un wrapper delgado con el hint de contexto de
-// registro ("tu@email.com") y el padding vertical que ya usa el
-// campo de correo real en register_form.dart.
+// Wrapper delgado sobre email_input.dart en modo Figma (label arriba,
+// sin ícono) — pantalla 07 · Registro.
 // ============================================================
 
 import 'package:flutter/material.dart';
-import '../core/design/app_spacing.dart';
 import 'email_input.dart';
 
 class RegisterEmailField extends StatelessWidget {
@@ -30,8 +24,8 @@ class RegisterEmailField extends StatelessWidget {
     return EmailInput(
       controller: controller,
       validator: validator,
-      hintText: 'tu@email.com',
-      verticalPadding: AppSpacing.md,
+      figmaLabel: 'Correo electrónico',
+      hintText: 'tucorreo@ejemplo.com',
     );
   }
 }

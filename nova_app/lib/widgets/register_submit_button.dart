@@ -2,18 +2,13 @@
 // ============================================================
 // BOTÓN DE ENVÍO DE REGISTRO — Nova App Móvil
 // ============================================================
-// FASE 2, PASO 2.5 del refactor de widgets. Widget standalone con
-// estado de carga (deshabilita el botón y muestra un spinner).
-//
-// Estilo tomado del botón real de register_form.dart (altura 52,
-// AppColors.primary, spinner 20x20 strokeWidth 2) en vez del
-// ElevatedButton por defecto de la estructura ilustrativa, para que
-// sea visualmente consistente si en algún momento reemplaza al real.
+// Único consumidor: register_form.dart. Estilo Figma: verde de marca,
+// StadiumBorder — pantalla 07 · Registro.
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_radius.dart';
 
 class RegisterSubmitButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -31,15 +26,14 @@ class RegisterSubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: 49,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.onPrimary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.55),
+          backgroundColor: AppColors.bienvenidaVerde,
+          disabledBackgroundColor: AppColors.bienvenidaBorde,
+          shape: const StadiumBorder(),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
         ),
         child: isLoading
             ? const SizedBox(
@@ -47,12 +41,17 @@ class RegisterSubmitButton extends StatelessWidget {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.onPrimary,
+                  color: Colors.white,
                 ),
               )
             : Text(
                 buttonText,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: GoogleFonts.openSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 25 / 13,
+                ),
               ),
       ),
     );

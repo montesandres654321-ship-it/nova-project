@@ -16,7 +16,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import '../core/design/app_spacing.dart';
 import 'password_input.dart';
 
 class RegisterConfirmPasswordField extends StatefulWidget {
@@ -53,7 +52,9 @@ class _RegisterConfirmPasswordFieldState
     return PasswordInput(
       controller: widget.confirmController,
       label: 'Confirmar contraseña',
-      verticalPadding: AppSpacing.md,
+      placeholder: 'Repite la contraseña',
+      figmaStyle: true,
+      verticalPadding: 15,
       obscureText: _obscureText,
       onToggleVisibility: (value) => setState(() => _obscureText = value),
       validator: _validateMatch,

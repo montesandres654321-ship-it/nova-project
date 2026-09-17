@@ -7,6 +7,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class TermsCheckbox extends StatelessWidget {
@@ -18,28 +19,37 @@ class TermsCheckbox extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
-    this.label = 'Acepto los términos y condiciones',
+    this.label = 'Acepto los Términos de uso y la Política de privacidad de Nova.',
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Transform.scale(
-          scale: 0.9,
+        SizedBox(
+          width: 18,
+          height: 18,
           child: Checkbox(
             value: value,
             onChanged: (v) => onChanged(v ?? false),
-            activeColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.textHint, width: 1.5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5)),
+            activeColor: AppColors.bienvenidaVerde,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            visualDensity: VisualDensity.compact,
           ),
         ),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: GoogleFonts.openSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: AppColors.textSecondary,
+              height: 19 / 13,
+            ),
           ),
         ),
       ],

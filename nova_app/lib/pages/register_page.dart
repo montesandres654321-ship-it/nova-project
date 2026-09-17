@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
-import '../core/design/app_back_button.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_spacing.dart';
 import '../widgets/register_form.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -22,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmCtrl = TextEditingController();
   final _dobCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+  final _residenciaCtrl = TextEditingController();
 
   String _gender = 'Femenino';
   String _countryCode = '+57';
@@ -43,6 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _confirmCtrl.dispose();
     _dobCtrl.dispose();
     _phoneCtrl.dispose();
+    _residenciaCtrl.dispose();
     super.dispose();
   }
 
@@ -112,6 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
         dob: _dobCtrl.text.trim(),
         gender: _gender,
         acceptedTerms: _acceptTos,
+        residence: _residenciaCtrl.text.trim(),
       );
 
       if (!mounted) return;
@@ -148,80 +151,70 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration:
-            const BoxDecoration(gradient: AppColors.primaryGradient),
-        child: SafeArea(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHero(),
-              Expanded(
-                child: RegisterForm(
-                  formKey: _formKey,
-                  firstNameController: _firstCtrl,
-                  lastNameController: _lastCtrl,
-                  usernameController: _usernameCtrl,
-                  emailController: _emailCtrl,
-                  passwordController: _passCtrl,
-                  confirmController: _confirmCtrl,
-                  dobController: _dobCtrl,
-                  phoneController: _phoneCtrl,
-                  gender: _gender,
-                  onGenderChanged: (v) => setState(() => _gender = v),
-                  countryCode: _countryCode,
-                  onCountryCodeChanged: (v) =>
-                      setState(() => _countryCode = v),
-                  countryCodes: _countryCodes,
-                  obscurePassword: _obscure,
-                  onTogglePasswordObscure: (v) =>
-                      setState(() => _obscure = v),
-                  acceptTos: _acceptTos,
-                  onAcceptTosChanged: (v) => setState(() => _acceptTos = v),
-                  isRegistering: _isRegistering,
-                  onDobTap: _pickDate,
-                  onRegisterPressed: _register,
+              // ── ENCABEZADO ──────────────────────────────────
+              SvgPicture.asset(
+                'assets/images/logos/logo-nova-verde.svg',
+                width: 88,
+                height: 52.585,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Crea tu cuenta y empieza\na recorrer Sucre.',
+                style: GoogleFonts.openSans(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.bienvenidaVerde,
+                  height: 33 / 26,
                 ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Guarda tus lugares, reserva y acumula recompensas.',
+                style: GoogleFonts.openSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 22 / 15,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              RegisterForm(
+                formKey: _formKey,
+                firstNameController: _firstCtrl,
+                lastNameController: _lastCtrl,
+                usernameController: _usernameCtrl,
+                emailController: _emailCtrl,
+                passwordController: _passCtrl,
+                confirmController: _confirmCtrl,
+                dobController: _dobCtrl,
+                phoneController: _phoneCtrl,
+                residenciaController: _residenciaCtrl,
+                gender: _gender,
+                onGenderChanged: (v) => setState(() => _gender = v),
+                countryCode: _countryCode,
+                onCountryCodeChanged: (v) =>
+                    setState(() => _countryCode = v),
+                countryCodes: _countryCodes,
+                obscurePassword: _obscure,
+                onTogglePasswordObscure: (v) =>
+                    setState(() => _obscure = v),
+                acceptTos: _acceptTos,
+                onAcceptTosChanged: (v) => setState(() => _acceptTos = v),
+                isRegistering: _isRegistering,
+                onDobTap: _pickDate,
+                onRegisterPressed: _register,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // Sección superior: flecha de regreso + título
-  Widget _buildHero() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AppBackButton(variant: AppBackButtonVariant.onPrimary),
-          const SizedBox(height: AppSpacing.md),
-          const Text(
-            'Crear cuenta',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -0.3,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Únete a Nova y empieza tu aventura',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-          ),
-        ],
       ),
     );
   }
