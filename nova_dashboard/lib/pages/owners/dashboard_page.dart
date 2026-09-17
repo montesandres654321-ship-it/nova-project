@@ -33,25 +33,26 @@
 /// - [QrDialog] para mostrar el código QR del lugar
 /// - [RewardDialog] para configurar la recompensa activa
 /// - [VisitorsPage] para ver el listado completo de visitantes
+///
+/// REFACTOR: gráficas, stats, QR, recompensa, visitantes y menú de usuario
+/// extraídos a lib/pages/owners/dashboard/ para bajar de 460 a <300 líneas.
+library;
 
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
 import '../../services/place_service.dart';
 import '../../models/place.dart';
 import '../../utils/constants.dart';
 import '../../utils/app_theme.dart';
-import '../places/qr_dialog.dart';
-import '../profile/profile_page.dart';
-import '../profile/change_password_dialog.dart';
-import '../../widgets/charts/line_chart_widget.dart';
-import '../../widgets/charts/donut_chart_widget.dart';
-import '../../widgets/charts/bar_chart_widget.dart';
-import 'visitors_page.dart';
-import 'reward_dialog.dart';
+import 'dashboard/owner_dashboard_charts.dart';
+import 'dashboard/owner_dashboard_stats.dart';
+import 'dashboard/owner_qr_widgets.dart';
+import 'dashboard/owner_reward_mini.dart';
+import 'dashboard/owner_user_menu.dart';
+import 'dashboard/owner_visitors_compact.dart';
 import 'place_edit_page.dart';
+import '../places/qr_dialog.dart';
 
 class OwnerDashboardPage extends StatefulWidget {
   final String userName;
@@ -64,12 +65,6 @@ class OwnerDashboardPage extends StatefulWidget {
 }
 
 class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
-  // Constantes locales eliminadas (Paso 2, Lote 2) — migradas a AppTheme:
-  //   _teal   (#06B6A4) → AppTheme.primary      (match exacto)
-  //   _teal2  (#0891B2) → AppTheme.primaryDark  (sin match exacto — consolidado)
-  //   _amber  (#D97706) → AppTheme.warning      (match exacto)
-  //   _green  (#059669) → AppTheme.success      (sin match exacto — consolidado)
-
   bool _loading = true;
   String _error = '';
   int? _userId;
@@ -142,7 +137,15 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           if (_place != null) IconButton(icon: const Icon(Icons.qr_code_2_rounded, size: 20), tooltip: 'Mi QR',
               onPressed: () => showDialog(context: context, builder: (_) => QRDialog(place: _place!))),
           IconButton(icon: const Icon(Icons.refresh_rounded, size: 20), tooltip: 'Actualizar', onPressed: _loadAll),
-          _buildUserMenu(),
+          ownerUserMenu(
+            context: context,
+            loggedUserName: _loggedUserName,
+            loggedUserEmail: _loggedUserEmail,
+            fallbackUserName: widget.userName,
+            fallbackUserEmail: widget.userEmail,
+            userId: _userId,
+            onLogout: widget.onLogout,
+          ),
           const SizedBox(width: AppTheme.space4),
         ],
       ),
@@ -153,19 +156,20 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         padding: const EdgeInsets.all(AppTheme.space16),
         child: Column(children: [
           // Fila 1: 4 stats compactos
-          _buildStatsRow(),
+          ownerStatsRow(visitors: _visitors, scans: _scans, rewards: _rewards, redeemed: _redeemed),
           const SizedBox(height: AppTheme.space8),
           // Fila 2: 2 columnas — gráfica única | QR grande + recompensa
           Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             // FIX 4: columna izquierda — solo gráfica de barras (escaneos)
-            Expanded(flex: 3, child: _barChart()),
+            Expanded(flex: 3, child: ownerBarChart(_scansByDay)),
             const SizedBox(width: 10),
             // FIX 4: columna derecha — QR grande + tarjeta recompensa
             Expanded(flex: 2, child: _buildRightColumn()),
           ])),
           const SizedBox(height: AppTheme.space8),
           // Actividad reciente (altura fija)
-          SizedBox(height: 160, child: _visitorsCompact()),
+          SizedBox(height: 160, child: ownerVisitorsCompact(
+              context: context, placeId: widget.placeId, recentScans: _recentScans)),
         ]),
       ),
     );
@@ -174,281 +178,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   // ── FIX 4: columna derecha — QR grande + recompensa ─
   Widget _buildRightColumn() => Column(children: [
     if (_place!.hasReward) ...[
-      Expanded(flex: 3, child: _qrBig()),
+      Expanded(flex: 3, child: ownerQrBig(context, _place!)),
       const SizedBox(height: AppTheme.space8),
-      Expanded(flex: 2, child: _rewardMini()),
+      Expanded(flex: 2, child: ownerRewardMini(
+          context: context, place: _place, rewards: _rewards, onSaved: _loadAll)),
     ] else
-      Expanded(child: _qrBig()),
+      Expanded(child: ownerQrBig(context, _place!)),
   ]);
-
-  // ── FIX 4: QR grande con botón "Ver completo" ────────
-  Widget _qrBig() => Container(
-      padding: const EdgeInsets.all(AppTheme.space16),
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Text('Código QR',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-        const SizedBox(height: AppTheme.space8),
-        Expanded(
-          child: Center(
-            child: QrImageView(
-              data: 'PLACE:${_place!.id}',
-              version: QrVersions.auto,
-              size: 200,
-            ),
-          ),
-        ),
-        Text('PLACE:${_place!.id}',
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 9,
-                fontWeight: FontWeight.w700, color: AppTheme.primary)),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () => showDialog(
-                context: context, builder: (_) => QRDialog(place: _place!)),
-            icon: const Icon(Icons.fullscreen_rounded, size: 14),
-            label: const Text('Ver QR completo',
-                style: TextStyle(fontSize: 11)),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppTheme.primary,
-              side: const BorderSide(color: AppTheme.primary),
-              padding: const EdgeInsets.symmetric(vertical: 6),
-            ),
-          ),
-        ),
-      ]));
-
-  // ── Stats row compacto ──────────────────────────────
-  Widget _buildStatsRow() {
-    return Row(children: [
-      _stat('Visitantes', _visitors, Icons.people_rounded, AppTheme.primary),
-      const SizedBox(width: AppTheme.space8),
-      _stat('Escaneos', _scans, Icons.qr_code_scanner_rounded, AppTheme.primaryDark),
-      const SizedBox(width: AppTheme.space8),
-      _stat('Otorgadas', _rewards, Icons.card_giftcard_rounded, AppTheme.warning),
-      const SizedBox(width: AppTheme.space8),
-      _stat('Canjeadas', _redeemed, Icons.check_circle_rounded, AppTheme.success),
-    ]);
-  }
-
-  Widget _stat(String t, int v, IconData i, Color c) => Expanded(child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      // Antipatrón corregido: antes tenía border: Border.all(c.withOpacity(0.2))
-      // Y boxShadow a la vez. Ahora usa AppTheme.cardDecoration() — solo sombra
-      // (nova-design 4bis). Efecto secundario: el radio pasa de 10 a 12 (cardRadius).
-      decoration: AppTheme.cardDecoration(),
-      child: Row(children: [
-        Container(width: 32, height: 32, decoration: BoxDecoration(
-            color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
-            child: Icon(i, color: c, size: 16)),
-        const SizedBox(width: AppTheme.space8),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(v.toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: c)),
-          Text(t, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted)),
-        ])),
-      ])));
-
-  // ── Gráfica de líneas ───────────────────────────────
-  Widget _lineChart() {
-    if (_scansByDay.isEmpty) return _emptyBox(Icons.show_chart, 'Sin actividad aún');
-    final d = _scansByDay.map((i) { String l = i['date']?.toString() ?? '';
-    try { l = DateFormat('d MMM', 'es').format(DateTime.parse(l)); } catch (_) {}
-    return {'label': l, 'value': i['count'] ?? 0}; }).toList();
-    return LineChartWidget(title: 'Visitas por Día', data: d, color: AppTheme.primary, height: double.infinity, fillArea: true);
-  }
-
-  // ── Gráfica de barras ───────────────────────────────
-  Widget _barChart() {
-    if (_scansByDay.isEmpty) return _emptyBox(Icons.bar_chart_rounded, 'Sin datos');
-    final d = _scansByDay.map((i) { String l = i['date']?.toString() ?? '';
-    try { l = DateFormat('d MMM', 'es').format(DateTime.parse(l)); } catch (_) {}
-    return {'label': l, 'value': i['count'] ?? 0}; }).toList();
-    return BarChartWidget(title: 'Escaneos por Día', data: d, color: AppTheme.primary, height: double.infinity, showValues: true);
-  }
-
-  // ── Donut compacto ──────────────────────────────────
-  Widget _donutChart() {
-    if (_rewards == 0) return _emptyBox(Icons.donut_large, 'Sin recompensas');
-    return DonutChartWidget(title: 'Recompensas', subtitle: '', data: [
-      {'label': 'Canjeadas', 'value': _redeemed, 'color': AppTheme.success},
-      {'label': 'Pendientes', 'value': _rewards - _redeemed, 'color': AppTheme.warning},
-    ], height: double.infinity, showLegend: true);
-  }
-
-  // ── FIX 3: Recompensa mini — 3 métricas: Stock / Entregadas / Disponibles
-  Widget _rewardMini() {
-    // rewardStock == null → ilimitado; rewardStock != null → stock fijo
-    final stock         = _place?.rewardStock;
-    final disponiblesNum = stock != null ? stock - _rewards : null;
-    final disponiblesStr = disponiblesNum == null ? '∞' : '$disponiblesNum';
-    // Alerta roja si quedan 3 o menos unidades (solo cuando hay stock fijo)
-    final disponiblesColor = disponiblesNum != null && disponiblesNum <= 3
-        ? AppTheme.error
-        : AppTheme.warning;
-
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.warning.withOpacity(0.2))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Row(children: [
-          Text(_place?.rewardIcon ?? '🎁', style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: AppTheme.space8),
-          Expanded(child: Text(_place?.rewardName ?? 'Recompensa',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-              maxLines: 1, overflow: TextOverflow.ellipsis)),
-        ]),
-        const SizedBox(height: 6),
-        Row(children: [
-          _miniStat(stock == null ? '∞' : '$stock', 'Stock',       AppTheme.primary),
-          const SizedBox(width: 6),
-          _miniStat('$_rewards',                    'Entregadas',   AppTheme.warning),
-          const SizedBox(width: 6),
-          _miniStat(disponiblesStr,                 'Disponibles',  disponiblesColor),
-        ]),
-        const SizedBox(height: 6),
-        InkWell(
-          onTap: () => showDialog(context: context, builder: (_) => OwnerRewardDialog(
-              currentIcon: _place?.rewardIcon, currentName: _place?.rewardName,
-              currentDescription: _place?.rewardDescription, currentStock: _place?.rewardStock, onSaved: _loadAll)),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
-            decoration: BoxDecoration(color: AppTheme.warning.withOpacity(0.08), borderRadius: BorderRadius.circular(6)),
-            child: const Text('Editar', textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: AppTheme.warning, fontWeight: FontWeight.w600)),
-          ),
-        ),
-      ]));
-  }
-
-  Widget _miniStat(String v, String l, Color c) => Expanded(child: Container(
-      padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
-      decoration: BoxDecoration(color: c.withOpacity(0.06), borderRadius: BorderRadius.circular(6)),
-      child: Column(children: [
-        Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-        Text(l, style: const TextStyle(fontSize: 8, color: AppTheme.textMuted)),
-      ])));
-
-  // ── QR mini ─────────────────────────────────────────
-  Widget _qrMini() => Container(
-      width: 100,
-      padding: const EdgeInsets.all(AppTheme.space8),
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.primary.withOpacity(0.2))),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: Image.network(
-            'https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=PLACE:${_place!.id}&format=png&margin=2',
-            width: 60, height: 60, errorBuilder: (_, __, ___) => Container(width: 60, height: 60,
-            color: AppTheme.bgPage, child: const Icon(Icons.qr_code, size: 24, color: AppTheme.textMuted)))),
-        const SizedBox(height: AppTheme.space4),
-        Text('PLACE:${_place!.id}', style: const TextStyle(fontFamily: 'monospace', fontSize: 9, fontWeight: FontWeight.w700, color: AppTheme.primary)),
-        const SizedBox(height: AppTheme.space4),
-        InkWell(
-          onTap: () => showDialog(context: context, builder: (_) => QRDialog(place: _place!)),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
-            decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(6)),
-            child: const Text('Descargar', textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 9, color: AppTheme.onPrimary, fontWeight: FontWeight.w600)),
-          ),
-        ),
-      ]));
-
-  // ── Visitantes compacto ─────────────────────────────
-  Widget _visitorsCompact() => Container(
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-            child: Row(children: [
-              Container(width: 3, height: 14, decoration: BoxDecoration(color: AppTheme.primaryDark, borderRadius: BorderRadius.circular(2))),
-              const SizedBox(width: 6),
-              const Text('Últimos Visitantes', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              InkWell(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => OwnerVisitorsPage(placeId: widget.placeId))),
-                child: const Text('Ver todos →', style: TextStyle(fontSize: 10, color: AppTheme.primaryDark, fontWeight: FontWeight.w600)),
-              ),
-            ])),
-        Expanded(child: _recentScans.isEmpty
-            ? const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(Icons.people_outline, size: 28, color: AppTheme.textMuted),
-          SizedBox(height: AppTheme.space4),
-          Text('Sin visitantes aún', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
-        ]))
-            : ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: AppTheme.space8),
-          itemCount: _recentScans.length,
-          itemBuilder: (_, i) {
-            final s = _recentScans[i];
-            final n = '${s['first_name'] ?? ''} ${s['last_name'] ?? ''}'.trim();
-            final d = (s['created_at'] ?? '').toString();
-            String dl = ''; try { dl = DateFormat('d MMM, HH:mm', 'es').format(DateTime.parse(d)); } catch (_) { dl = d; }
-            return ListTile(
-              dense: true, visualDensity: const VisualDensity(vertical: -3),
-              contentPadding: const EdgeInsets.symmetric(horizontal: AppTheme.space4),
-              leading: CircleAvatar(radius: 14, backgroundColor: AppTheme.primary.withOpacity(0.1),
-                  child: Text(n.isNotEmpty ? n[0].toUpperCase() : '?',
-                      style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 10))),
-              title: Text(n.isNotEmpty ? n : 'Turista',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
-              trailing: Text(dl, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted)),
-            );
-          },
-        )),
-      ]));
-
-  Widget _emptyBox(IconData icon, String msg) => Container(
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.06), blurRadius: 6)]),
-      child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(icon, size: 28, color: AppTheme.textMuted), const SizedBox(height: AppTheme.space4),
-        Text(msg, style: const TextStyle(fontSize: 10, color: AppTheme.textMuted))])));
-
-  // ── User menu ───────────────────────────────────────
-  // FIX 2: usa _loggedUserName/_loggedUserEmail (del JWT/SharedPreferences),
-  // no widget.userName que puede ser el nombre del propietario del lugar.
-  Widget _buildUserMenu() => PopupMenuButton<String>(offset: const Offset(0, 50),
-      child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Row(mainAxisSize: MainAxisSize.min, children: [
-        CircleAvatar(radius: 13, backgroundColor: AppTheme.surface,
-            child: Text(
-              _loggedUserName.isNotEmpty ? _loggedUserName[0].toUpperCase() : 'U',
-              style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 11),
-            )),
-        const SizedBox(width: AppTheme.space4),
-        Text(
-          (_loggedUserName.isNotEmpty ? _loggedUserName : widget.userName).split(' ').first,
-          style: const TextStyle(color: AppTheme.onPrimary, fontSize: 12),
-        ),
-        const Icon(Icons.arrow_drop_down, color: AppTheme.onPrimary, size: 18),
-      ])),
-      itemBuilder: (_) => [
-        PopupMenuItem(enabled: false, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(
-            _loggedUserName.isNotEmpty ? _loggedUserName : widget.userName,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          ),
-          Text(
-            _loggedUserEmail.isNotEmpty ? _loggedUserEmail : widget.userEmail,
-            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-          ),
-          const Divider(),
-        ])),
-        const PopupMenuItem(value: 'profile', child: ListTile(leading: Icon(Icons.person_rounded, color: AppTheme.primary), title: Text('Mi Perfil'), contentPadding: EdgeInsets.zero, dense: true)),
-        const PopupMenuItem(value: 'password', child: ListTile(leading: Icon(Icons.lock_rounded, color: AppTheme.primary), title: Text('Cambiar Contraseña'), contentPadding: EdgeInsets.zero, dense: true)),
-        const PopupMenuItem(value: 'logout', child: ListTile(leading: Icon(Icons.logout_rounded, color: AppTheme.error), title: Text('Cerrar Sesión', style: TextStyle(color: AppTheme.error)), contentPadding: EdgeInsets.zero, dense: true)),
-      ],
-      onSelected: (v) {
-        switch (v) {
-          case 'profile': Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfilePage())); break;
-          case 'password': if (_userId != null) showDialog(context: context, builder: (_) => ChangePasswordDialog(userId: _userId!)); break;
-          case 'logout': widget.onLogout(); break;
-        }
-      });
 
   Widget _buildError() => Center(child: Padding(padding: const EdgeInsets.all(AppTheme.space24),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

@@ -6,12 +6,17 @@
 //     llama PATCH /admin/users/:id (nuevo endpoint backend)
 //  4. PopupMenuItem 'change-role' y _showChangeRoleDialog() eliminados
 //  5. Texto del diálogo de desactivar corregido — menciona "app Nova"
+// REFACTOR: tarjeta de usuario y diálogos extraídos a lib/pages/users/
+// para bajar de 524 a <300 líneas.
 
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../models/user_model.dart';
-import '../utils/app_theme.dart';
 import 'user_detail_page.dart';
+import 'users/dialogs/edit_user_dialog.dart';
+import 'users/dialogs/toggle_user_status_dialog.dart';
+import 'users/widgets/user_card_item.dart';
+import 'users/widgets/users_header.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -78,192 +83,17 @@ class _UsersPageState extends State<UsersPage> {
     });
   }
 
-  // ── Desactivar / Activar ──────────────────────────────
-  Future<void> _toggleUserStatus(UserModel user) async {
-    final confirm = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-            title: Text(user.isActive ? 'Desactivar Turista' : 'Activar Turista'),
-            content: Text(user.isActive
-            // ← texto mejorado: menciona "app Nova" no "sistema"
-                ? '¿Desactivar a ${user.displayName}?\n\n'
-                'No podrá iniciar sesión en la app Nova.\n'
-                'Su historial de escaneos y recompensas se conserva.\n'
-                'Esta acción se puede revertir.'
-                : '¿Activar a ${user.displayName}?\n\n'
-                'Podrá volver a usar la app Nova.'),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancelar')),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: user.isActive ? Colors.red : Colors.green),
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(user.isActive ? 'Desactivar' : 'Activar',
-                      style: const TextStyle(color: Colors.white))),
-            ]));
+  void _toggleUserStatus(UserModel user) =>
+      showToggleUserStatusDialog(context, user, _loadUsers);
 
-    if (confirm != true) return;
-
-    try {
-      final result = await AdminService.toggleUserStatus(user.id);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(result['success'] == true
-              ? result['message'] ?? 'Estado actualizado'
-              : result['error']   ?? 'Error'),
-          backgroundColor: result['success'] == true ? Colors.green : Colors.red));
-      if (result['success'] == true) { _loadUsers(); }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error: $e'), backgroundColor: Colors.red));
-    }
-  }
-
-  // ── Editar turista ─────────────────────────────────────
-  // Campos editables: nombre, apellido, teléfono
-  // NO: email, username, rol
-  void _editUser(UserModel user) {
-    final firstCtrl = TextEditingController(text: user.firstName ?? '');
-    final lastCtrl  = TextEditingController(text: user.lastName  ?? '');
-    final phoneCtrl = TextEditingController(text: user.phone     ?? '');
-
-    showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-            title: Row(children: [
-              const Icon(Icons.edit, color: AppTheme.primary),
-              const SizedBox(width: 10),
-              Expanded(child: Text('Editar — ${user.displayName}',
-                  style: const TextStyle(fontSize: 16))),
-            ]),
-            content: SizedBox(width: 380, child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LayoutBuilder(builder: (ctx, constraints) {
-                    final isMobile = constraints.maxWidth < 500;
-                    if (isMobile) {
-                      return Column(children: [
-                        TextField(
-                            controller: firstCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Nombre',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.person),
-                                isDense: true)),
-                        const SizedBox(height: 12),
-                        TextField(
-                            controller: lastCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Apellido',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.person_outline),
-                                isDense: true)),
-                      ]);
-                    }
-                    return Row(children: [
-                      Expanded(child: TextField(
-                          controller: firstCtrl,
-                          decoration: const InputDecoration(
-                              labelText: 'Nombre',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.person),
-                              isDense: true))),
-                      const SizedBox(width: 12),
-                      Expanded(child: TextField(
-                          controller: lastCtrl,
-                          decoration: const InputDecoration(
-                              labelText: 'Apellido',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.person_outline),
-                              isDense: true))),
-                    ]);
-                  }),
-                  const SizedBox(height: 12),
-                  TextField(
-                      controller: phoneCtrl,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                          labelText: 'Teléfono',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.phone),
-                          isDense: true)),
-                ])),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancelar')),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary, foregroundColor: Colors.white),
-                  onPressed: () async {
-                    Navigator.pop(ctx);
-                    // Usar el nuevo endpoint PATCH /admin/users/:id
-                    final result = await AdminService.updateUser(
-                      userId:    user.id,
-                      firstName: firstCtrl.text.trim(),
-                      lastName:  lastCtrl.text.trim(),
-                      phone:     phoneCtrl.text.trim().isEmpty
-                          ? null : phoneCtrl.text.trim(),
-                    );
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(result['success'] == true
-                            ? 'Turista actualizado correctamente'
-                            : result['error'] ?? 'Error al actualizar'),
-                        backgroundColor: result['success'] == true
-                            ? Colors.green : Colors.red));
-                    if (result['success'] == true) { _loadUsers(); }
-                  },
-                  child: const Text('Guardar')),
-            ]));
-  }
-
-  Widget _buildPageHeader() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Turistas',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 20, fontWeight: FontWeight.w700,
-                  color: const Color(0xFF0F172A))),
-          const SizedBox(height: 2),
-          const Text('Gestión de usuarios registrados',
-              style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-        ]),
-        const Spacer(),
-        _buildIconButton(icon: Icons.refresh_rounded, tooltip: 'Actualizar', onTap: _loadUsers),
-      ]),
-    );
-  }
-
-  // Botón icono reutilizable
-  Widget _buildIconButton({required IconData icon, required String tooltip, required VoidCallback onTap}) {
-    return Tooltip(
-      message: tooltip,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.all(9),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: Icon(icon, size: 18, color: const Color(0xFF64748B)),
-        ),
-      ),
-    );
-  }
+  // Campos editables: nombre, apellido, teléfono. NO: email, username, rol.
+  void _editUser(UserModel user) =>
+      showEditUserDialog(context, user, _loadUsers);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-          _buildPageHeader(),
+          UsersPageHeader(onRefresh: _loadUsers),
           // Barra de búsqueda
           Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
@@ -346,7 +176,7 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   Widget _buildUserCard(UserModel user) {
-    return _UserCardItem(
+    return UserCardItem(
       user: user,
       currentRole: _currentRole,
       // ← Tap abre UserDetailPage
@@ -355,170 +185,6 @@ class _UsersPageState extends State<UsersPage> {
       // ← Editar solo admin_general
       onEdit: () { if (_currentRole == 'admin_general') _editUser(user); },
       onToggle: () => _toggleUserStatus(user),
-    );
-  }
-}
-
-// ── Card item con hover effect para desktop ───────────────
-class _UserCardItem extends StatefulWidget {
-  final UserModel user;
-  final String? currentRole;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onToggle;
-
-  const _UserCardItem({
-    required this.user,
-    required this.currentRole,
-    required this.onTap,
-    required this.onEdit,
-    required this.onToggle,
-  });
-
-  @override
-  State<_UserCardItem> createState() => _UserCardItemState();
-}
-
-class _UserCardItemState extends State<_UserCardItem> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final user = widget.user;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit:  (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: _hovered ? const Color(0xFFF0FDFA) : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _hovered
-                  ? const Color(0xFF06B6A4).withOpacity(0.35)
-                  : const Color(0xFFE2E8F0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(_hovered ? 0.08 : 0.04),
-                blurRadius: _hovered ? 14 : 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(children: [
-              // Avatar
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: user.isActive
-                    ? const Color(0xFF06B6A4).withOpacity(0.12)
-                    : Colors.grey.shade200,
-                child: Icon(
-                    user.isGoogleUser ? Icons.g_mobiledata : Icons.person,
-                    color: user.isActive ? const Color(0xFF06B6A4) : Colors.grey,
-                    size: 22),
-              ),
-              const SizedBox(width: 14),
-
-              // Info principal
-              Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user.displayName,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 15,
-                            color: Color(0xFF111827))),
-                    const SizedBox(height: 3),
-                    Text(user.email,
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                        maxLines: 1, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 7),
-                    Row(children: [
-                      // Badge estado
-                      Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                              color: user.isActive
-                                  ? Colors.green.withOpacity(0.1)
-                                  : Colors.red.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text(
-                              user.isActive ? 'Activo' : 'Inactivo',
-                              style: TextStyle(
-                                  fontSize: 11, fontWeight: FontWeight.w600,
-                                  color: user.isActive
-                                      ? const Color(0xFF059669)
-                                      : Colors.red))),
-                      const SizedBox(width: 8),
-                      Text('${user.scansCount} escaneos',
-                          style: const TextStyle(
-                              fontSize: 11, color: Color(0xFF9CA3AF))),
-                      if (user.isGoogleUser) ...[
-                        const SizedBox(width: 8),
-                        const Text('Google',
-                            style: TextStyle(
-                                fontSize: 11, color: Color(0xFF9CA3AF))),
-                      ],
-                    ]),
-                  ])),
-
-              // Menú de acciones
-              PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.grey),
-                  onSelected: (value) {
-                    switch (value) {
-                    // ← Activado: navega a UserDetailPage
-                      case 'detail': widget.onTap(); break;
-                    // ← Implementado: abre diálogo de edición
-                      case 'edit':   widget.onEdit(); break;
-                      case 'toggle': widget.onToggle(); break;
-                    }
-                  },
-                  itemBuilder: (ctx) => [
-                    // Ver detalle — siempre visible
-                    const PopupMenuItem(
-                        value: 'detail',
-                        child: Row(children: [
-                          Icon(Icons.info_outline, size: 20),
-                          SizedBox(width: 8),
-                          Text('Ver detalle'),
-                        ])),
-
-                    // Editar — solo admin_general
-                    if (widget.currentRole == 'admin_general')
-                      const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(children: [
-                            Icon(Icons.edit, size: 20),
-                            SizedBox(width: 8),
-                            Text('Editar'),
-                          ])),
-
-                    // ← 'change-role' ELIMINADO — turistas no cambian de rol
-
-                    // Desactivar / Activar
-                    PopupMenuItem(
-                        value: 'toggle',
-                        child: Row(children: [
-                          Icon(
-                              user.isActive ? Icons.block : Icons.check_circle,
-                              size: 20,
-                              color: user.isActive ? Colors.red : Colors.green),
-                          const SizedBox(width: 8),
-                          Text(user.isActive ? 'Desactivar' : 'Activar'),
-                        ])),
-                  ]),
-            ]),
-          ),
-        ),
-      ),
     );
   }
 }

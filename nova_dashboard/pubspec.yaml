@@ -16,6 +16,9 @@ dependencies:
   # HTTP & Networking
   http: ^1.1.2
 
+  # Utilidades de colecciones (firstOrNull, etc.)
+  collection: ^1.19.1
+
   # State Management & Storage
   shared_preferences: ^2.2.2
 

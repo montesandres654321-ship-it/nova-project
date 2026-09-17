@@ -1,8 +1,13 @@
 // lib/pages/login_page.dart
 // CORRECCIÓN CRÍTICA: pushNamedAndRemoveUntil limpia TODO el stack
 // Evita que el botón ← lleve a sesiones de otros usuarios
+// REFACTOR: fondo, header y campos del formulario extraídos a
+// lib/pages/login/ para bajar de 446 a <300 líneas.
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
+import 'login/login_background.dart';
+import 'login/login_form_fields.dart';
+import 'login/login_header.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -111,98 +116,15 @@ class _LoginPageState extends State<LoginPage>
     ));
   }
 
-  // ── HELPER UI ────────────────────────────────────────────
-  InputDecoration _inputDec({
-    required String   hint,
-    required IconData icon,
-    Widget?           suffix,
-  }) {
-    return InputDecoration(
-      hintText:  hint,
-      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFCBD5E1)),
-      prefixIcon: Icon(icon, size: 18, color: const Color(0xFF94A3B8)),
-      suffixIcon: suffix,
-      filled:    true,
-      fillColor: const Color(0xFFF8FAFC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF06B6A4), width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEF4444)),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
-      ),
-    );
-  }
-
   // ── BUILD ────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          const LoginBackground(),
 
-          // ── 1. FONDO GRADIENTE 3 COLORES ─────────────────
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end:   Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0F766E), // teal oscuro
-                  Color(0xFF06B6A4), // primary
-                  Color(0xFF67E8F9), // light accent
-                ],
-              ),
-            ),
-          ),
-
-          // ── 2. CÍRCULOS DECORATIVOS SUTILES ───────────────
-          Positioned(
-            top: -100, right: -80,
-            child: Container(
-              width: 300, height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.06),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -80, left: -60,
-            child: Container(
-              width: 240, height: 240,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.06),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 120, left: 50,
-            child: Container(
-              width: 70, height: 70,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.04),
-              ),
-            ),
-          ),
-
-          // ── 3. CARD DE LOGIN (centrada, animada) ──────────
+          // ── CARD DE LOGIN (centrada, animada) ──────────
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
@@ -238,147 +160,27 @@ class _LoginPageState extends State<LoginPage>
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-
-                              // ── HEADER / BRANDING ────────
-                              Center(
-                                child: Column(children: [
-
-                                  // Logo badge con gradiente y sombra teal
-                                  Container(
-                                    width: 64, height: 64,
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFF0F766E), Color(0xFF06B6A4)],
-                                        begin: Alignment.topLeft,
-                                        end:   Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(18),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF06B6A4).withOpacity(0.40),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.qr_code_scanner_rounded,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 18),
-
-                                  // Título dos tonos: NOVA (negro bold) + Dashboard (slate ligero)
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: const TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: 'NOVA',
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w900,
-                                            color: Color(0xFF0F172A),
-                                            letterSpacing: 2.0,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: ' Dashboard',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w300,
-                                            color: Color(0xFF475569),
-                                            letterSpacing: 0.4,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 6),
-
-                                  const Text(
-                                    'Panel de administración',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF94A3B8),
-                                      letterSpacing: 0.2,
-                                    ),
-                                  ),
-                                ]),
-                              ),
+                              const LoginHeader(),
 
                               const SizedBox(height: 28),
                               const Divider(
                                   color: Color(0xFFF1F5F9), height: 1, thickness: 1),
                               const SizedBox(height: 24),
 
-                              // ── EMAIL ────────────────────
-                              const Text(
-                                'Correo electrónico',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF374151),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              TextFormField(
+                              LoginEmailField(
                                 controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Color(0xFF0F172A)),
-                                decoration: _inputDec(
-                                  hint: 'admin@ejemplo.com',
-                                  icon: Icons.email_outlined,
-                                ),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Ingrese su email';
-                                  if (!v.contains('@')) return 'Email inválido';
-                                  return null;
-                                },
                                 enabled: !_loading,
                               ),
 
                               const SizedBox(height: 16),
 
-                              // ── CONTRASEÑA ───────────────
-                              const Text(
-                                'Contraseña',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF374151),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              TextFormField(
+                              LoginPasswordField(
                                 controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Color(0xFF0F172A)),
-                                decoration: _inputDec(
-                                  hint: '••••••••',
-                                  icon: Icons.lock_outline_rounded,
-                                  suffix: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      size: 18,
-                                      color: const Color(0xFF94A3B8),
-                                    ),
-                                    onPressed: () => setState(
-                                        () => _obscurePassword = !_obscurePassword),
-                                    splashRadius: 16,
-                                  ),
-                                ),
-                                validator: (v) =>
-                                    v?.isEmpty ?? true ? 'Ingrese su contraseña' : null,
                                 enabled: !_loading,
-                                onFieldSubmitted: (_) => _login(),
+                                obscure: _obscurePassword,
+                                onToggleObscure: () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
+                                onSubmitted: _login,
                               ),
 
                               const SizedBox(height: 24),

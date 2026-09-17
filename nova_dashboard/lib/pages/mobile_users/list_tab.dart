@@ -1,10 +1,14 @@
 // lib/pages/mobile_users/list_tab.dart
+// REFACTOR: toolbar y tarjeta de usuario extraídas a
+// lib/pages/mobile_users/widgets/ para bajar de 463 a <300 líneas.
 
 import 'package:flutter/material.dart';
 import 'package:nova_dashboard/services/admin_service.dart';
 import 'package:nova_dashboard/models/user_model.dart';
 import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:nova_dashboard/pages/user_detail_page.dart';
+import 'widgets/mobile_user_card.dart';
+import 'widgets/mobile_users_toolbar.dart';
 
 class MobileUsersListTab extends StatefulWidget {
   final bool canEdit;
@@ -173,76 +177,27 @@ class _MobileUsersListTabState extends State<MobileUsersListTab> {
 
   @override
   Widget build(BuildContext context) {
+    final total = _users.length;
+    final active = _users.where((u) => u.isActive).length;
+    final inactive = total - active;
+
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(AppTheme.spaceMD),
-          color: Colors.white,
-          child: Column(
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Buscar usuarios...',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      setState(() => _searchQuery = '');
-                      _applyFilters();
-                    },
-                  )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() => _searchQuery = value);
-                  _applyFilters();
-                },
-              ),
-              const SizedBox(height: AppTheme.spaceSM),
-              Row(
-                children: [
-                  Expanded(
-                    child: SegmentedButton<String>(
-                      segments: const [
-                        ButtonSegment(
-                          value: 'all',
-                          label: Text('Todos'),
-                          icon: Icon(Icons.people, size: 16),
-                        ),
-                        ButtonSegment(
-                          value: 'active',
-                          label: Text('Activos'),
-                          icon: Icon(Icons.check_circle, size: 16),
-                        ),
-                        ButtonSegment(
-                          value: 'inactive',
-                          label: Text('Inactivos'),
-                          icon: Icon(Icons.block, size: 16),
-                        ),
-                      ],
-                      selected: {_filterStatus},
-                      onSelectionChanged: (Set<String> selected) {
-                        setState(() => _filterStatus = selected.first);
-                        _applyFilters();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.spaceSM),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: _loadUsers,
-                    tooltip: 'Actualizar',
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spaceSM),
-              _buildStats(),
-            ],
-          ),
+        MobileUsersToolbar(
+          searchQuery: _searchQuery,
+          filterStatus: _filterStatus,
+          total: total,
+          active: active,
+          inactive: inactive,
+          onSearchChanged: (v) {
+            setState(() => _searchQuery = v);
+            _applyFilters();
+          },
+          onFilterChanged: (v) {
+            setState(() => _filterStatus = v);
+            _applyFilters();
+          },
+          onRefresh: _loadUsers,
         ),
         const Divider(height: 1),
         Expanded(
@@ -255,49 +210,6 @@ class _MobileUsersListTabState extends State<MobileUsersListTab> {
               : _buildUsersList(),
         ),
       ],
-    );
-  }
-
-  Widget _buildStats() {
-    final total = _users.length;
-    final active = _users.where((u) => u.isActive).length;
-    final inactive = total - active;
-
-    return Row(
-      children: [
-        Expanded(child: _buildStatCard('Total', total, AppTheme.info)),
-        const SizedBox(width: AppTheme.spaceSM),
-        Expanded(child: _buildStatCard('Activos', active, AppTheme.success)),
-        const SizedBox(width: AppTheme.spaceSM),
-        Expanded(child: _buildStatCard('Inactivos', inactive, AppTheme.warning)),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String label, int value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(AppTheme.spaceSM),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value.toString(),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: color),
-          ),
-        ],
-      ),
     );
   }
 
@@ -344,121 +256,13 @@ class _MobileUsersListTabState extends State<MobileUsersListTab> {
       separatorBuilder: (_, __) => const SizedBox(height: AppTheme.spaceSM),
       itemBuilder: (context, index) {
         final user = _filteredUsers[index];
-        return _buildUserCard(user);
+        return MobileUserCard(
+          user: user,
+          canEdit: widget.canEdit,
+          onToggleStatus: () => _toggleUserStatus(user),
+          onTap: () => _navigateToUserDetail(user),
+        );
       },
-    );
-  }
-
-  Widget _buildUserCard(UserModel user) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: user.isActive
-              ? AppTheme.success.withOpacity(0.2)
-              : AppTheme.gray300,
-          child: Icon(
-            user.isGoogleUser ? Icons.g_mobiledata : Icons.person,
-            color: user.isActive ? AppTheme.success : AppTheme.gray600,
-          ),
-        ),
-        title: Text(
-          user.displayName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: user.isActive ? AppTheme.gray900 : AppTheme.gray500,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(user.email),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: user.isActive
-                        ? AppTheme.success.withOpacity(0.1)
-                        : AppTheme.error.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                  ),
-                  child: Text(
-                    user.isActive ? 'Activo' : 'Inactivo',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: user.isActive ? AppTheme.success : AppTheme.error,
-                    ),
-                  ),
-                ),
-                if (user.isGoogleUser) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.info.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                    ),
-                    child: const Text(
-                      'Google',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.info,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-        trailing: widget.canEdit
-            ? PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'toggle') {
-              _toggleUserStatus(user);
-            } else if (value == 'detail') {
-              _navigateToUserDetail(user);
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'detail',
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 20),
-                  SizedBox(width: 8),
-                  Text('Ver detalle'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 'toggle',
-              child: Row(
-                children: [
-                  Icon(
-                    user.isActive ? Icons.block : Icons.check_circle,
-                    size: 20,
-                    color: user.isActive ? AppTheme.error : AppTheme.success,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(user.isActive ? 'Desactivar' : 'Activar'),
-                ],
-              ),
-            ),
-          ],
-        )
-            : null,
-        onTap: () => _navigateToUserDetail(user),
-      ),
     );
   }
 }

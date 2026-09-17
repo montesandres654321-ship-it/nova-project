@@ -10,6 +10,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../utils/app_theme.dart';
+import 'donut/donut_colors.dart';
+import 'donut/donut_legend.dart';
 
 class DonutChartWidget extends StatelessWidget {
   final String title;
@@ -140,7 +142,7 @@ class DonutChartWidget extends StatelessWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         flex: 2,
-                        child: _buildLegend(),
+                        child: DonutLegend(data: data),
                       ),
                     ],
                   ],
@@ -195,7 +197,7 @@ class DonutChartWidget extends StatelessWidget {
       final item = entry.value;
       final value = (item['value'] ?? 0).toDouble();
       final percentage = total > 0 ? (value / total * 100) : 0;
-      final color = item['color'] ?? _getColor(index);
+      final color = item['color'] ?? donutColorForIndex(index);
 
       return PieChartSectionData(
         value: value,
@@ -211,73 +213,12 @@ class DonutChartWidget extends StatelessWidget {
     }).toList();
   }
 
-  Widget _buildLegend() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: data.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          final label = item['label']?.toString() ?? '';
-          final value = item['value'] ?? 0;
-          final color = item['color'] ?? _getColor(index);
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Text(
-                  value.toString(),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   double _getTotal() {
     double total = 0;
     for (var item in data) {
       total += (item['value'] ?? 0).toDouble();
     }
     return total;
-  }
-
-  Color _getColor(int index) {
-    // Antes: arcoíris de librería (Colors.green/orange/blue/red/purple).
-    // Ahora: variantes de teal/verde de la paleta NOVA (nova-charts §3).
-    const colors = [
-      Color(0xFF06B6A4), // primary teal
-      Color(0xFF048577), // primaryDark
-      Color(0xFF5EEAD4), // teal 300
-      Color(0xFF0891B2), // cyan 600
-      Color(0xFF2563EB), // info blue
-      Color(0xFF94A9A7), // textMuted (neutro)
-    ];
-    return colors[index % colors.length];
   }
 
   Widget _buildEmptyState() {

@@ -17,23 +17,19 @@
 ///
 /// Parámetros de navegación opcionales permiten navegar a otras secciones
 /// del [DashboardPage] al interactuar con los KPIs o gráficas.
+///
+/// REFACTOR: las gráficas, KPIs y controles del header se extrajeron a
+/// lib/pages/stats/ (stats_charts.dart, stats_kpi_section.dart,
+/// stats_header_controls.dart) para bajar de 772 a <300 líneas, sin
+/// cambiar comportamiento.
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../services/analytics_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/common/loading_indicator.dart';
-import '../widgets/charts/line_chart_widget.dart';
-import '../widgets/charts/bar_chart_widget.dart';
-import '../widgets/charts/donut_chart_widget.dart';
-
-// Design tokens locales eliminados (Paso 2, Lote 3) — migrados a AppTheme:
-//   AppTheme.primary   (#06B6A4) → AppTheme.primary   (match exacto)
-//   AppTheme.bgPage    (#F1F5F9) → AppTheme.bgPage    (sin match exacto — consolidado)
-//   AppTheme.textHead  (#0F172A) → AppTheme.textHead  (sin match exacto — consolidado)
-//   AppTheme.textMuted (#64748B) → AppTheme.textMuted (sin match exacto — consolidado)
-//   AppTheme.border    (#E2E8F0) → AppTheme.border    (match casi exacto)
-
-// ──────────────────────────────────────────────────────────────
+import 'stats/stats_header_controls.dart';
+import 'stats/stats_kpi_section.dart';
+import 'stats/stats_layouts.dart';
 
 /// Widget principal de la página de estadísticas.
 ///
@@ -61,7 +57,6 @@ class StatsDashboardPage extends StatefulWidget {
   State<StatsDashboardPage> createState() => _StatsDashboardPageState();
 }
 
-// ──────────────────────────────────────────────────────────────
 class _StatsDashboardPageState extends State<StatsDashboardPage> {
   static const double _mobileBreak = 600;
   static const double _tabletBreak = 900;
@@ -138,6 +133,11 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     }
   }
 
+  StatsTotals get _totals => StatsTotals(
+    scans: _totalScans, users: _totalUsers,
+    places: _totalPlaces, rewards: _totalRewards,
+  );
+
   // ── BUILD ─────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
@@ -170,7 +170,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
                     color: AppTheme.textHead)),
           ),
-          _PeriodDropdown(
+          PeriodDropdown(
             value: _selectedDays,
             options: _daysOptions,
             onChanged: (v) {
@@ -181,7 +181,7 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
             },
           ),
           const SizedBox(width: 8),
-          _DashIconButton(
+          DashIconButton(
             icon: Icons.refresh_rounded,
             tooltip: 'Actualizar',
             onTap: _load,
@@ -203,219 +203,23 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     );
   }
 
-  // ═══════════════════════════════════════════════════════
-  // DESKTOP (>= 900px) — sin scroll
-  // ═══════════════════════════════════════════════════════
-  Widget _buildDesktopLayout() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      child: Column(
-        children: [
-          SizedBox(height: 75, child: _buildKpiRow(columns: 4)),
-          const SizedBox(height: 10),
-          Expanded(
-            flex: 6,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 3, child: _buildScansByDayChart()),
-                const SizedBox(width: 10),
-                Expanded(flex: 2, child: _buildTopPlacesChart()),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            flex: 4,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 1, child: _buildScansByHourChart()),
-                const SizedBox(width: 10),
-                Expanded(flex: 1, child: _buildPlacesByTypeChart()),
-                const SizedBox(width: 10),
-                Expanded(flex: 1, child: _buildRewardsByDayChart()),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildDesktopLayout() => statsDesktopLayout(
+      totals: _totals, scansByDay: _scansByDay, scansByHour: _scansByHour,
+      topPlaces: _topPlaces, rewardsByDay: _rewardsByDay,
+      placesByType: _placesByType, selectedDays: _selectedDays,
+      onKpiTap: _navigateFromKpi);
 
-  // ═══════════════════════════════════════════════════════
-  // TABLET (600–900px) — scroll suave
-  // ═══════════════════════════════════════════════════════
-  Widget _buildTabletLayout() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        children: [
-          _buildKpiGrid(columns: 2, aspectRatio: 2.5),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 220,
-                  child: _buildScansByDayChart(),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: SizedBox(
-                  height: 220,
-                  child: _buildTopPlacesChart(),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 200,
-                  child: _buildScansByHourChart(),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: SizedBox(
-                  height: 200,
-                  child: _buildPlacesByTypeChart(),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: _buildRewardsByDayChart(),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
+  Widget _buildTabletLayout() => statsTabletLayout(
+      totals: _totals, scansByDay: _scansByDay, scansByHour: _scansByHour,
+      topPlaces: _topPlaces, rewardsByDay: _rewardsByDay,
+      placesByType: _placesByType, selectedDays: _selectedDays,
+      onKpiTap: _navigateFromKpi);
 
-  // ═══════════════════════════════════════════════════════
-  // MÓVIL (< 600px) — scroll vertical
-  // ═══════════════════════════════════════════════════════
-  Widget _buildMobileLayout() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          _buildKpiGrid(columns: 2, aspectRatio: 2.0),
-          const SizedBox(height: 10),
-          SizedBox(height: 200, child: _buildScansByDayChart()),
-          const SizedBox(height: 10),
-          SizedBox(height: 200, child: _buildTopPlacesChart()),
-          const SizedBox(height: 10),
-          SizedBox(height: 180, child: _buildScansByHourChart()),
-          const SizedBox(height: 10),
-          SizedBox(height: 180, child: _buildPlacesByTypeChart()),
-          const SizedBox(height: 10),
-          SizedBox(height: 180, child: _buildRewardsByDayChart()),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // KPI — Row (desktop) y Grid (tablet/móvil)
-  // ═══════════════════════════════════════════════════════
-  Widget _buildKpiRow({required int columns}) {
-    return Row(
-      children: [
-        Expanded(child: _buildKpiCard('Total Escaneos', _totalScans,
-            Icons.qr_code_scanner_rounded, AppTheme.primary)),
-        const SizedBox(width: 8),
-        Expanded(child: _buildKpiCard('Turistas', _totalUsers,
-            Icons.people_rounded, AppTheme.info)),
-        const SizedBox(width: 8),
-        Expanded(child: _buildKpiCard('Lugares Activos', _totalPlaces,
-            Icons.place_rounded, AppTheme.success)),
-        const SizedBox(width: 8),
-        Expanded(child: _buildKpiCard('Recompensas', _totalRewards,
-            Icons.card_giftcard_rounded, AppTheme.warning)),
-      ],
-    );
-  }
-
-  Widget _buildKpiGrid({required int columns, required double aspectRatio}) {
-    final cards = [
-      _buildKpiCard('Total Escaneos', _totalScans,
-          Icons.qr_code_scanner_rounded, AppTheme.primary),
-      _buildKpiCard('Turistas', _totalUsers,
-          Icons.people_rounded, AppTheme.info),
-      _buildKpiCard('Lugares Activos', _totalPlaces,
-          Icons.place_rounded, AppTheme.success),
-      _buildKpiCard('Recompensas', _totalRewards,
-          Icons.card_giftcard_rounded, AppTheme.warning),
-    ];
-
-    return GridView.count(
-      crossAxisCount: columns,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 8,
-      mainAxisSpacing: 8,
-      childAspectRatio: aspectRatio,
-      children: cards,
-    );
-  }
-
-  Widget _buildKpiCard(String label, int value, IconData icon, Color color) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _navigateFromKpi(label),
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          // Antipatrón corregido: antes tenía border (franja superior de color)
-          // + boxShadow a la vez. Ahora usa AppTheme.cardDecoration() — solo
-          // sombra (nova-design 4bis). Se pierde la franja de color superior
-          // como método de distinción; el ícono y el número siguen coloreados.
-          decoration: AppTheme.cardDecoration(),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: Icon(icon, color: color, size: 16),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('$value',
-                        style: TextStyle(fontSize: 18,
-                            fontWeight: FontWeight.w700, color: color,
-                            height: 1.1)),
-                    Text(label,
-                        style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget _buildMobileLayout() => statsMobileLayout(
+      totals: _totals, scansByDay: _scansByDay, scansByHour: _scansByHour,
+      topPlaces: _topPlaces, rewardsByDay: _rewardsByDay,
+      placesByType: _placesByType, selectedDays: _selectedDays,
+      onKpiTap: _navigateFromKpi);
 
   void _navigateFromKpi(String label) {
     switch (label) {
@@ -446,215 +250,6 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
     }
   }
 
-  // ═══════════════════════════════════════════════════════
-  // CHART CONTAINER genérico
-  // ═══════════════════════════════════════════════════════
-  Widget _buildChartContainer({
-    required String title,
-    required String subtitle,
-    required Color  accentColor,
-    required Widget chart,
-  }) {
-    // Este contenedor sigue siendo la ÚNICA capa de decoración de la gráfica:
-    // LineChartWidget y BarChartWidget ya no se auto-decoran (Lote 3), así que
-    // el problema de doble-tarjeta queda resuelto para esas 2. DonutChartWidget
-    // todavía se auto-decora (fuera del alcance de este lote) — la gráfica
-    // "Distribución por Tipo" sigue con doble tarjeta hasta un próximo lote.
-    return Container(
-      decoration: AppTheme.cardDecoration(),
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Container(
-              width: 4, height: 18,
-              decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: BorderRadius.circular(2)),
-            ),
-            const SizedBox(width: AppTheme.space8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(fontSize: 13,
-                          fontWeight: FontWeight.w600),
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text(subtitle,
-                      style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                ],
-              ),
-            ),
-          ]),
-          const SizedBox(height: 10),
-          Expanded(child: chart),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // 5 GRÁFICAS
-  // ═══════════════════════════════════════════════════════
-
-  Widget _buildScansByDayChart() {
-    final data = _scansByDay.map((e) => <String, dynamic>{
-      'label': _formatDate(e['date']?.toString() ?? ''),
-      'value': e['count'] ?? 0,
-    }).toList();
-
-    return _buildChartContainer(
-      title: 'Actividad de Escaneos',
-      subtitle: _selectedDays == 0
-          ? 'Todo el historial'
-          : 'Últimos $_selectedDays días',
-      accentColor: AppTheme.primary,
-      chart: data.isEmpty
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return LineChartWidget(
-                title: '', data: data,
-                color: AppTheme.primary,
-                fillArea: true,
-                height: h,
-              );
-            }),
-    );
-  }
-
-  Widget _buildTopPlacesChart() {
-    final data = _topPlaces.map((p) => <String, dynamic>{
-      'label': () {
-        final n = (p['name'] ?? '').toString();
-        return n.length > 12 ? '${n.substring(0, 12)}…' : n;
-      }(),
-      'value': p['total_scans'] ?? 0,
-    }).toList();
-
-    return _buildChartContainer(
-      title: 'Top Establecimientos',
-      subtitle: 'Por número de escaneos',
-      accentColor: AppTheme.warning,
-      chart: data.isEmpty
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return BarChartWidget(
-                title: '', data: data,
-                color: AppTheme.warning,
-                height: h,
-                showValues: true,
-              );
-            }),
-    );
-  }
-
-  Widget _buildScansByHourChart() {
-    final Map<int, int> hourMap = {};
-    for (final e in _scansByHour) {
-      final h = (e['hour'] as num?)?.toInt() ?? 0;
-      hourMap[h] = (e['count'] as num?)?.toInt() ?? 0;
-    }
-    final List<Map<String, dynamic>> data = List.generate(24, (h) => {
-      'label': '${h.toString().padLeft(2, '0')}h',
-      'value': hourMap[h] ?? 0,
-    });
-
-    return _buildChartContainer(
-      title: 'Horario Pico',
-      subtitle: 'Escaneos por hora del día',
-      accentColor: AppTheme.info,
-      chart: data.every((e) => (e['value'] as int) == 0)
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return BarChartWidget(
-                title: '', data: data,
-                color: AppTheme.info,
-                height: h,
-                showValues: false,
-              );
-            }),
-    );
-  }
-
-  Widget _buildPlacesByTypeChart() {
-    final hotel = (_placesByType['hotel']      as num?)?.toInt() ?? 0;
-    final rest  = (_placesByType['restaurant'] as num?)?.toInt() ?? 0;
-    final bar   = (_placesByType['bar']        as num?)?.toInt() ?? 0;
-    final total = hotel + rest + bar;
-
-    final List<Map<String, dynamic>> chartData = [
-      {'label': 'Hoteles',      'value': hotel, 'color': AppTheme.info},
-      {'label': 'Restaurantes', 'value': rest,  'color': AppTheme.success},
-      {'label': 'Bares',        'value': bar,   'color': AppTheme.warning},
-    ].where((e) => (e['value'] as int) > 0).toList();
-
-    return _buildChartContainer(
-      title: 'Distribución por Tipo',
-      subtitle: 'Establecimientos registrados',
-      accentColor: AppTheme.success,
-      chart: total == 0
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return DonutChartWidget(
-                title: '', subtitle: '',
-                data: chartData,
-                height: h,
-                showLegend: true,
-              );
-            }),
-    );
-  }
-
-  Widget _buildRewardsByDayChart() {
-    final data = _rewardsByDay.map((e) => <String, dynamic>{
-      'label': _formatDate(e['date']?.toString() ?? ''),
-      'value': e['count'] ?? 0,
-    }).toList();
-
-    return _buildChartContainer(
-      title: 'Recompensas por Día',
-      subtitle: _selectedDays == 0
-          ? 'Todo el historial'
-          : 'Últimos $_selectedDays días',
-      accentColor: AppTheme.primaryDark,
-      chart: data.isEmpty
-          ? _buildEmptyState()
-          : LayoutBuilder(builder: (ctx, c) {
-              final h = c.maxHeight.isInfinite ? 160.0 : c.maxHeight;
-              return LineChartWidget(
-                title: '', data: data,
-                color: AppTheme.primaryDark,
-                fillArea: true,
-                height: h,
-              );
-            }),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // HELPERS
-  // ═══════════════════════════════════════════════════════
-
-  Widget _buildEmptyState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.bar_chart_rounded, size: 32, color: AppTheme.textMuted),
-          SizedBox(height: 6),
-          Text('Sin datos disponibles', style: AppTheme.textCaption),
-        ],
-      ),
-    );
-  }
-
   Widget _buildError() {
     return Center(
       child: Column(
@@ -678,95 +273,4 @@ class _StatsDashboardPageState extends State<StatsDashboardPage> {
       ),
     );
   }
-
-  String _formatDate(String dateStr) {
-    try {
-      final d = DateTime.parse(dateStr);
-      return '${d.day} ${_monthShort(d.month)}';
-    } catch (_) {
-      return dateStr;
-    }
-  }
-
-  String _monthShort(int m) {
-    const months = [
-      '', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
-    ];
-    return m >= 1 && m <= 12 ? months[m] : '';
-  }
-}
-
-// ──────────────────────────────────────────────────────────────
-// PERIOD DROPDOWN
-// ──────────────────────────────────────────────────────────────
-class _PeriodDropdown extends StatelessWidget {
-  final int                value;
-  final List<int>          options;
-  final ValueChanged<int?> onChanged;
-
-  const _PeriodDropdown({
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: AppTheme.surface,
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: AppTheme.border),
-    ),
-    child: DropdownButtonHideUnderline(
-      child: DropdownButton<int>(
-        value: value,
-        isDense: true,
-        icon: const Icon(Icons.expand_more_rounded, size: 15, color: AppTheme.textMuted),
-        style: const TextStyle(fontSize: 12, color: AppTheme.textHead),
-        items: options.map((d) => DropdownMenuItem(
-          value: d,
-          child: Text(
-            d == 0 ? 'Todo' : 'Últ. $d días',
-            style: const TextStyle(fontSize: 12),
-          ),
-        )).toList(),
-        onChanged: onChanged,
-      ),
-    ),
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// ICON BUTTON (header)
-// ──────────────────────────────────────────────────────────────
-class _DashIconButton extends StatelessWidget {
-  final IconData     icon;
-  final String       tooltip;
-  final VoidCallback onTap;
-
-  const _DashIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) => Tooltip(
-    message: tooltip,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(AppTheme.space8),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.border),
-        ),
-        child: Icon(icon, size: 16, color: AppTheme.textMuted),
-      ),
-    ),
-  );
 }

@@ -2,327 +2,48 @@
 // ============================================================
 // FIX: getDashboardStats() ahora incluye scansByDay en el return
 // ============================================================
+// REFACTOR: la lógica real vive en lib/services/admin/ (admin_auth_service,
+// admin_users_service, admin_panel_service, admin_stats_service,
+// admin_profile_service), divididos por dominio para que ningún archivo
+// supere 300 líneas. Esta clase se mantiene como la ÚNICA API pública
+// (AdminService.xxx) para no tener que tocar los archivos que ya la usan
+// — cada método delega, sin cambiar ninguna firma ni comportamiento.
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
-import 'api_client.dart';
+import 'admin/admin_auth_service.dart';
+import 'admin/admin_panel_service.dart';
+import 'admin/admin_profile_service.dart';
+import 'admin/admin_stats_service.dart';
+import 'admin/admin_users_service.dart';
 import '../models/admin_model.dart';
 import '../models/admin_stats_model.dart';
-import '../utils/constants.dart';
 
 class AdminService {
-
   // ─── AUTENTICACIÓN ─────────────────────────────────────
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
-  }) async {
-    try {
-      final response = await ApiClient.post<dynamic>(
-        '/login',
-        body: {'email': email, 'password': password},
-      );
-      final data = response.data;
-      if (data is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      final token = data['token'] as String?;
-      final user  = data['user']  as Map<String, dynamic>?;
-      if (token == null || user == null) throw ApiException('Falta token o user');
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(AppConstants.keyToken,    token);
-      await prefs.setString(AppConstants.keyUserName,
-          '${user['first_name'] ?? ''} ${user['last_name'] ?? ''}'.trim());
-      await prefs.setString(AppConstants.keyUserEmail, user['email']   as String? ?? '');
-      await prefs.setString(AppConstants.keyUserRole,  user['role']    as String? ?? '');
-      if (user['id']       != null) await prefs.setInt(AppConstants.keyUserId, user['id'] as int);
-      if (user['place_id'] != null) await prefs.setInt('placeId', user['place_id'] as int);
-      final userName  = '${user['first_name'] ?? ''} ${user['last_name'] ?? ''}'.trim();
-      final userEmail = user['email'] as String? ?? '';
-      debugPrint('✅ Login: ${user['email']} (${user['role'] ?? 'mobile'})');
-      return {
-        'success':   true,
-        'role':      user['role'],
-        'place_id':  user['place_id'],
-        'userName':  userName,
-        'userEmail': userEmail,
-      };
-    } catch (e) {
-      debugPrint('❌ Login error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  }) =>
+      AdminAuthService.login(email: email, password: password);
 
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(AppConstants.keyToken);
-    await prefs.remove(AppConstants.keyUserName);
-    await prefs.remove(AppConstants.keyUserEmail);
-    await prefs.remove(AppConstants.keyUserRole);
-    await prefs.remove(AppConstants.keyUserId);
-    await prefs.remove('placeId');
-  }
+  static Future<void> logout() => AdminAuthService.logout();
 
-  static Future<String?> getCurrentRole()   async =>
-      (await SharedPreferences.getInstance()).getString(AppConstants.keyUserRole);
-  static Future<int?>    getCurrentUserId() async =>
-      (await SharedPreferences.getInstance()).getInt(AppConstants.keyUserId);
-  static Future<String?> getCurrentEmail()  async =>
-      (await SharedPreferences.getInstance()).getString(AppConstants.keyUserEmail);
-  static Future<bool> isAdminGeneral() async =>
-      (await getCurrentRole()) == AppConstants.roleAdminGeneral;
-  static Future<bool> isUserGeneral()  async =>
-      (await getCurrentRole()) == AppConstants.roleUserGeneral;
-  static Future<bool> isUserPlace()    async =>
-      (await getCurrentRole()) == AppConstants.roleUserPlace;
-  static Future<bool> hasAdminAccess() async {
-    final r = await getCurrentRole();
-    return r == AppConstants.roleAdminGeneral || r == AppConstants.roleUserGeneral;
-  }
+  static Future<String?> getCurrentRole()   => AdminAuthService.getCurrentRole();
+  static Future<int?>    getCurrentUserId() => AdminAuthService.getCurrentUserId();
+  static Future<String?> getCurrentEmail()  => AdminAuthService.getCurrentEmail();
+  static Future<bool> isAdminGeneral()  => AdminAuthService.isAdminGeneral();
+  static Future<bool> isUserGeneral()   => AdminAuthService.isUserGeneral();
+  static Future<bool> isUserPlace()     => AdminAuthService.isUserPlace();
+  static Future<bool> hasAdminAccess()  => AdminAuthService.hasAdminAccess();
 
   // ─── USUARIOS MÓVILES ──────────────────────────────────
-  static Future<Map<String, dynamic>> getAllUsers() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/admin/users');
-      if (r.data is! List) throw ApiException('Esperaba List');
-      return {'success': true, 'users': r.data};
-    } catch (e) {
-      debugPrint('❌ getAllUsers: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  static Future<Map<String, dynamic>> getAllUsers() => AdminUsersService.getAllUsers();
 
-  static Future<Map<String, dynamic>> toggleUserStatus(int userId) async {
-    try {
-      final r = await ApiClient.patch<dynamic>('/admin/users/$userId/toggle');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {'success': true, 'message': d['message'] ?? 'Estado actualizado'};
-    } catch (e) {
-      debugPrint('❌ toggleUserStatus: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  static Future<Map<String, dynamic>> toggleUserStatus(int userId) =>
+      AdminUsersService.toggleUserStatus(userId);
 
-  static Future<Map<String, dynamic>> getUserDetail(int userId) async {
-    try {
-      final r = await ApiClient.get<dynamic>('/admin/users/$userId');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {
-        'success':   true,
-        'user':      d['user'],
-        'scans':     d['scans']     ?? [],
-        'rewards':   d['rewards']   ?? [],
-        'topPlaces': d['topPlaces'] ?? [],
-        'stats':     d['stats']     ?? {},
-      };
-    } catch (e) {
-      debugPrint('❌ getUserDetail: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  static Future<Map<String, dynamic>> getUserDetail(int userId) =>
+      AdminUsersService.getUserDetail(userId);
 
-  // ─── ADMINS DEL PANEL ──────────────────────────────────
-  static Future<List<AdminStats>> getUsersWithDetails() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/analytics/admins/users-with-details');
-      final raw = r.data;
-      List<dynamic> list;
-      if (raw is List) {
-        list = raw;
-      } else if (raw is Map<String, dynamic> && raw['data'] is List) {
-        list = raw['data'] as List;
-      } else {
-        list = [];
-      }
-      return list
-          .whereType<Map<String, dynamic>>()
-          .map((json) => AdminStats.fromJson(json))
-          .toList();
-    } catch (e) {
-      debugPrint('❌ getUsersWithDetails: $e');
-      rethrow;
-    }
-  }
-
-  // ─── DASHBOARD SUMMARY (una sola llamada) ─────────────
-  static Future<Map<String, dynamic>> getDashboardSummary() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/dashboard/summary');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {'success': true, ...d};
-    } catch (e) {
-      debugPrint('❌ getDashboardSummary: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  // ─── ESTADÍSTICAS DASHBOARD ────────────────────────────
-  // FIX: ahora incluye scansByDay en el return
-  static Future<Map<String, dynamic>> getDashboardStats() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/stats/dashboard');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-
-      final raw = d['stats'] as Map<String, dynamic>? ?? d;
-
-      return {
-        'success': true,
-        'stats': {
-          'users':   _toInt(raw['users']   ?? raw['totalUsers']   ?? d['totalUsers']),
-          'places':  _toInt(raw['places']  ?? raw['totalPlaces']  ?? d['totalPlaces']),
-          'scans':   _toInt(raw['scans']   ?? raw['totalScans']   ?? d['totalScans']),
-          'rewards': _toInt(raw['rewards'] ?? raw['totalRewards'] ?? d['totalRewards']),
-        },
-        'scansByDay':   d['scansByDay']   ?? [],   // ← FIX: ahora incluye scansByDay
-        'topPlaces':    d['topPlaces']    ?? [],
-        'placesByType': d['placesByType'] ?? {},
-      };
-    } catch (e) {
-      debugPrint('❌ getDashboardStats: $e');
-      return {
-        'success': false,
-        'error': e.toString(),
-        'stats': {'users': 0, 'places': 0, 'scans': 0, 'rewards': 0},
-        'scansByDay': [],   // ← FIX: también en el fallback
-        'topPlaces': [],
-        'placesByType': {},
-      };
-    }
-  }
-
-  static int _toInt(dynamic v) => v is num ? v.toInt() : 0;
-
-  // ─── ESTADÍSTICAS OWNER (user_place → /owner/stats) ───
-  // Backend devuelve: { success, place, stats:{totalScans,totalVisitors,todayScans,...}, scansByDay:[...], recentVisits:[...] }
-  static Future<Map<String, dynamic>> getOwnerStats() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/owner/stats');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      final stats = d['stats'] as Map<String, dynamic>? ?? {};
-      return {
-        'success':          true,
-        'total_scans':      _toInt(stats['totalScans']),
-        'scans_today':      _toInt(stats['todayScans']),
-        'unique_visitors':  _toInt(stats['totalVisitors']),
-        'total_rewards':    _toInt(stats['totalRewards']),
-        'redeemed_rewards': _toInt(stats['redeemedRewards']),
-        'pending_rewards':  _toInt(stats['pendingRewards']),
-        'conversion_rate':  0.0,
-        'scans_by_day':     d['scansByDay']   ?? [],
-        'recent_activity':  d['recentVisits'] ?? [],
-      };
-    } catch (e) {
-      debugPrint('❌ getOwnerStats: $e');
-      return {
-        'success': false, 'error': e.toString(),
-        'total_scans': 0, 'scans_today': 0, 'unique_visitors': 0,
-        'total_rewards': 0, 'redeemed_rewards': 0, 'pending_rewards': 0,
-        'conversion_rate': 0.0, 'scans_by_day': [], 'recent_activity': [],
-      };
-    }
-  }
-
-  // ─── ESTADÍSTICAS MI LUGAR (user_place) ────────────────
-  static Future<Map<String, dynamic>> getMyPlaceStats({int? placeId}) async {
-    try {
-      final queryParam = placeId != null ? '?place_id=$placeId' : '';
-      final r = await ApiClient.get<dynamic>('/places/my-place/stats$queryParam');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      final inner = d['data'] as Map<String, dynamic>? ?? d;
-      return {
-        'success':          true,
-        'unique_visitors':  inner['uniqueVisitors']  ?? inner['unique_visitors']  ?? 0,
-        'total_scans':      inner['totalScans']      ?? inner['total_scans']      ?? 0,
-        'total_rewards':    inner['totalRewards']    ?? inner['total_rewards']    ?? 0,
-        'redeemed_rewards': inner['redeemedRewards'] ?? inner['redeemed_rewards'] ?? 0,
-        'scans_by_day':     inner['scansByDay']      ?? inner['scans_by_day']     ?? [],
-      };
-    } catch (e) {
-      debugPrint('❌ getMyPlaceStats: $e');
-      return {
-        'success': false, 'error': e.toString(),
-        'unique_visitors': 0, 'total_scans': 0,
-        'total_rewards': 0, 'redeemed_rewards': 0, 'scans_by_day': [],
-      };
-    }
-  }
-
-  static Future<Map<String, dynamic>> getMyPlaceScans({int? placeId}) async {
-    try {
-      final queryParam = placeId != null ? '?place_id=$placeId' : '';
-      final r = await ApiClient.get<dynamic>('/places/my-place/scans$queryParam');
-      final d = r.data;
-      // Backend devuelve { success:true, data:[...] } → ApiClient extrae `data` → d es List
-      final list = d is List
-          ? List<dynamic>.from(d)
-          : (d is Map
-              ? (d['data'] as List? ?? d['scans'] as List? ?? <dynamic>[])
-              : <dynamic>[]);
-      return {'success': true, 'scans': list};
-    } catch (e) {
-      debugPrint('❌ getMyPlaceScans: $e');
-      return {'success': false, 'error': e.toString(), 'scans': []};
-    }
-  }
-
-  static Future<Map<String, dynamic>> getMyPlaceVisitors({int? placeId}) async {
-    try {
-      final queryParam = placeId != null ? '?place_id=$placeId' : '';
-      final r = await ApiClient.get<dynamic>('/places/my-place/visitors$queryParam');
-      final d = r.data;
-      // Backend devuelve { success:true, data:[...], total:N } → ApiClient extrae `data` → d es List
-      final list = d is List
-          ? List<dynamic>.from(d)
-          : (d is Map
-              ? (d['data'] as List? ?? d['visitors'] as List? ?? <dynamic>[])
-              : <dynamic>[]);
-      return {'success': true, 'visitors': list};
-    } catch (e) {
-      debugPrint('❌ getMyPlaceVisitors: $e');
-      return {'success': false, 'error': e.toString(), 'visitors': []};
-    }
-  }
-
-  // ─── PERFIL PROPIO ─────────────────────────────────────
-  static Future<Map<String, dynamic>> updateMyProfile({
-    required String firstName,
-    required String lastName,
-    String? phone,
-  }) async {
-    try {
-      final body = <String, dynamic>{'first_name': firstName, 'last_name': lastName};
-      if (phone != null) body['phone'] = phone;
-      await ApiClient.patch<dynamic>('/users/me/profile', body: body);
-      return {'success': true, 'message': 'Perfil actualizado correctamente'};
-    } catch (e) {
-      debugPrint('❌ updateMyProfile: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  // ─── CONTRASEÑA PROPIA ─────────────────────────────────
-  static Future<Map<String, dynamic>> changePassword({
-    required int    userId,
-    required String oldPassword,
-    required String newPassword,
-  }) async {
-    try {
-      await ApiClient.post<dynamic>(
-        '/users/me/password',
-        body: {'current_password': oldPassword, 'new_password': newPassword},
-      );
-      return {'success': true, 'message': 'Contraseña actualizada exitosamente'};
-    } catch (e) {
-      debugPrint('❌ changePassword: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  // ─── EDITAR PERFIL DE OTRO USUARIO ─────────────────────
   static Future<Map<String, dynamic>> updateUser({
     required int    userId,
     required String firstName,
@@ -330,71 +51,26 @@ class AdminService {
     String? email,
     String? username,
     String? phone,
-  }) async {
-    try {
-      final body = <String, dynamic>{'first_name': firstName, 'last_name': lastName};
-      if (phone    != null) body['phone']    = phone;
-      if (email    != null) body['email']    = email;
-      if (username != null) body['username'] = username;
-      await ApiClient.patch<dynamic>('/admin/users/$userId', body: body);
-      return {'success': true, 'message': 'Usuario actualizado correctamente'};
-    } catch (e) {
-      debugPrint('❌ updateUser: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  }) =>
+      AdminUsersService.updateUser(
+        userId: userId, firstName: firstName, lastName: lastName,
+        email: email, username: username, phone: phone,
+      );
 
-  // ─── DESACTIVAR USUARIO ────────────────────────────────
-  static Future<Map<String, dynamic>> deactivateUser(int userId) async {
-    try {
-      final r = await ApiClient.delete<dynamic>('/admin/users/$userId');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {
-        'success': true,
-        'message': d['message'] ?? 'Usuario desactivado correctamente',
-        'data':    d['data'],
-      };
-    } catch (e) {
-      debugPrint('❌ deactivateUser: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  static Future<Map<String, dynamic>> deactivateUser(int userId) =>
+      AdminUsersService.deactivateUser(userId);
 
-  // ─── PROPIETARIOS Y ADMINS ─────────────────────────────
-  static Future<List<AdminModel>> getOwners() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/api/admins/owners');
-      if (r.data is! List) throw ApiException('Esperaba List');
-      return (r.data as List)
-          .whereType<Map<String, dynamic>>()
-          .map((j) => AdminModel.fromJson(j))
-          .toList();
-    } catch (e) { debugPrint('❌ getOwners: $e'); rethrow; }
-  }
+  // ─── ADMINS DEL PANEL / PROPIETARIOS ───────────────────
+  static Future<List<AdminStats>> getUsersWithDetails() =>
+      AdminPanelService.getUsersWithDetails();
 
-  static Future<List<AdminModel>> getOwnersWithoutPlace() async {
-    try {
-      final r = await ApiClient.get<dynamic>('/api/admins/owners/without-place');
-      if (r.data is! List) throw ApiException('Esperaba List');
-      return (r.data as List)
-          .whereType<Map<String, dynamic>>()
-          .map((j) => AdminModel.fromJson(j))
-          .toList();
-    } catch (e) { debugPrint('❌ getOwnersWithoutPlace: $e'); rethrow; }
-  }
+  static Future<List<AdminModel>> getOwners() => AdminPanelService.getOwners();
 
-  static Future<Map<String, dynamic>> toggleOwnerStatus(int ownerId) async {
-    try {
-      final r = await ApiClient.patch<dynamic>('/api/admins/$ownerId/toggle');
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {'success': true, 'message': d['message'] ?? 'Estado actualizado'};
-    } catch (e) {
-      debugPrint('❌ toggleOwnerStatus: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  static Future<List<AdminModel>> getOwnersWithoutPlace() =>
+      AdminPanelService.getOwnersWithoutPlace();
+
+  static Future<Map<String, dynamic>> toggleOwnerStatus(int ownerId) =>
+      AdminPanelService.toggleOwnerStatus(ownerId);
 
   static Future<Map<String, dynamic>> createUser({
     required String firstName,
@@ -404,35 +80,51 @@ class AdminService {
     required String username,
     required String role,
     int? placeId,
-  }) async {
-    try {
-      final body = <String, dynamic>{
-        'first_name': firstName, 'last_name': lastName,
-        'email': email, 'password': password,
-        'username': username, 'role': role,
-        if (placeId != null) 'place_id': placeId,
-      };
-      final r = await ApiClient.post<dynamic>('/admin/users/create', body: body);
-      final d = r.data;
-      if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
-      return {'success': true, 'user': d};
-    } catch (e) {
-      debugPrint('❌ createUser: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+  }) =>
+      AdminPanelService.createUser(
+        firstName: firstName, lastName: lastName, email: email,
+        password: password, username: username, role: role, placeId: placeId,
+      );
 
   static Future<Map<String, dynamic>> changeUserRole(
-      int userId, String role, {int? placeId}) async {
-    try {
-      await ApiClient.patch<dynamic>(
-        '/admin/users/$userId/role',
-        body: {'role': role, if (placeId != null) 'place_id': placeId},
+      int userId, String role, {int? placeId}) =>
+      AdminPanelService.changeUserRole(userId, role, placeId: placeId);
+
+  // ─── DASHBOARD Y ESTADÍSTICAS ──────────────────────────
+  static Future<Map<String, dynamic>> getDashboardSummary() =>
+      AdminStatsService.getDashboardSummary();
+
+  static Future<Map<String, dynamic>> getDashboardStats() =>
+      AdminStatsService.getDashboardStats();
+
+  static Future<Map<String, dynamic>> getOwnerStats() =>
+      AdminStatsService.getOwnerStats();
+
+  static Future<Map<String, dynamic>> getMyPlaceStats({int? placeId}) =>
+      AdminStatsService.getMyPlaceStats(placeId: placeId);
+
+  static Future<Map<String, dynamic>> getMyPlaceScans({int? placeId}) =>
+      AdminStatsService.getMyPlaceScans(placeId: placeId);
+
+  static Future<Map<String, dynamic>> getMyPlaceVisitors({int? placeId}) =>
+      AdminStatsService.getMyPlaceVisitors(placeId: placeId);
+
+  // ─── PERFIL Y CONTRASEÑA PROPIA ────────────────────────
+  static Future<Map<String, dynamic>> updateMyProfile({
+    required String firstName,
+    required String lastName,
+    String? phone,
+  }) =>
+      AdminProfileService.updateMyProfile(
+        firstName: firstName, lastName: lastName, phone: phone,
       );
-      return {'success': true};
-    } catch (e) {
-      debugPrint('❌ changeUserRole: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
+
+  static Future<Map<String, dynamic>> changePassword({
+    required int    userId,
+    required String oldPassword,
+    required String newPassword,
+  }) =>
+      AdminProfileService.changePassword(
+        userId: userId, oldPassword: oldPassword, newPassword: newPassword,
+      );
 }

@@ -2,23 +2,14 @@
 // ============================================================
 // REDESIGN: SaaS-style card · franja por rol · context menu
 // Callbacks y lógica sin cambios
+// REFACTOR: tokens y _StatusBadge movidos a admin_tokens.dart /
+// widgets/admin_status_badge.dart para bajar de 310 a <300 líneas.
 // ============================================================
 import 'package:flutter/material.dart';
 import '../../models/admin_stats_model.dart';
 import '../../utils/constants.dart';
-
-// ── Design tokens ─────────────────────────────────────────────
-const _kPrimary   = Color(0xFF06B6A4);
-const _kBgPage    = Color(0xFFF1F5F9);
-const _kTextHead  = Color(0xFF0F172A);
-const _kTextMuted = Color(0xFF64748B);
-const _kTextSub   = Color(0xFF94A3B8);
-const _kBorder    = Color(0xFFE2E8F0);
-const _kBlue      = Color(0xFF3B82F6);
-const _kAmber     = Color(0xFFF59E0B);
-const _kRed       = Color(0xFFEF4444);
-const _kPurple    = Color(0xFF8B5CF6);
-const _kGreen     = Color(0xFF10B981);
+import 'admin_tokens.dart';
+import 'widgets/admin_status_badge.dart';
 
 class AdminCard extends StatelessWidget {
   final AdminStats      adminStats;
@@ -51,7 +42,7 @@ class AdminCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: isActive ? _kBorder : const Color(0xFFEEF2F7)),
+            color: isActive ? kAdminBorder : const Color(0xFFEEF2F7)),
         boxShadow: [
           BoxShadow(
             color: roleClr.withOpacity(isActive ? 0.07 : 0.02),
@@ -119,13 +110,13 @@ class AdminCard extends StatelessWidget {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
-                                        color: isActive ? _kTextHead : _kTextSub,
+                                        color: isActive ? kAdminTextHead : kAdminTextSub,
                                         height: 1.2),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                               ),
                               const SizedBox(width: 8),
-                              _StatusBadge(isActive: isActive),
+                              AdminStatusBadge(isActive: isActive),
                             ]),
 
                             const SizedBox(height: 4),
@@ -133,7 +124,7 @@ class AdminCard extends StatelessWidget {
                             // Email
                             Text(admin.email,
                                 style: const TextStyle(
-                                    fontSize: 12, color: _kTextMuted),
+                                    fontSize: 12, color: kAdminTextMuted),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis),
 
@@ -166,7 +157,7 @@ class AdminCard extends StatelessWidget {
                         width: 36,
                         child: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert_rounded,
-                              size: 18, color: _kTextSub),
+                              size: 18, color: kAdminTextSub),
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
@@ -185,23 +176,23 @@ class AdminCard extends StatelessWidget {
                             if (onTapDetail != null)
                               _menuItem('detail',
                                   Icons.visibility_outlined, 'Ver detalle',
-                                  _kTextHead),
+                                  kAdminTextHead),
                             if (onTapEdit != null)
                               _menuItem('edit',
-                                  Icons.edit_outlined, 'Editar', _kTextHead),
+                                  Icons.edit_outlined, 'Editar', kAdminTextHead),
                             if (onTapDashboard != null)
                               _menuItem('dashboard',
                                   Icons.dashboard_outlined, 'Ver Dashboard',
-                                  _kBlue),
+                                  kAdminBlue),
                             if (hasPlace && onTapReassign != null)
                               _menuItem('reassign',
                                   Icons.swap_horiz_rounded, 'Reasignar lugar',
-                                  _kAmber),
+                                  kAdminAmber),
                             if (onTapDeactivate != null) ...[
                               const PopupMenuDivider(height: 1),
                               _menuItem('deactivate',
                                   Icons.person_off_rounded, 'Desactivar',
-                                  _kRed),
+                                  kAdminRed),
                             ],
                           ],
                         ),
@@ -215,9 +206,9 @@ class AdminCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _kBgPage,
+                          color: kAdminBgPage,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: _kBorder),
+                          border: Border.all(color: kAdminBorder),
                         ),
                         child: Row(children: [
                           Text(adminStats.placeStats!.typeWithEmoji,
@@ -227,17 +218,17 @@ class AdminCard extends StatelessWidget {
                             child: Text(adminStats.placeStats!.placeName,
                                 style: const TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.w600,
-                                    color: _kTextHead),
+                                    color: kAdminTextHead),
                                 overflow: TextOverflow.ellipsis),
                           ),
                           const SizedBox(width: 8),
                           Text('📱 ${adminStats.placeStats!.totalScans}',
                               style: const TextStyle(
-                                  fontSize: 11, color: _kTextMuted)),
+                                  fontSize: 11, color: kAdminTextMuted)),
                           const SizedBox(width: 8),
                           Text('🎁 ${adminStats.placeStats!.totalRewards}',
                               style: const TextStyle(
-                                  fontSize: 11, color: _kTextMuted)),
+                                  fontSize: 11, color: kAdminTextMuted)),
                         ]),
                       ),
                     ],
@@ -267,44 +258,10 @@ class AdminCard extends StatelessWidget {
 
   Color _roleColor(String role) {
     switch (role) {
-      case AppConstants.roleAdminGeneral: return _kPurple;
-      case AppConstants.roleUserGeneral:  return _kBlue;
-      case AppConstants.roleUserPlace:    return _kPrimary;
-      default:                            return _kTextSub;
+      case AppConstants.roleAdminGeneral: return kAdminPurple;
+      case AppConstants.roleUserGeneral:  return kAdminBlue;
+      case AppConstants.roleUserPlace:    return kAdminPrimary;
+      default:                            return kAdminTextSub;
     }
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// STATUS BADGE
-// ─────────────────────────────────────────────────────────────
-class _StatusBadge extends StatelessWidget {
-  final bool isActive;
-  const _StatusBadge({required this.isActive});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? _kGreen : _kTextSub;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.35)),
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 6, height: 6,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          isActive ? 'Activo' : 'Inactivo',
-          style: TextStyle(
-              fontSize: 10, color: color,
-              fontWeight: FontWeight.w700, letterSpacing: 0.2),
-        ),
-      ]),
-    );
   }
 }

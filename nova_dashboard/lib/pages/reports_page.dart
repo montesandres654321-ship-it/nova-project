@@ -1,11 +1,13 @@
 // lib/pages/reports_page.dart
+// REFACTOR: header, fila de KPIs y tarjetas de gráficas extraídas a
+// lib/pages/reports/ para bajar de 423 a <300 líneas.
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../services/admin_service.dart';
 import '../services/analytics_service.dart';
 import '../utils/app_theme.dart';
-import '../widgets/charts/line_chart_widget.dart';
-import '../widgets/charts/bar_chart_widget.dart';
+import 'reports/reports_charts.dart';
+import 'reports/reports_header.dart';
+import 'reports/reports_kpi_row.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -69,64 +71,6 @@ class _ReportsPageState extends State<ReportsPage> {
   String get _periodLabel =>
       _selectedDays == 0 ? 'Todo el historial' : 'Últimos $_selectedDays días';
 
-  // ─── PAGE HEADER ──────────────────────────────────────────────
-
-  Widget _buildHeader() {
-    return Container(
-      color: AppTheme.surface,
-      padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
-      child: Row(children: [
-        Container(
-          width: 3, height: 18,
-          decoration: BoxDecoration(
-            color: AppTheme.primary, borderRadius: BorderRadius.circular(2)),
-        ),
-        const SizedBox(width: 10),
-        const Text('Reportes',
-            style: TextStyle(
-                fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.textHead)),
-        const Spacer(),
-        // Period selector
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppTheme.border),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: DropdownButton<int>(
-            value: _selectedDays,
-            underline: const SizedBox(),
-            isDense: true,
-            style: const TextStyle(fontSize: 12, color: AppTheme.textBody),
-            icon: const Icon(Icons.expand_more, size: 16, color: AppTheme.textMuted),
-            items: _daysOptions.map((d) => DropdownMenuItem<int>(
-              value: d,
-              child: Text(d == 0 ? 'Todo' : '$d días',
-                  style: const TextStyle(fontSize: 12)),
-            )).toList(),
-            onChanged: (v) {
-              if (v != null) { setState(() => _selectedDays = v); _loadData(); }
-            },
-          ),
-        ),
-        const SizedBox(width: 8),
-        _refreshing
-            ? const Padding(
-                padding: EdgeInsets.all(10),
-                child: SizedBox(
-                    width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary)))
-            : IconButton(
-                icon: const Icon(Icons.refresh_rounded, size: 18, color: AppTheme.textMuted),
-                tooltip: 'Actualizar',
-                onPressed: _refresh,
-                padding: const EdgeInsets.all(6),
-                constraints: const BoxConstraints(),
-              ),
-      ]),
-    );
-  }
-
   // ─── BUILD ────────────────────────────────────────────────────
 
   @override
@@ -134,7 +78,13 @@ class _ReportsPageState extends State<ReportsPage> {
     return ColoredBox(
       color: AppTheme.backgroundGray,
       child: Column(children: [
-        _buildHeader(),
+        ReportsHeader(
+          selectedDays: _selectedDays,
+          daysOptions: _daysOptions,
+          refreshing: _refreshing,
+          onDaysChanged: (v) { setState(() => _selectedDays = v); _loadData(); },
+          onRefresh: _refresh,
+        ),
         Expanded(
           child: _loading
               ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
@@ -156,19 +106,25 @@ class _ReportsPageState extends State<ReportsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildKpiRow(isWide),
+            reportsKpiRow(
+              context: context, isWide: isWide,
+              totalScans: _totalScans, totalUsers: _totalUsers,
+              totalPlaces: _totalPlaces, totalRewards: _totalRewards,
+            ),
             const SizedBox(height: 14),
             Expanded(
               child: isWide
                   ? Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      Expanded(flex: 55, child: _buildScansCard()),
+                      Expanded(flex: 55, child: reportsScansCard(
+                          scansByDay: _scansByDay, periodLabel: _periodLabel)),
                       const SizedBox(width: 14),
-                      Expanded(flex: 45, child: _buildRankingCard()),
+                      Expanded(flex: 45, child: reportsRankingCard(_topPlaces)),
                     ])
                   : Column(children: [
-                      Expanded(child: _buildScansCard()),
+                      Expanded(child: reportsScansCard(
+                          scansByDay: _scansByDay, periodLabel: _periodLabel)),
                       const SizedBox(height: 14),
-                      if (_topPlaces.isNotEmpty) Expanded(child: _buildRankingCard()),
+                      if (_topPlaces.isNotEmpty) Expanded(child: reportsRankingCard(_topPlaces)),
                     ]),
             ),
           ],
@@ -176,231 +132,6 @@ class _ReportsPageState extends State<ReportsPage> {
       );
     });
   }
-
-  // ─── KPI CARDS (compactas) ────────────────────────────────────
-
-  // Antes: [blue, green, amber, purple] — el morado no existe en la paleta
-  // oficial y esta pantalla usaba un orden distinto al de stats_dashboard_page
-  // para los mismos 4 KPIs. Alineado aquí para que "Turistas"/"Recompensas"/etc.
-  // tengan el mismo color en toda la app (hallazgo de la auditoría).
-  static const _kpiColors = [
-    AppTheme.primary,
-    AppTheme.info,
-    AppTheme.success,
-    AppTheme.warning,
-  ];
-  static const _kpiIcons = [
-    Icons.qr_code_scanner_rounded,
-    Icons.people_rounded,
-    Icons.place_rounded,
-    Icons.card_giftcard_rounded,
-  ];
-  static const _kpiLabels  = ['Total Escaneos', 'Turistas', 'Lugares Activos', 'Recompensas'];
-  // Rutas de navegación para cada KPI (deben existir en main.dart)
-  static const _kpiRoutes  = ['/scans', '/users', '/places', '/rewards'];
-
-  Widget _buildKpiRow(bool isWide) {
-    final values = [
-      _totalScans.toString(),
-      _totalUsers.toString(),
-      _totalPlaces.toString(),
-      _totalRewards.toString(),
-    ];
-
-    if (isWide) {
-      return Row(children: List.generate(4, (i) => Expanded(
-        child: Padding(
-          padding: EdgeInsets.only(left: i > 0 ? 12 : 0),
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => Navigator.pushNamed(context, _kpiRoutes[i]),
-              child: _kpiCard(i, values[i]),
-            ),
-          ),
-        ),
-      )));
-    }
-    return GridView.count(
-      crossAxisCount: 2, shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10, crossAxisSpacing: 10,
-      childAspectRatio: 2.2,
-      children: List.generate(4, (i) => MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => Navigator.pushNamed(context, _kpiRoutes[i]),
-          child: _kpiCard(i, values[i]),
-        ),
-      )),
-    );
-  }
-
-  Widget _kpiCard(int index, String value) {
-    final color = _kpiColors[index];
-    return Container(
-      // Antipatrón corregido: antes tenía border izquierdo de color + boxShadow
-      // a la vez. Ahora solo sombra (nova-design 4bis) — se pierde la franja
-      // de color como distinción, el ícono y el valor siguen coloreados.
-      decoration: AppTheme.cardDecoration(),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Row(children: [
-        Container(
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(_kpiIcons[index], color: color, size: 16),
-        ),
-        const SizedBox(width: 10),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(value,
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w800,
-                    color: AppTheme.textHead, height: 1.1)),
-            Text(_kpiLabels[index],
-                style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
-                overflow: TextOverflow.ellipsis),
-          ],
-        )),
-      ]),
-    );
-  }
-
-  // ─── SCANS CHART CARD ─────────────────────────────────────────
-
-  Widget _buildScansCard() {
-    final chartData = _scansByDay.map((item) {
-      final ds = item['date']?.toString() ?? '';
-      String l = ds;
-      try { l = DateFormat('d MMM', 'es').format(DateTime.parse(ds)); } catch (_) {}
-      return {'label': l, 'value': item['count'] ?? 0};
-    }).toList();
-
-    return _chartCard(
-      title: 'Actividad de Escaneos',
-      trailing: _periodChip(_periodLabel),
-      child: chartData.isEmpty
-          ? _emptyChart(Icons.show_chart_rounded, 'Sin datos en este período')
-          : LineChartWidget(
-              title: '',
-              data: chartData,
-              color: AppTheme.primary,
-              fillArea: true,
-              height: double.infinity,
-            ),
-    );
-  }
-
-  // ─── RANKING CHART CARD ───────────────────────────────────────
-
-  Widget _buildRankingCard() {
-    if (_topPlaces.isEmpty) {
-      return _chartCard(
-        title: 'Top Establecimientos',
-        trailing: _periodChip('por escaneos'),
-        child: _emptyChart(Icons.bar_chart_rounded, 'Sin datos de lugares'),
-      );
-    }
-
-    final cd = _topPlaces.map((p) => {
-      'label': p['name']?.toString() ?? '',
-      'value': p['totalScans'] ?? p['total_scans'] ?? 0,
-    }).toList();
-
-    return _chartCard(
-      title: 'Top Establecimientos',
-      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-        _periodChip('por escaneos'),
-        const SizedBox(width: 6),
-        if (cd.length > 7)
-          _periodChip('← scroll →', subtle: true),
-      ]),
-      child: BarChartWidget(
-        title: '',
-        data: cd,
-        color: AppTheme.primary,
-        showValues: true,
-      ),
-    );
-  }
-
-  // ─── HELPERS ─────────────────────────────────────────────────
-
-  Widget _chartCard({
-    required String title,
-    required Widget child,
-    Widget? trailing,
-  }) {
-    return Container(
-      decoration: AppTheme.cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Card header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 12, 10),
-            child: Row(children: [
-              Container(
-                  width: 3, height: 16,
-                  decoration: BoxDecoration(
-                      color: AppTheme.primary,
-                      borderRadius: BorderRadius.circular(2))),
-              const SizedBox(width: AppTheme.space8),
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w700,
-                      color: AppTheme.textHead)),
-              const Spacer(),
-              if (trailing != null) trailing,
-            ]),
-          ),
-          // Divisor: nova-design reserva AppTheme.border para inputs y
-          // divisores — antes usaba un gris suelto (#F1F5F9).
-          const Divider(height: 1, color: AppTheme.border),
-          // Chart area
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
-              child: child,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _periodChip(String text, {bool subtle = false}) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-    decoration: BoxDecoration(
-      color: subtle
-          ? AppTheme.bgPage
-          : AppTheme.primary.withOpacity(0.06),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: subtle
-            ? AppTheme.border
-            : AppTheme.primary.withOpacity(0.15),
-      ),
-    ),
-    child: Text(text,
-        style: TextStyle(
-            fontSize: 9,
-            color: subtle ? AppTheme.textMuted : AppTheme.textBody,
-            fontWeight: FontWeight.w500)),
-  );
-
-  Widget _emptyChart(IconData icon, String text) => Center(
-    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(icon, size: 36, color: AppTheme.textMuted),
-      const SizedBox(height: 10),
-      Text(text, style: AppTheme.textCaption),
-    ]),
-  );
 
   Widget _buildError() => Center(
     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

@@ -2,22 +2,18 @@
 // ============================================================
 // REDESIGN: SaaS settings panel · categorías · items premium
 // Lógica sin cambios
+// REFACTOR: tarjetas, filas y diálogo extraídos a
+// lib/pages/profile/settings/ para bajar de 486 a <300 líneas.
+// NOTA: página sin ruta activa (código no alcanzable desde la navegación
+// actual, según AUDITORIA_DASHBOARD_REPORTE.md) — se refactoriza igual
+// por pedido explícito, sin cambiar su comportamiento.
 // ============================================================
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'settings/dialogs/clear_cache_dialog.dart';
+import 'settings/settings_tokens.dart';
+import 'settings/widgets/settings_shared.dart';
 
-// ── Design tokens ─────────────────────────────────────────────
-const _kPrimary   = Color(0xFF06B6A4);
-const _kBgPage    = Color(0xFFF1F5F9);
-const _kTextHead  = Color(0xFF0F172A);
-const _kTextMuted = Color(0xFF64748B);
-const _kTextSub   = Color(0xFF94A3B8);
-const _kBorder    = Color(0xFFE2E8F0);
-const _kBlue      = Color(0xFF3B82F6);
-const _kAmber     = Color(0xFFF59E0B);
-const _kRed       = Color(0xFFEF4444);
-
-// ─────────────────────────────────────────────────────────────
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
   @override
@@ -57,92 +53,24 @@ class _SettingsPageState extends State<SettingsPage> {
     else if (value is String) { await prefs.setString(key, value); }
   }
 
-  Future<void> _clearCache() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 60, height: 60,
-              decoration: BoxDecoration(
-                color: _kRed.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(Icons.cleaning_services_rounded,
-                  color: _kRed, size: 28),
-            ),
-            const SizedBox(height: 16),
-            const Text('¿Limpiar caché?',
-                style: TextStyle(fontSize: 17,
-                    fontWeight: FontWeight.w800, color: _kTextHead)),
-            const SizedBox(height: 8),
-            const Text('Se eliminarán todos los datos temporales.',
-                style: TextStyle(fontSize: 13, color: _kTextMuted),
-                textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            Row(children: [
-              Expanded(child: OutlinedButton(
-                onPressed: () => Navigator.pop(context, false),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: _kTextMuted,
-                  side: const BorderSide(color: _kBorder),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: const Text('Cancelar',
-                    style: TextStyle(fontSize: 13)),
-              )),
-              const SizedBox(width: 12),
-              Expanded(child: ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _kRed,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: const Text('Limpiar',
-                    style: TextStyle(fontSize: 13,
-                        fontWeight: FontWeight.w600)),
-              )),
-            ]),
-          ]),
-        ),
-      ),
-    );
-
-    if (confirm == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Caché limpiado'),
-          backgroundColor: Colors.green));
-    }
-  }
-
   // ─────────────────────────────────────────────────────
   // BUILD
   // ─────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBgPage,
+      backgroundColor: kSettingsBgPage,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: _kTextHead,
+        foregroundColor: kSettingsTextHead,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: const Text('Configuración',
             style: TextStyle(fontSize: 16,
-                fontWeight: FontWeight.w600, color: _kTextHead)),
+                fontWeight: FontWeight.w600, color: kSettingsTextHead)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: _kBorder),
+          child: Container(height: 0.5, color: kSettingsBorder),
         ),
       ),
       body: LayoutBuilder(builder: (_, constraints) {
@@ -157,10 +85,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
 
                   // ── Notificaciones ─────────────────
-                  _SettingsCard(title: 'Notificaciones', children: [
-                    _toggleRow(
+                  SettingsCard(title: 'Notificaciones', children: [
+                    settingsToggleRow(
                       icon: Icons.notifications_outlined,
-                      iconColor: _kPrimary,
+                      iconColor: kSettingsPrimary,
                       title: 'Notificaciones push',
                       subtitle: 'Alertas en tiempo real',
                       value: _notifications,
@@ -169,10 +97,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         _saveSetting('notifications', v);
                       },
                     ),
-                    _itemDivider(),
-                    _toggleRow(
+                    settingsItemDivider(),
+                    settingsToggleRow(
                       icon: Icons.mail_outline_rounded,
-                      iconColor: _kBlue,
+                      iconColor: kSettingsBlue,
                       title: 'Notificaciones por email',
                       subtitle: 'Resúmenes por correo',
                       value: _emailNotifications,
@@ -186,10 +114,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 16),
 
                   // ── Preferencias ───────────────────
-                  _SettingsCard(title: 'Preferencias', children: [
-                    _toggleRow(
+                  SettingsCard(title: 'Preferencias', children: [
+                    settingsToggleRow(
                       icon: Icons.sync_rounded,
-                      iconColor: _kAmber,
+                      iconColor: kSettingsAmber,
                       title: 'Auto-actualizar',
                       subtitle: 'Recargar datos automáticamente',
                       value: _autoRefresh,
@@ -198,13 +126,13 @@ class _SettingsPageState extends State<SettingsPage> {
                         _saveSetting('auto_refresh', v);
                       },
                     ),
-                    _itemDivider(),
-                    _dropdownRow(
+                    settingsItemDivider(),
+                    settingsDropdownRow(
                       icon: Icons.language_rounded,
-                      iconColor: _kBlue,
+                      iconColor: kSettingsBlue,
                       title: 'Idioma',
                       subtitle: 'Idioma de la interfaz',
-                      trailing: _styledDropdown<String>(
+                      trailing: settingsStyledDropdown<String>(
                         value: _language,
                         items: const [
                           DropdownMenuItem(value: 'es', child: Text('Español')),
@@ -218,13 +146,13 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                       ),
                     ),
-                    _itemDivider(),
-                    _dropdownRow(
+                    settingsItemDivider(),
+                    settingsDropdownRow(
                       icon: Icons.calendar_today_rounded,
-                      iconColor: _kPrimary,
+                      iconColor: kSettingsPrimary,
                       title: 'Formato de fecha',
                       subtitle: 'Cómo se muestran las fechas',
-                      trailing: _styledDropdown<String>(
+                      trailing: settingsStyledDropdown<String>(
                         value: _dateFormat,
                         items: const [
                           DropdownMenuItem(
@@ -270,25 +198,25 @@ class _SettingsPageState extends State<SettingsPage> {
                             Container(
                               width: 6, height: 6,
                               decoration: const BoxDecoration(
-                                  color: _kRed, shape: BoxShape.circle),
+                                  color: kSettingsRed, shape: BoxShape.circle),
                             ),
                             const SizedBox(width: 8),
                             const Text('Sistema',
                                 style: TextStyle(fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: _kRed)),
+                                    color: kSettingsRed)),
                           ]),
                         ),
                         const Divider(height: 20, thickness: 0.5,
                             color: Color(0xFFFEE2E2)),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-                          child: _dangerRow(
+                          child: settingsDangerRow(
                             icon: Icons.cleaning_services_rounded,
                             title: 'Limpiar caché',
                             subtitle:
                                 'Eliminar datos temporales del sistema',
-                            onTap: _clearCache,
+                            onTap: () => showClearCacheDialog(context),
                           ),
                         ),
                       ],
@@ -304,183 +232,4 @@ class _SettingsPageState extends State<SettingsPage> {
       }),
     );
   }
-
-  // ─────────────────────────────────────────────────────
-  // ROW WIDGETS
-  // ─────────────────────────────────────────────────────
-  Widget _toggleRow({
-    required IconData         icon,
-    required Color            iconColor,
-    required String           title,
-    required String           subtitle,
-    required bool             value,
-    required ValueChanged<bool> onChanged,
-  }) =>
-    Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: [
-        _iconBox(icon, iconColor),
-        const SizedBox(width: 14),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(fontSize: 14,
-                    fontWeight: FontWeight.w600, color: _kTextHead)),
-            const SizedBox(height: 2),
-            Text(subtitle,
-                style: const TextStyle(fontSize: 11, color: _kTextSub)),
-          ],
-        )),
-        Transform.scale(
-          scale: 0.85,
-          child: Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: _kPrimary,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-      ]),
-    );
-
-  Widget _dropdownRow({
-    required IconData icon,
-    required Color    iconColor,
-    required String   title,
-    required String   subtitle,
-    required Widget   trailing,
-  }) =>
-    Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: [
-        _iconBox(icon, iconColor),
-        const SizedBox(width: 14),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(fontSize: 14,
-                    fontWeight: FontWeight.w600, color: _kTextHead)),
-            const SizedBox(height: 2),
-            Text(subtitle,
-                style: const TextStyle(fontSize: 11, color: _kTextSub)),
-          ],
-        )),
-        trailing,
-      ]),
-    );
-
-  Widget _dangerRow({
-    required IconData     icon,
-    required String       title,
-    required String       subtitle,
-    required VoidCallback onTap,
-  }) =>
-    InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              color: _kRed.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: _kRed),
-          ),
-          const SizedBox(width: 14),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(fontSize: 14,
-                      fontWeight: FontWeight.w600, color: _kRed)),
-              const SizedBox(height: 2),
-              Text(subtitle,
-                  style: const TextStyle(
-                      fontSize: 11, color: _kTextSub)),
-            ],
-          )),
-          Icon(Icons.arrow_forward_ios_rounded, size: 13,
-              color: _kRed.withOpacity(0.4)),
-        ]),
-      ),
-    );
-
-  Widget _iconBox(IconData icon, Color color) => Container(
-    width: 40, height: 40,
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Icon(icon, size: 18, color: color),
-  );
-
-  Widget _styledDropdown<T>({
-    required T value,
-    required List<DropdownMenuItem<T>> items,
-    required ValueChanged<T?> onChanged,
-  }) =>
-    Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: _kBgPage,
-        borderRadius: BorderRadius.circular(9),
-        border: Border.all(color: _kBorder),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          value: value,
-          isDense: true,
-          icon: const Icon(Icons.expand_more_rounded,
-              size: 15, color: _kTextMuted),
-          style: const TextStyle(fontSize: 12, color: _kTextHead),
-          items: items,
-          onChanged: onChanged,
-        ),
-      ),
-    );
-
-  Widget _itemDivider() => const Padding(
-    padding: EdgeInsets.symmetric(vertical: 2),
-    child: Divider(height: 1, thickness: 0.5, color: _kBorder),
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SETTINGS CARD (sección con título + lista de items)
-// ─────────────────────────────────────────────────────────────────────────────
-class _SettingsCard extends StatelessWidget {
-  final String       title;
-  final List<Widget> children;
-  const _SettingsCard({required this.title, required this.children});
-
-  @override
-  Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: _kBorder),
-      boxShadow: [BoxShadow(
-        color: Colors.black.withOpacity(0.04),
-        blurRadius: 8, offset: const Offset(0, 2),
-      )],
-    ),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
-        child: Text(title,
-            style: const TextStyle(fontSize: 13,
-                fontWeight: FontWeight.w700, color: _kTextHead)),
-      ),
-      const Divider(height: 20, thickness: 0.5, color: _kBorder),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-        child: Column(children: children),
-      ),
-    ]),
-  );
 }
