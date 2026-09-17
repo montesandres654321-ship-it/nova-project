@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
-import '../core/design/app_back_button.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
 import '../widgets/change_password_form.dart';
 
@@ -70,55 +70,78 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHero(),
-              Expanded(
-                child: ChangePasswordForm(
-                  formKey: _formKey,
-                  oldPasswordController: _oldPassCtrl,
-                  newPasswordController: _newPassCtrl,
-                  confirmController: _confirmCtrl,
-                  loading: _loading,
-                  onSubmit: _updatePassword,
-                ),
+      backgroundColor: AppColors.bienvenidaFondoInput,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: ChangePasswordForm(
+                formKey: _formKey,
+                oldPasswordController: _oldPassCtrl,
+                newPasswordController: _newPassCtrl,
+                confirmController: _confirmCtrl,
+                loading: _loading,
+                onSubmit: _updatePassword,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHero() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  // Encabezado interno: botón circular atrás + título + subtítulo
+  Widget _buildHeader() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.bienvenidaBorde)),
+      ),
+      child: Row(
         children: [
-          AppBackButton(
-            variant: AppBackButtonVariant.onPrimary,
+          GestureDetector(
             onTap: _loading ? null : () => Navigator.pop(context),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const Text(
-            'Cambiar contraseña',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -0.3,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: AppColors.bienvenidaAzulClaro,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/ic-flecha-atras.svg',
+                  width: 16,
+                  height: 16,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Elige una contraseña segura',
-            style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.8)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cambiar contraseña',
+                  style: GoogleFonts.openSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.bienvenidaTextoFuerte,
+                  ),
+                ),
+                Text(
+                  'Protege la seguridad de tu cuenta',
+                  style: GoogleFonts.openSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
