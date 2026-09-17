@@ -4,10 +4,7 @@
 // Campos: selector de ícono, nombre, descripción, stock disponible
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../utils/constants.dart';
+import '../../services/place_service.dart';
 
 class OwnerRewardDialog extends StatefulWidget {
   final String? currentIcon;
@@ -92,9 +89,6 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
 
     setState(() => _saving = true);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(AppConstants.keyToken) ?? '';
-
       final body = <String, dynamic>{
         'reward_icon':        _selectedIcon,
         'reward_name':        name,
@@ -102,26 +96,18 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
         'reward_stock':       _unlimited ? null : stock,
       };
 
-      final response = await http.patch(
-        Uri.parse('${AppConstants.backendUrl}/places/my-place/reward'),
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      final result = await PlaceService.updateMyReward(body);
 
       if (!mounted) return;
 
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      if (response.statusCode == 200 && data['success'] == true) {
+      if (result['success'] == true) {
         Navigator.of(context).pop();
         widget.onSaved();
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('✅ Recompensa actualizada correctamente'),
             backgroundColor: Colors.green));
       } else {
-        _showError(data['error']?.toString() ?? 'Error al actualizar');
+        _showError(result['error']?.toString() ?? 'Error al actualizar');
       }
     } catch (e) {
       if (mounted) _showError('Error: $e');

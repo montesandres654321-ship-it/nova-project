@@ -15,6 +15,7 @@ import 'widgets/logout_dialog.dart';
 import 'widgets/profile_danger_card.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
+import 'widgets/profile_preferences_card.dart';
 import 'widgets/profile_security_card.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -190,6 +191,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           _securityCard(),
                           const SizedBox(height: 16),
+                          _preferencesCard(),
+                          const SizedBox(height: 16),
                           _dangerCard(),
                         ],
                       ),
@@ -205,6 +208,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     _infoCard(),
                     const SizedBox(height: 16),
                     _securityCard(),
+                    const SizedBox(height: 16),
+                    _preferencesCard(),
                     const SizedBox(height: 16),
                     _dangerCard(),
                     const SizedBox(height: 28),
@@ -231,6 +236,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _securityCard() => ProfileSecurityCard(
       userRole: _userRole, onChangePassword: _showChangePasswordDialog);
+
+  Widget _preferencesCard() => const ProfilePreferencesCard();
 
   Widget _dangerCard() => ProfileDangerCard(onLogout: _confirmLogout);
 }

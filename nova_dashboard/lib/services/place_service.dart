@@ -181,6 +181,28 @@ class PlaceService {
     }
   }
 
+  // ── ACTUALIZAR MI LUGAR (propietario, self-service) ───
+  static Future<Map<String, dynamic>> updateMyPlace(Map<String, dynamic> body) async {
+    try {
+      final response = await ApiClient.patch<dynamic>('/places/my-place', body: body);
+      return {'success': true, 'message': 'Información actualizada correctamente', 'data': response.data};
+    } catch (e) {
+      debugPrint('❌ Error en updateMyPlace: $e');
+      return {'success': false, 'error': e is ApiException ? e.message : e.toString()};
+    }
+  }
+
+  // ── ACTUALIZAR MI RECOMPENSA (propietario, self-service) ─
+  static Future<Map<String, dynamic>> updateMyReward(Map<String, dynamic> body) async {
+    try {
+      final response = await ApiClient.patch<dynamic>('/places/my-place/reward', body: body);
+      return {'success': true, 'message': 'Recompensa actualizada correctamente', 'data': response.data};
+    } catch (e) {
+      debugPrint('❌ Error en updateMyReward: $e');
+      return {'success': false, 'error': e is ApiException ? e.message : e.toString()};
+    }
+  }
+
   // ── ESTADÍSTICAS DEL LUGAR ────────────────────────────
   static Future<Map<String, dynamic>> getPlaceStats(int placeId) async {
     try {

@@ -11,11 +11,8 @@
 // ============================================================
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../../models/place.dart';
-import '../../utils/constants.dart';
+import '../../services/place_service.dart';
 import 'place_edit/place_edit_basic_sections.dart';
 import 'place_edit/place_edit_fields.dart';
 import 'place_edit/place_edit_image_section.dart';
@@ -128,9 +125,6 @@ class _OwnerPlaceEditPageState extends State<OwnerPlaceEditPage> {
         if (imageUrl == null) { setState(() => _loading = false); return; }
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(AppConstants.keyToken) ?? '';
-
       // Stock
       int? stock;
       if (_hasReward && !_unlimitedStock) {
@@ -150,26 +144,18 @@ class _OwnerPlaceEditPageState extends State<OwnerPlaceEditPage> {
         'reward_stock':       _hasReward ? (_unlimitedStock ? null : stock) : null,
       };
 
-      final response = await http.patch(
-        Uri.parse('${AppConstants.backendUrl}/places/my-place'),
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      final result = await PlaceService.updateMyPlace(body);
 
       if (!mounted) return;
 
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      if (response.statusCode == 200 && data['success'] == true) {
+      if (result['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('✅ Información actualizada correctamente'),
             backgroundColor: Colors.green));
         widget.onSaved();
         Navigator.pop(context, true);
       } else {
-        _showError(data['error']?.toString() ?? 'Error al guardar');
+        _showError(result['error']?.toString() ?? 'Error al guardar');
       }
     } catch (e) {
       if (mounted) _showError('Error: $e');
