@@ -38,7 +38,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/logos/
+    - assets/images/onboarding/
     - assets/icon/
+    - assets/icons/
+    - assets/icons/nav/
 
 flutter_launcher_icons:
   android: "launcher_icon"
