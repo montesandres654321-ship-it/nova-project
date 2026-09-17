@@ -32,4 +32,15 @@ class AppColors {
     end: Alignment.bottomRight,
     colors: [primary, primaryLight],
   );
+
+  // Flujo bienvenida (splash/permisos/onboarding) — paleta propia del Figma,
+  // distinta de la marca teal usada en el resto de la app.
+  static const Color bienvenidaAzul    = Color(0xFF0071BD);
+  static const Color bienvenidaVerde   = Color(0xFF078930);
+  static const Color bienvenidaDorado  = Color(0xFFF5A623);
+  static const Color bienvenidaTextoFuerte = Color(0xFF3D3D3D);
+  static const Color bienvenidaTextoMedio  = Color(0xFF4B5563);
+  static const Color bienvenidaBorde   = Color(0xFFE3E8EE);
+  // Dot inactivo del onboarding: azul distinto a bienvenidaAzul, exacto del Figma.
+  static const Color bienvenidaDotInactivo = Color(0xFF1A87C4);
 }
