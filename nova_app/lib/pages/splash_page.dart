@@ -3,7 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/design/app_colors.dart';
+import '../utils/constants.dart';
 import 'permissions_page.dart';
+import 'login_page.dart';
 import 'main_navigation_page.dart';
 
 const _kLogoBlancoUrl =
@@ -27,13 +29,20 @@ class _SplashPageState extends State<SplashPage> {
     await Future.delayed(const Duration(milliseconds: 2500));
     final prefs = await SharedPreferences.getInstance();
     final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+    final hasToken = (prefs.getString(AppConstants.keyToken) ?? '').isNotEmpty;
     if (!mounted) return;
+
+    Widget destination;
+    if (!onboardingComplete) {
+      destination = const PermissionsPage();
+    } else if (hasToken) {
+      destination = const MainNavigationPage();
+    } else {
+      destination = const LoginPage();
+    }
+
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => onboardingComplete
-            ? const MainNavigationPage()
-            : const PermissionsPage(),
-      ),
+      MaterialPageRoute(builder: (_) => destination),
     );
   }
 

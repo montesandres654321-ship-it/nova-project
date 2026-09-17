@@ -18,6 +18,7 @@ import 'pages/history_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/change_password_page.dart';
 import 'pages/about_page.dart';
+import 'pages/splash_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,8 +33,9 @@ class MyApp extends StatelessWidget {
       title: 'Nova App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      initialRoute: '/',
+      initialRoute: '/splash',
       routes: {
+        '/splash':          (context) => const SplashPage(),
         '/':                (context) => const LoginPage(),
         '/register':        (context) => const RegisterPage(),
         '/forgot-password': (context) => const ForgotPasswordPage(),
