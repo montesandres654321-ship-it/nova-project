@@ -40,6 +40,7 @@ class ApiService {
     required String dob,
     required String gender,
     required bool acceptedTerms,
+    String? residence,
   }) =>
       AuthService.register(
         firstName: firstName,
@@ -51,6 +52,7 @@ class ApiService {
         dob: dob,
         gender: gender,
         acceptedTerms: acceptedTerms,
+        residence: residence,
       );
 
   static Future<Map<String, dynamic>> changePassword({

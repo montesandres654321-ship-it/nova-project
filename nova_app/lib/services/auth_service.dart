@@ -112,6 +112,7 @@ class AuthService {
     required String dob,
     required String gender,
     required bool acceptedTerms,
+    String? residence,
   }) async {
     try {
       final response = await http.post(
@@ -126,6 +127,7 @@ class AuthService {
           'phone': phone,
           'dob': dob,
           'gender': gender,
+          'residence': residence,
           'accepted_terms': acceptedTerms ? 1 : 0,
         }),
       ).timeout(AppConstants.timeoutNormal);
