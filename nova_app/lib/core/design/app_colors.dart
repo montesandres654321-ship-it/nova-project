@@ -49,4 +49,9 @@ class AppColors {
   static const Color bienvenidaRojo      = Color(0xFFBD0412); // Requisitos de seguridad
   static const Color bienvenidaAzulClaro = Color(0xFFEAF7FF); // Fondo botón atrás circular
   static const Color bienvenidaFondoInput = Color(0xFFF7F9FB); // Fondo input login/registro
+
+  // Home / Explorar / Municipio (mismo Figma, tokens adicionales)
+  static const Color bienvenidaCoral      = Color(0xFFE8622A); // Banner Juegos 2027
+  static const Color bienvenidaFondoChip  = Color(0xFFF0F3F7); // Chips inactivos Explorar
+  static const Color bienvenidaAzulOferta = Color(0xFFEAF4FB); // Card "Oferta integral"
 }
