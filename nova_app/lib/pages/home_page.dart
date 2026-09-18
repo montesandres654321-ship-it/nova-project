@@ -29,6 +29,7 @@ import '../core/design/app_colors.dart';
 import '../widgets/nova_carrusel_card.dart';
 import '../widgets/nova_lista_card.dart';
 import '../widgets/nova_chip.dart';
+import '../widgets/error_display_widget.dart';
 import 'place_detail_page.dart';
 import 'municipio_page.dart';
 import 'rutas_page.dart';
@@ -90,6 +91,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Place> _topPlaces = [];
   bool _loadingTopPlaces = true;
+  String? _topPlacesError;
   String _chipActivo = 'Escenarios';
 
   // ── Lifecycle ──────────────────────────────────────────────
@@ -148,12 +150,20 @@ class _HomePageState extends State<HomePage> {
   // "Lo mejor valorado" — top lugares reales de la BD, ya vienen
   // ordenados por rating desde el backend (GET /places sin filtros).
   Future<void> _loadTopPlaces() async {
+    setState(() {
+      _loadingTopPlaces = true;
+      _topPlacesError = null;
+    });
     try {
       final places = await ApiService.getAllPlaces();
       if (!mounted) return;
       setState(() => _topPlaces = places.take(5).toList());
     } catch (e) {
       debugPrint('Error cargando lo mejor valorado: $e');
+      if (mounted) {
+        setState(() => _topPlacesError =
+            'No pudimos cargar los lugares destacados. Verifica tu conexión.');
+      }
     } finally {
       if (mounted) setState(() => _loadingTopPlaces = false);
     }
@@ -669,6 +679,11 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: LinearProgressIndicator(minHeight: 2),
+          )
+        else if (_topPlacesError != null)
+          ErrorDisplayWidget(
+            mensaje: _topPlacesError!,
+            onRetry: _loadTopPlaces,
           )
         else if (_topPlaces.isEmpty)
           Padding(

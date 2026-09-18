@@ -17,6 +17,7 @@ import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
 import '../widgets/nova_chip.dart';
+import '../widgets/error_display_widget.dart';
 import 'municipio_page.dart';
 import 'mapa_page.dart';
 
@@ -63,6 +64,7 @@ class _PlacesPageState extends State<PlacesPage> {
   String _categoriaActiva = 'Lugares';
 
   bool _loading = true;
+  String? _error;
   final Map<String, List<Place>> _placesPorMunicipio = {};
 
   @override
@@ -73,7 +75,10 @@ class _PlacesPageState extends State<PlacesPage> {
   }
 
   Future<void> _loadTodos() async {
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final resultados = await Future.wait(
         _kMunicipiosExplorar.map((m) => ApiService.getPlacesByMunicipio(m.slug)),
@@ -86,6 +91,10 @@ class _PlacesPageState extends State<PlacesPage> {
       });
     } catch (e) {
       debugPrint('Error cargando lugares por municipio: $e');
+      if (mounted && _placesPorMunicipio.isEmpty) {
+        setState(() =>
+            _error = 'No pudimos cargar los lugares. Verifica tu conexión.');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -313,6 +322,12 @@ class _PlacesPageState extends State<PlacesPage> {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Center(child: CircularProgressIndicator(color: AppColors.bienvenidaAzul)),
+      );
+    }
+    if (_error != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ErrorDisplayWidget(mensaje: _error!, onRetry: _loadTodos),
       );
     }
     final activo = _kMunicipiosExplorar.firstWhere((m) => m.slug == _municipioActivo);
