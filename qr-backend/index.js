@@ -63,14 +63,23 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// ── Rate limiting (opcional) ─────────────────────────────
+// ── Rate limiting ─────────────────────────────────────────
 try {
   const rateLimit = require('express-rate-limit');
-  const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20,
+  const skipInTest = () => process.env.NODE_ENV === 'test';
+
+  const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, skip: skipInTest,
     handler: (_, res) => res.status(429).json({ success: false, error: 'Demasiados intentos' }) });
+  const scanLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 30, skip: skipInTest,
+    handler: (_, res) => res.status(429).json({ success: false, error: 'Límite de escaneos por hora alcanzado. Intenta de nuevo en unos minutos.' }) });
+  const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, skip: skipInTest,
+    handler: (_, res) => res.status(429).json({ success: false, error: 'Demasiadas solicitudes. Intenta de nuevo en unos minutos.' }) });
+
+  app.use(generalLimiter);
   app.post('/login', authLimiter);
-  app.post('/users/register', rateLimit({ windowMs: 15 * 60 * 1000, max: 10,
+  app.post('/users/register', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, skip: skipInTest,
     handler: (_, res) => res.status(429).json({ success: false, error: 'Demasiados registros' }) }));
+  app.post('/scan', scanLimiter);
 } catch (e) { console.warn('⚠️ Rate limiting no disponible:', e.message); }
 
 // ── Importar rutas ───────────────────────────────────────
