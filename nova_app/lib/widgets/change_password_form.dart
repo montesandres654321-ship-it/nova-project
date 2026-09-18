@@ -95,12 +95,14 @@ class ChangePasswordForm extends StatelessWidget {
                         height: 16,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        'Requisitos de seguridad',
-                        style: GoogleFonts.openSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.bienvenidaRojo,
+                      Flexible(
+                        child: Text(
+                          'Requisitos de seguridad',
+                          style: GoogleFonts.openSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.bienvenidaRojo,
+                          ),
                         ),
                       ),
                     ],

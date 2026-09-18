@@ -202,9 +202,8 @@ class RegisterForm extends StatelessWidget {
           // ── PIE DE PÁGINA ────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            child: Wrap(
+                alignment: WrapAlignment.center,
                 children: [
                   Text(
                     '¿Ya tienes cuenta? ',
@@ -228,7 +227,6 @@ class RegisterForm extends StatelessWidget {
                 ],
               ),
             ),
-          ),
         ],
       ),
     );
@@ -314,6 +312,7 @@ class RegisterForm extends StatelessWidget {
           ),
           child: DropdownButtonFormField<String>(
             initialValue: gender,
+            isExpanded: true,
             style: GoogleFonts.openSans(
               fontSize: 15,
               fontWeight: FontWeight.w400,
