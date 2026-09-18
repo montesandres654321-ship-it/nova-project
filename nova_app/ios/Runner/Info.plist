@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Nova necesita tu ubicación para mostrarte lugares cercanos en el mapa.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Nova necesita tu ubicación para mostrarte lugares cercanos en el mapa.</string>
 </dict>
 </plist>
