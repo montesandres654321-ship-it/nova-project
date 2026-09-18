@@ -70,7 +70,9 @@ async function migrate() {
     await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_valoracion REAL DEFAULT 0.0`);
     await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_lugares INTEGER DEFAULT 0`);
     await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_rutas INTEGER DEFAULT 0`);
-    console.log('   ✓  places.tipo ampliado + municipio/categoria/historia/disciplinas/stats_*');
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS latitud DOUBLE PRECISION`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS longitud DOUBLE PRECISION`);
+    console.log('   ✓  places.tipo ampliado + municipio/categoria/historia/disciplinas/stats_*/lat+lon');
 
     // ── Tabla places ─────────────────────────────────────────
     await client.query(`

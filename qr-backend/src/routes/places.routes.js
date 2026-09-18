@@ -291,6 +291,7 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
       reward_icon, reward_stock, owner_id, municipio, categoria,
+      latitud, longitud,
     } = req.body;
 
     if (!name || !tipo || !lugar || !description) return res.status(400).json({ success: false, error: 'Campos requeridos' });
@@ -308,10 +309,12 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
     const ownerIdVal      = owner_id || null;
     const municipioVal    = municipio || null;
     const categoriaVal    = categoria || null;
+    const latitudVal      = latitud !== undefined ? latitud : null;
+    const longitudVal     = longitud !== undefined ? longitud : null;
 
     const inserted = await prisma.$queryRaw`
-      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active, municipio, categoria)
-      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive}, ${municipioVal}, ${categoriaVal})
+      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active, municipio, categoria, latitud, longitud)
+      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive}, ${municipioVal}, ${categoriaVal}, ${latitudVal}, ${longitudVal})
       RETURNING id
     `;
 
@@ -331,6 +334,7 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
       reward_icon, reward_stock, owner_id, municipio, categoria,
+      latitud, longitud,
     } = req.body;
 
     const place = (await prisma.$queryRaw`SELECT * FROM places WHERE id = ${id}`)[0];
@@ -361,9 +365,11 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
     const oi = owner_id     !== undefined ? owner_id     : place.owner_id;
     const mu = municipio    !== undefined ? municipio    : place.municipio;
     const ca = categoria    !== undefined ? categoria    : place.categoria;
+    const lat = latitud     !== undefined ? latitud      : place.latitud;
+    const lon = longitud    !== undefined ? longitud     : place.longitud;
 
     await prisma.$executeRaw`
-      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, municipio=${mu}, categoria=${ca}, updated_at=NOW()
+      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, municipio=${mu}, categoria=${ca}, latitud=${lat}, longitud=${lon}, updated_at=NOW()
       WHERE id=${id}
     `;
 

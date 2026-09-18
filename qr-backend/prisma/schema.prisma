@@ -101,6 +101,9 @@ model Place {
   statsValoracion   Float?    @default(0) @map("stats_valoracion")
   statsLugares      Int?      @default(0) @map("stats_lugares")
   statsRutas        Int?      @default(0) @map("stats_rutas")
+  /// Coordenadas para el mapa (pantalla Mapa) — null hasta que se georreferencie el lugar
+  latitud           Float?
+  longitud          Float?
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
   scans             Scan[]
