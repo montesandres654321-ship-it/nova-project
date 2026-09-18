@@ -76,6 +76,28 @@ class PlacesService {
     }
   }
 
+  /// Obtener lugares activos de un municipio (sincelejo, santiago_de_tolu, covenas)
+  static Future<List<Place>> getPlacesByMunicipio(String municipio) async {
+    try {
+      final response = await http.get(
+        Uri.parse(AppConstants.buildUrl('${AppConstants.placesEndpoint}?municipio=$municipio')),
+        headers: _headers,
+      ).timeout(AppConstants.timeoutLong);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          final List<dynamic> list = data['data'] ?? [];
+          return list.map((json) => Place.fromJson(json)).toList();
+        }
+      }
+      throw Exception('Error al cargar lugares de $municipio (${response.statusCode})');
+    } catch (e) {
+      debugPrint('❌ Error en getPlacesByMunicipio ($municipio): $e');
+      rethrow;
+    }
+  }
+
   /// Obtener lugar por ID
   static Future<Place> getPlaceById(int id) async {
     try {

@@ -75,6 +75,9 @@ class ApiService {
   static Future<List<Place>> getPlacesByType(String type) =>
       PlacesService.getPlacesByType(type);
 
+  static Future<List<Place>> getPlacesByMunicipio(String municipio) =>
+      PlacesService.getPlacesByMunicipio(municipio);
+
   static Future<Place> getPlaceById(int id) => PlacesService.getPlaceById(id);
 
   static Future<List<Place>> getHotels() => PlacesService.getHotels();

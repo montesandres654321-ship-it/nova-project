@@ -53,12 +53,20 @@ class NovaListaCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                imagePath,
-                width: photoSize,
-                height: photoSize,
-                fit: BoxFit.cover,
-              ),
+              child: imagePath.startsWith('http')
+                  ? Image.network(
+                      imagePath,
+                      width: photoSize,
+                      height: photoSize,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _placeholder(),
+                    )
+                  : Image.asset(
+                      imagePath,
+                      width: photoSize,
+                      height: photoSize,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -140,4 +148,11 @@ class NovaListaCard extends StatelessWidget {
       ),
     );
   }
+
+  Widget _placeholder() => Container(
+        width: photoSize,
+        height: photoSize,
+        color: AppColors.surfaceVariant,
+        child: Icon(Icons.image_not_supported_outlined, color: AppColors.textHint, size: photoSize * 0.4),
+      );
 }
