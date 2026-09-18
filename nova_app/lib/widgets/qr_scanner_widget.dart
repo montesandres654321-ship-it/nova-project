@@ -13,6 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../core/design/app_colors.dart';
 
+// Colores del marco de escaneo — Figma NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md
+const _kMarcoVerde = Color(0xFF078930);
+const _kLineaVerdeClara = Color(0xFF4ADE80);
+
 class QrScannerWidget extends StatefulWidget {
   final MobileScannerController controller;
   final void Function(BarcodeCapture) onDetect;
@@ -105,15 +109,15 @@ class _QrScannerWidgetState extends State<QrScannerWidget>
                     gradient: LinearGradient(
                       colors: [
                         Colors.transparent,
-                        AppColors.primary.withValues(alpha: 0.8),
-                        AppColors.primary,
-                        AppColors.primary.withValues(alpha: 0.8),
+                        _kLineaVerdeClara.withValues(alpha: 0.8),
+                        _kLineaVerdeClara,
+                        _kLineaVerdeClara.withValues(alpha: 0.8),
                         Colors.transparent,
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.6),
+                        color: _kLineaVerdeClara.withValues(alpha: 0.6),
                         blurRadius: 6,
                         spreadRadius: 1,
                       ),
@@ -142,7 +146,7 @@ class ScannerOverlayPainter extends CustomPainter {
     path.addRect(Rect.fromCenter(center: center, width: sq, height: sq));
     canvas.drawPath(path, paint);
 
-    final borderPaint = Paint()..color = AppColors.primary..style = PaintingStyle.stroke..strokeWidth = 3;
+    final borderPaint = Paint()..color = _kMarcoVerde..style = PaintingStyle.stroke..strokeWidth = 3;
     final rect = Rect.fromCenter(center: center, width: sq, height: sq);
     const cl = 25.0;
 
