@@ -64,9 +64,13 @@ model User {
 model Place {
   id                Int       @id @default(autoincrement())
   name              String
-  /// Tipo de establecimiento: 'hotel' | 'restaurant' | 'bar'
+  /// Tipo de establecimiento: hotel, restaurant, bar, escenario_deportivo,
+  /// parque, naturaleza, cultura, artesania, playa, ruta, gastronomia,
+  /// compras, servicio (ampliado Septiembre 2026 para Home/Explorar Figma)
   tipo              String
-  /// Municipio donde se ubica el lugar (ej: 'Tolú', 'Coveñas', 'San Antero')
+  /// Municipio donde se ubica el lugar, en texto libre para mostrar en UI
+  /// (ej: 'Tolú', 'Coveñas', 'San Antero') — ver `municipio` para el valor
+  /// normalizado usado en filtros
   lugar             String
   description       String?
   imageUrl          String?   @map("image_url")
@@ -86,6 +90,17 @@ model Place {
   isActive          Boolean   @default(true) @map("is_active")
   /// ID del propietario (user_place) asignado a este lugar
   ownerId           Int?      @map("owner_id")
+  /// Municipio normalizado para filtros: 'sincelejo' | 'santiago_de_tolu' | 'covenas'
+  municipio         String?
+  /// Categoría de exhibición para el Home/Explorar (distinta de `tipo`)
+  categoria         String?
+  /// Reseña histórica del municipio/lugar (pantalla Municipio)
+  historia          String?
+  /// Disciplinas deportivas — solo aplica a escenario_deportivo
+  disciplinas       String?
+  statsValoracion   Float?    @default(0) @map("stats_valoracion")
+  statsLugares      Int?      @default(0) @map("stats_lugares")
+  statsRutas        Int?      @default(0) @map("stats_rutas")
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
   scans             Scan[]

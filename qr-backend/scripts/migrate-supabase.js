@@ -49,6 +49,29 @@ async function migrate() {
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS residence TEXT`);
     console.log('   ✓  users.residence');
 
+    // ── places: ampliar tipos + columnas Home/Explorar (Figma Sep 2026) ──
+    await client.query(`ALTER TABLE places DROP CONSTRAINT IF EXISTS places_tipo_check`);
+    await client.query(`
+      ALTER TABLE places ADD CONSTRAINT places_tipo_check
+      CHECK (tipo = ANY (ARRAY[
+        'hotel', 'restaurant', 'bar',
+        'escenario_deportivo', 'parque', 'naturaleza',
+        'cultura', 'artesania', 'playa', 'ruta',
+        'gastronomia', 'compras', 'servicio'
+      ]::text[]))
+    `);
+    await client.query(`
+      ALTER TABLE places ADD COLUMN IF NOT EXISTS municipio TEXT
+        CHECK (municipio IN ('sincelejo', 'santiago_de_tolu', 'covenas'))
+    `);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS categoria TEXT`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS historia TEXT`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS disciplinas TEXT`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_valoracion REAL DEFAULT 0.0`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_lugares INTEGER DEFAULT 0`);
+    await client.query(`ALTER TABLE places ADD COLUMN IF NOT EXISTS stats_rutas INTEGER DEFAULT 0`);
+    console.log('   ✓  places.tipo ampliado + municipio/categoria/historia/disciplinas/stats_*');
+
     // ── Tabla places ─────────────────────────────────────────
     await client.query(`
       CREATE TABLE IF NOT EXISTS places (

@@ -15,14 +15,29 @@ const parsePlace = (place) => ({
   reward_stock: place.reward_stock ?? null,
 });
 
+// Tipos de lugar soportados — ampliado para el Home/Explorar del Figma
+// (Septiembre 2026). Debe reflejar exactamente places_tipo_check en la BD.
+const VALID_TIPOS = [
+  'hotel', 'restaurant', 'bar',
+  'escenario_deportivo', 'parque', 'naturaleza',
+  'cultura', 'artesania', 'playa', 'ruta',
+  'gastronomia', 'compras', 'servicio',
+];
+const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas'];
+
 router.get('/', async (req, res) => {
   try {
-    const { tipo } = req.query;
-    const validTypes = ['hotel', 'restaurant', 'bar'];
+    const { tipo, municipio } = req.query;
+    const t = tipo && VALID_TIPOS.includes(tipo.toLowerCase()) ? tipo.toLowerCase() : null;
+    const m = municipio && VALID_MUNICIPIOS.includes(municipio.toLowerCase()) ? municipio.toLowerCase() : null;
+
     let places;
-    if (tipo && validTypes.includes(tipo.toLowerCase())) {
-      const t = tipo.toLowerCase();
+    if (t && m) {
+      places = await prisma.$queryRaw`SELECT * FROM places WHERE tipo = ${t} AND municipio = ${m} AND is_active = TRUE ORDER BY rating DESC`;
+    } else if (t) {
       places = await prisma.$queryRaw`SELECT * FROM places WHERE tipo = ${t} AND is_active = TRUE ORDER BY rating DESC`;
+    } else if (m) {
+      places = await prisma.$queryRaw`SELECT * FROM places WHERE municipio = ${m} AND is_active = TRUE ORDER BY rating DESC`;
     } else {
       places = await prisma.$queryRaw`SELECT * FROM places WHERE is_active = TRUE ORDER BY rating DESC`;
     }
@@ -37,10 +52,9 @@ router.get('/', async (req, res) => {
 router.get('/all', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
     const { tipo } = req.query;
-    const validTypes = ['hotel', 'restaurant', 'bar'];
+    const t = tipo && VALID_TIPOS.includes(tipo.toLowerCase()) ? tipo.toLowerCase() : null;
     let places;
-    if (tipo && validTypes.includes(tipo.toLowerCase())) {
-      const t = tipo.toLowerCase();
+    if (t) {
       places = await prisma.$queryRaw`SELECT * FROM places WHERE tipo = ${t} ORDER BY is_active DESC, name ASC`;
     } else {
       places = await prisma.$queryRaw`SELECT * FROM places ORDER BY is_active DESC, name ASC`;
@@ -75,8 +89,7 @@ router.patch('/:id/status', authenticateToken, authorize(['admin_general']), asy
 router.get('/type/:type', async (req, res) => {
   try {
     const { type } = req.params;
-    const validTypes = ['hotel', 'restaurant', 'bar'];
-    if (!validTypes.includes(type.toLowerCase())) {
+    if (!VALID_TIPOS.includes(type.toLowerCase())) {
       return res.status(400).json({ success: false, error: 'Tipo inválido' });
     }
     const t = type.toLowerCase();
@@ -277,12 +290,14 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
     const {
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
-      reward_icon, reward_stock, owner_id,
+      reward_icon, reward_stock, owner_id, municipio, categoria,
     } = req.body;
 
     if (!name || !tipo || !lugar || !description) return res.status(400).json({ success: false, error: 'Campos requeridos' });
-    const validTypes = ['hotel', 'restaurant', 'bar'];
-    if (!validTypes.includes(tipo)) return res.status(400).json({ success: false, error: 'Tipo inválido' });
+    if (!VALID_TIPOS.includes(tipo)) return res.status(400).json({ success: false, error: 'Tipo inválido' });
+    if (municipio !== undefined && municipio !== null && !VALID_MUNICIPIOS.includes(municipio)) {
+      return res.status(400).json({ success: false, error: 'Municipio inválido' });
+    }
 
     const isActive        = (req.body.is_active ?? 1) !== 0;
     const amenitiesStr    = amenities ? JSON.stringify(amenities) : null;
@@ -291,10 +306,12 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
     const rewardIconVal   = reward_icon || '🎁';
     const rewardStockVal  = reward_stock !== undefined ? reward_stock : null;
     const ownerIdVal      = owner_id || null;
+    const municipioVal    = municipio || null;
+    const categoriaVal    = categoria || null;
 
     const inserted = await prisma.$queryRaw`
-      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active)
-      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive})
+      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active, municipio, categoria)
+      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive}, ${municipioVal}, ${categoriaVal})
       RETURNING id
     `;
 
@@ -313,11 +330,18 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
     const {
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
-      reward_icon, reward_stock, owner_id,
+      reward_icon, reward_stock, owner_id, municipio, categoria,
     } = req.body;
 
     const place = (await prisma.$queryRaw`SELECT * FROM places WHERE id = ${id}`)[0];
     if (!place) return res.status(404).json({ success: false, error: 'Lugar no encontrado' });
+
+    if (tipo !== undefined && !VALID_TIPOS.includes(tipo)) {
+      return res.status(400).json({ success: false, error: 'Tipo inválido' });
+    }
+    if (municipio !== undefined && municipio !== null && !VALID_MUNICIPIOS.includes(municipio)) {
+      return res.status(400).json({ success: false, error: 'Municipio inválido' });
+    }
 
     const n  = name  || place.name;
     const t  = tipo  || place.tipo;
@@ -335,9 +359,11 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
     const ri = reward_icon  !== undefined ? reward_icon  : place.reward_icon;
     const rs = reward_stock !== undefined ? reward_stock : place.reward_stock;
     const oi = owner_id     !== undefined ? owner_id     : place.owner_id;
+    const mu = municipio    !== undefined ? municipio    : place.municipio;
+    const ca = categoria    !== undefined ? categoria    : place.categoria;
 
     await prisma.$executeRaw`
-      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, updated_at=NOW()
+      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, municipio=${mu}, categoria=${ca}, updated_at=NOW()
       WHERE id=${id}
     `;
 
