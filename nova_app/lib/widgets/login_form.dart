@@ -98,12 +98,16 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Fila: Recordarme + ¿Olvidaste?
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               GestureDetector(
                 onTap: () => onRememberMeChanged(!rememberMe),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       width: 20,
@@ -305,9 +309,8 @@ class LoginForm extends StatelessWidget {
           // ── PIE DE PÁGINA ────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            child: Wrap(
+                alignment: WrapAlignment.center,
                 children: [
                   Text(
                     '¿Aún no tienes cuenta? ',
@@ -333,7 +336,6 @@ class LoginForm extends StatelessWidget {
                 ],
               ),
             ),
-          ),
         ],
       ),
     );
