@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="gift">
+<path id="Vector" d="M16.7913 11.625V18.792C16.7912 19.2061 16.4554 19.542 16.0413 19.542H5.95833C5.54423 19.542 5.20851 19.2061 5.20833 18.792V11.625H16.7913Z" stroke="#3C3C3C" stroke-width="1.25" stroke-linejoin="round"/>
+<g id="Vector_2">
+<mask id="path-2-inside-1_0_18" fill="white">
+<rect x="2.75" y="7.33333" width="16.5" height="3.66667" rx="0.916667"/>
+</mask>
+<rect x="2.75" y="7.33333" width="16.5" height="3.66667" rx="0.916667" stroke="#3C3C3C" stroke-width="2.5" stroke-linejoin="round" mask="url(#path-2-inside-1_0_18)"/>
+</g>
+<path id="Vector_3" d="M11 8V19" stroke="#3C3C3C" stroke-width="1.25" stroke-linecap="round"/>
+<circle id="Vector_4" cx="8.25" cy="5.04167" r="1.66667" stroke="#3C3C3C" stroke-width="1.25"/>
+<circle id="Vector_5" cx="13.75" cy="5.04167" r="1.66667" stroke="#3C3C3C" stroke-width="1.25"/>
+</g>
+</svg>

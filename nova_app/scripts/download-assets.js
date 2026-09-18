@@ -398,6 +398,165 @@ const assetsToDownload = [
     pantalla: '11 Municipio (chip compras)'
   },
 
+  // ═══════════════════════════════════════════════════════════
+  // MAPA — carpeta: assets/icons/mapa
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/mapa/ic-pin-agenda.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/94346.svg',
+    pantalla: '18 Mapa (pin agenda)'
+  },
+  {
+    filename: 'icons/mapa/ic-pin-escenario.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/7ddaa.svg',
+    pantalla: '18 Mapa (pin escenario)'
+  },
+  {
+    filename: 'icons/mapa/ic-pin-parque.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/a851d.svg',
+    pantalla: '18 Mapa (pin parque)'
+  },
+  {
+    filename: 'icons/mapa/ic-pin-restaurante.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/07f14.svg',
+    pantalla: '18 Mapa (pin restaurante)'
+  },
+  {
+    filename: 'icons/mapa/ic-mi-ubicacion.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/6113b.svg',
+    pantalla: '18 Mapa (mi ubicación)'
+  },
+  {
+    filename: 'icons/mapa/ic-halo-gps.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e8960cd7-d49f-4ffc-9c35-b85cb2929dac/86313.svg',
+    pantalla: '18 Mapa (halo GPS)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // RUTAS — carpeta: assets/images/rutas
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'images/rutas/foto-escenarios-deportivos.png',
+    url: 'https://www.figma.com/api/mcp/asset/3a15daf9-51e8-4984-afe7-22f7c42fbc61/d85d3.png',
+    pantalla: '19 Rutas (escenarios deportivos)'
+  },
+  {
+    filename: 'images/rutas/foto-cultura-patrimonio.png',
+    url: 'https://www.figma.com/api/mcp/asset/3a15daf9-51e8-4984-afe7-22f7c42fbc61/f1706.png',
+    pantalla: '19 Rutas (cultura y patrimonio)'
+  },
+  {
+    filename: 'images/rutas/foto-gastronomia.png',
+    url: 'https://www.figma.com/api/mcp/asset/3a15daf9-51e8-4984-afe7-22f7c42fbc61/95cb5.png',
+    pantalla: '19 Rutas (gastronomía)'
+  },
+  {
+    filename: 'images/rutas/foto-naturaleza-parques.png',
+    url: 'https://www.figma.com/api/mcp/asset/3a15daf9-51e8-4984-afe7-22f7c42fbc61/d46fc.png',
+    pantalla: '19 Rutas (naturaleza y parques)'
+  },
+  {
+    filename: 'images/rutas/foto-compras-artesanias.png',
+    url: 'https://www.figma.com/api/mcp/asset/3a15daf9-51e8-4984-afe7-22f7c42fbc61/53acf.png',
+    pantalla: '19 Rutas (compras y artesanías)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // RUTA OFICIAL JUEGOS 2027 — carpeta: assets/icons/rutas
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/rutas/ic-entradas.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/f271c.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/rutas/ic-transporte.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/15823.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/rutas/ic-hotel.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/cae7b.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/rutas/ic-desayuno.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/71c8e.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/rutas/ic-guia.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/78171.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/rutas/ic-seguro.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/3878e.svg',
+    pantalla: '20 Ruta Juegos (qué incluye)'
+  },
+  {
+    filename: 'icons/ic-whatsapp.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/b02ab.svg',
+    pantalla: '20 Ruta Juegos (operador)'
+  },
+  {
+    filename: 'icons/ic-phone.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/5ad6a.svg',
+    pantalla: '20 Ruta Juegos (operador)'
+  },
+  {
+    filename: 'icons/ic-mail.svg',
+    url: 'https://www.figma.com/api/mcp/asset/5aa06577-9037-4dd9-b69c-9e747e1979f4/00f48.svg',
+    pantalla: '20 Ruta Juegos (operador)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // ESCANEO QR — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-gift.svg',
+    url: 'https://www.figma.com/api/mcp/asset/59fdd8db-c8e5-4705-a59f-d512a9f08d33/bc891.svg',
+    pantalla: '21 Escaneo QR (bloque puntos)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // RECOMPENSAS — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-gift-blue.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e5e2cd7b-70be-4c98-93ed-65c33650325a/0d140.svg',
+    pantalla: '22 Mis recompensas (premio azul)'
+  },
+  {
+    filename: 'icons/ic-gift-green.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e5e2cd7b-70be-4c98-93ed-65c33650325a/0dce5.svg',
+    pantalla: '22 Mis recompensas (premio verde)'
+  },
+  {
+    filename: 'icons/ic-gift-orange.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e5e2cd7b-70be-4c98-93ed-65c33650325a/0d588.svg',
+    pantalla: '22 Mis recompensas (premio coral)'
+  },
+  {
+    filename: 'icons/ic-qr-history.svg',
+    url: 'https://www.figma.com/api/mcp/asset/e5e2cd7b-70be-4c98-93ed-65c33650325a/705a7.svg',
+    pantalla: '22 Mis recompensas (historial)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // RECOMPENSA DESBLOQUEADA — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-gift-white.svg',
+    url: 'https://www.figma.com/api/mcp/asset/1d2986b5-0396-43df-8a71-77aea87aa6f7/b8f63.svg',
+    pantalla: '24 Recompensa desbloqueada (icono)'
+  },
+  {
+    filename: 'icons/ic-linea.svg',
+    url: 'https://www.figma.com/api/mcp/asset/1d2986b5-0396-43df-8a71-77aea87aa6f7/6771f.svg',
+    pantalla: '24 Recompensa desbloqueada (divisor)'
+  },
+
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -423,6 +582,7 @@ async function downloadAssets() {
     'images/logos', 'images/onboarding', 'icons', 'icons/nav',
     'images/home', 'images/municipios', 'images/rutas',
     'images/naturaleza', 'images/gastronomia', 'images/lugares',
+    'icons/mapa', 'icons/rutas',
   ];
   for (const carpeta of subcarpetas) {
     await fs.mkdir(path.join(ASSETS_DIR, carpeta), { recursive: true });
