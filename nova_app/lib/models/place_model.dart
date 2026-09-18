@@ -21,6 +21,8 @@ class Place {
   final String? priceRange;
   final List<String> amenities;
   final bool isActive;
+  final double? latitud;
+  final double? longitud;
 
   // Campos de recompensa (nuevos)
   final bool hasReward;
@@ -42,6 +44,8 @@ class Place {
     this.priceRange,
     required this.amenities,
     this.isActive = true,
+    this.latitud,
+    this.longitud,
     this.hasReward = false,
     this.rewardName,
     this.rewardIcon,
@@ -82,6 +86,8 @@ class Place {
       priceRange: json['price_range'] ?? json['priceRange'],
       amenities: amenitiesList,
       isActive: json['is_active'] == true || json['is_active'] == 1,
+      latitud: (json['latitud'] as num?)?.toDouble(),
+      longitud: (json['longitud'] as num?)?.toDouble(),
       // Campos de recompensa
       hasReward: json['has_reward'] == true || json['has_reward'] == 1,
       rewardName: json['reward_name'],
