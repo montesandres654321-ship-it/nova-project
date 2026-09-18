@@ -8,8 +8,7 @@ import 'permissions_page.dart';
 import 'login_page.dart';
 import 'main_navigation_page.dart';
 
-const _kLogoBlancoUrl =
-    'https://www.figma.com/api/mcp/asset/b6c2b25d-2adf-489f-82ab-cd1bd96e362d/e5f41.svg';
+const _kLogoBlancoAsset = 'assets/images/logos/logo-nova-blanco.svg';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -51,8 +50,8 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       backgroundColor: AppColors.bienvenidaAzul,
       body: Center(
-        child: SvgPicture.network(
-          _kLogoBlancoUrl,
+        child: SvgPicture.asset(
+          _kLogoBlancoAsset,
           width: 144,
           height: 84.82,
         ),

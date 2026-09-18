@@ -9,32 +9,23 @@ import 'login_page.dart';
 import 'main_navigation_page.dart';
 
 // Slide 1 · Juegos Nacionales 2027
-const _kResplandorAmarilloUrl =
-    'https://www.figma.com/api/mcp/asset/adaf1d75-b547-461e-9a78-e1702b61e09b/8140d.svg';
-const _kResplandorAzulUrl =
-    'https://www.figma.com/api/mcp/asset/adaf1d75-b547-461e-9a78-e1702b61e09b/3acb3.svg';
-const _kResplandorVerdeUrl =
-    'https://www.figma.com/api/mcp/asset/adaf1d75-b547-461e-9a78-e1702b61e09b/74af4.svg';
-const _kIlustracionJuegosUrl =
-    'https://www.figma.com/api/mcp/asset/adaf1d75-b547-461e-9a78-e1702b61e09b/a50fc.svg';
-const _kLogoJuegosUrl =
-    'https://www.figma.com/api/mcp/asset/adaf1d75-b547-461e-9a78-e1702b61e09b/ef0b6.svg';
+const _kResplandorAmarilloAsset = 'assets/images/onboarding/resplandor-amarillo.svg';
+const _kResplandorAzulAsset = 'assets/images/onboarding/resplandor-azul.svg';
+const _kResplandorVerdeAsset = 'assets/images/onboarding/resplandor-verde.svg';
+const _kIlustracionJuegosAsset = 'assets/images/onboarding/ilustracion-juegos-mascota.svg';
+const _kLogoJuegosAsset = 'assets/images/logos/logo-juegos-nacionales-2027.svg';
 
 // Slide 2 · Descubre
-const _kFotoDescubreUrl =
-    'https://www.figma.com/api/mcp/asset/d4b27e73-70b6-4c6d-8aa2-bfc08f9f53d5/a2e6c.png';
-const _kOverlayDescubreUrl =
-    'https://www.figma.com/api/mcp/asset/d4b27e73-70b6-4c6d-8aa2-bfc08f9f53d5/1ad03.png';
-const _kLogoBlancoDescubreUrl =
-    'https://www.figma.com/api/mcp/asset/d4b27e73-70b6-4c6d-8aa2-bfc08f9f53d5/45af4.svg';
+const _kFotoDescubreAsset = 'assets/images/onboarding/foto-covenas-tolu-sincelejo.png';
+const _kOverlayDescubreAsset = 'assets/images/onboarding/overlay-foto.png';
+const _kLogoBlancoDescubreAsset = 'assets/images/logos/logo-nova-blanco-m.svg';
 
 // Slide 3 · Vive
-const _kFotoViveUrl =
-    'https://www.figma.com/api/mcp/asset/6115a06f-36f6-492e-baee-9eee424608d3/39831.png';
-const _kOverlayViveUrl =
-    'https://www.figma.com/api/mcp/asset/6115a06f-36f6-492e-baee-9eee424608d3/1ad03.png';
-const _kLogoBlancoViveUrl =
-    'https://www.figma.com/api/mcp/asset/6115a06f-36f6-492e-baee-9eee424608d3/049e8.svg';
+const _kFotoViveAsset = 'assets/images/onboarding/foto-sucre-sincelejo.png';
+const _kOverlayViveAsset = 'assets/images/onboarding/overlay-foto.png';
+// Mismo logo "Nova blanco M" que en el slide Descubre (Figma exportó un ID
+// distinto por estar en otro frame, pero es el mismo asset visual).
+const _kLogoBlancoViveAsset = 'assets/images/logos/logo-nova-blanco-m.svg';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -140,8 +131,8 @@ class _JuegosSlide extends StatelessWidget {
                   Positioned(
                     left: 260,
                     top: -21,
-                    child: SvgPicture.network(
-                      _kResplandorAmarilloUrl,
+                    child: SvgPicture.asset(
+                      _kResplandorAmarilloAsset,
                       width: 180,
                       height: 180,
                     ),
@@ -149,8 +140,8 @@ class _JuegosSlide extends StatelessWidget {
                   Positioned(
                     left: -62,
                     top: 203,
-                    child: SvgPicture.network(
-                      _kResplandorAzulUrl,
+                    child: SvgPicture.asset(
+                      _kResplandorAzulAsset,
                       width: 183,
                       height: 183,
                     ),
@@ -158,8 +149,8 @@ class _JuegosSlide extends StatelessWidget {
                   Positioned(
                     left: 249,
                     top: 256,
-                    child: SvgPicture.network(
-                      _kResplandorVerdeUrl,
+                    child: SvgPicture.asset(
+                      _kResplandorVerdeAsset,
                       width: 202,
                       height: 202,
                     ),
@@ -167,8 +158,8 @@ class _JuegosSlide extends StatelessWidget {
                   Positioned(
                     left: 70,
                     top: 12,
-                    child: SvgPicture.network(
-                      _kIlustracionJuegosUrl,
+                    child: SvgPicture.asset(
+                      _kIlustracionJuegosAsset,
                       width: 370,
                       height: 536,
                     ),
@@ -179,8 +170,8 @@ class _JuegosSlide extends StatelessWidget {
             Positioned(
               left: 16,
               top: 19,
-              child: SvgPicture.network(
-                _kLogoJuegosUrl,
+              child: SvgPicture.asset(
+                _kLogoJuegosAsset,
                 width: 109,
                 height: 49,
               ),
@@ -271,13 +262,13 @@ class _DescubreSlide extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(_kFotoDescubreUrl, fit: BoxFit.cover),
-              Image.network(_kOverlayDescubreUrl, fit: BoxFit.cover),
+              Image.asset(_kFotoDescubreAsset, fit: BoxFit.cover),
+              Image.asset(_kOverlayDescubreAsset, fit: BoxFit.cover),
               Positioned(
                 left: 253,
                 top: 295,
-                child: SvgPicture.network(
-                  _kLogoBlancoDescubreUrl,
+                child: SvgPicture.asset(
+                  _kLogoBlancoDescubreAsset,
                   width: 112,
                   height: 65.825,
                 ),
@@ -369,13 +360,13 @@ class _ViveSlide extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(_kFotoViveUrl, fit: BoxFit.cover),
-              Image.network(_kOverlayViveUrl, fit: BoxFit.cover),
+              Image.asset(_kFotoViveAsset, fit: BoxFit.cover),
+              Image.asset(_kOverlayViveAsset, fit: BoxFit.cover),
               Positioned(
                 left: 253,
                 top: 295,
-                child: SvgPicture.network(
-                  _kLogoBlancoViveUrl,
+                child: SvgPicture.asset(
+                  _kLogoBlancoViveAsset,
                   width: 112,
                   height: 65.825,
                 ),

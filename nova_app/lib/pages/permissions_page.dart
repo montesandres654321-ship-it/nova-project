@@ -5,18 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import 'onboarding_page.dart';
 
-const _kLogoVerdeUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/4f980.svg';
-const _kIconoMapaUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/b04f3.svg';
-const _kIconoEscudoUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/61457.svg';
-const _kIconoManosUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/64496.svg';
-const _kLogoMincitUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/fb3bb.png';
-const _kLogoGobernacionUrl =
-    'https://www.figma.com/api/mcp/asset/baf4c37f-0e17-4905-9818-d81d36c4e84b/209d0.png';
+const _kLogoVerdeAsset = 'assets/images/logos/logo-nova-verde.svg';
+const _kIconoMapaAsset = 'assets/icons/ic-mapa.svg';
+const _kIconoEscudoAsset = 'assets/icons/ic-escudo.svg';
+const _kIconoManosAsset = 'assets/icons/ic-manos.svg';
+const _kLogoMincitAsset = 'assets/images/logos/logo-mincit.png';
+const _kLogoGobernacionAsset = 'assets/images/logos/logo-gobernacion-sucre.png';
 
 class PermissionsPage extends StatelessWidget {
   const PermissionsPage({super.key});
@@ -35,8 +29,8 @@ class PermissionsPage extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SvgPicture.network(
-                    _kLogoVerdeUrl,
+                  SvgPicture.asset(
+                    _kLogoVerdeAsset,
                     width: 88,
                     height: 52.585,
                   ),
@@ -54,21 +48,21 @@ class PermissionsPage extends StatelessWidget {
                   Column(
                     children: [
                       _buildBullet(
-                        _kIconoMapaUrl,
+                        _kIconoMapaAsset,
                         33,
                         33,
                         'Usamos tu ubicación y datos de navegación para mostrarte hoteles, sitios y reservas cerca de ti.',
                       ),
                       const SizedBox(height: 28),
                       _buildBullet(
-                        _kIconoEscudoUrl,
+                        _kIconoEscudoAsset,
                         32,
                         34,
                         'Tu privacidad va primero. Solo usamos tu información para mejorar tu experiencia, nunca la compartimos sin tu permiso.',
                       ),
                       const SizedBox(height: 28),
                       _buildBullet(
-                        _kIconoManosUrl,
+                        _kIconoManosAsset,
                         34,
                         34,
                         'Al aceptar, nos ayudas a construir el mejor mapa de los tres municipios sede.',
@@ -101,10 +95,10 @@ class PermissionsPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const SizedBox(width: 12),
-                        Image.network(_kLogoMincitUrl, width: 69, height: 40),
+                        Image.asset(_kLogoMincitAsset, width: 69, height: 40),
                         const SizedBox(width: 15),
-                        Image.network(
-                          _kLogoGobernacionUrl,
+                        Image.asset(
+                          _kLogoGobernacionAsset,
                           width: 44,
                           height: 44,
                         ),
@@ -143,11 +137,11 @@ class PermissionsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBullet(String iconUrl, double w, double h, String text) {
+  Widget _buildBullet(String iconAsset, double w, double h, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SvgPicture.network(iconUrl, width: w, height: h),
+        SvgPicture.asset(iconAsset, width: w, height: h),
         const SizedBox(width: 16),
         Expanded(
           child: Text(
