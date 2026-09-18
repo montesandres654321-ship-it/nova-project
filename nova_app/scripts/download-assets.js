@@ -557,6 +557,63 @@ const assetsToDownload = [
     pantalla: '24 Recompensa desbloqueada (divisor)'
   },
 
+  // ═══════════════════════════════════════════════════════════
+  // PERFIL — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-chevron-right.svg',
+    url: 'https://www.figma.com/api/mcp/asset/0695ddc6-0e37-4cce-a567-fd07b623b8f0/bdc31.svg',
+    pantalla: '15 Perfil (link ajustes)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // AJUSTES — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-bell.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/fe43d.svg',
+    pantalla: '16 Ajustes (notificaciones)'
+  },
+  {
+    filename: 'icons/ic-lock.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/528df.svg',
+    pantalla: '16 Ajustes (privacidad)'
+  },
+  {
+    filename: 'icons/ic-key.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/f35d8.svg',
+    pantalla: '16 Ajustes (cambiar contraseña)'
+  },
+  {
+    filename: 'icons/ic-file-text.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/54b05.svg',
+    pantalla: '16 Ajustes (términos)'
+  },
+  {
+    filename: 'icons/ic-help-circle.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/0aca8.svg',
+    pantalla: '16 Ajustes (ayuda)'
+  },
+  {
+    filename: 'icons/ic-info.svg',
+    url: 'https://www.figma.com/api/mcp/asset/41b2104d-2802-45da-b212-ea1dcfc1ab10/7fe90.svg',
+    pantalla: '16 Ajustes (acerca de)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // HISTORIAL — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-map-pin-green.svg',
+    url: 'https://www.figma.com/api/mcp/asset/0d8660f6-9c76-42e1-8b87-b04232ced3a6/8b2a3.svg',
+    pantalla: '14 Historial (escaneo con recompensa)'
+  },
+  {
+    filename: 'icons/ic-map-pin-blue.svg',
+    url: 'https://www.figma.com/api/mcp/asset/0d8660f6-9c76-42e1-8b87-b04232ced3a6/80047.svg',
+    pantalla: '14 Historial (escaneo sin recompensa)'
+  },
+
 ];
 
 // ─────────────────────────────────────────────────────────────
