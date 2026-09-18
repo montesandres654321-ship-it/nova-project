@@ -56,6 +56,7 @@ class _MapaPageState extends State<MapaPage> {
   final MapController _mapController = MapController();
   List<Place> _places = [];
   bool _loading = true;
+  String? _error;
   String _filtroActivo = 'Todo';
   Place? _seleccionado;
   LatLng? _userPosition;
@@ -68,6 +69,10 @@ class _MapaPageState extends State<MapaPage> {
   }
 
   Future<void> _loadPlaces() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final places = await ApiService.getAllPlaces();
       if (!mounted) return;
@@ -78,6 +83,9 @@ class _MapaPageState extends State<MapaPage> {
       });
     } catch (e) {
       debugPrint('Error cargando lugares para el mapa: $e');
+      if (mounted) {
+        setState(() => _error = 'No pudimos cargar los lugares. Verifica tu conexión.');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -328,10 +336,27 @@ class _MapaPageState extends State<MapaPage> {
           if (p == null)
             Expanded(
               child: Center(
-                child: Text(
-                  _loading ? 'Cargando lugares…' : 'Aún no hay lugares con ubicación en el mapa.',
-                  style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
-                ),
+                child: _error != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: _loadPlaces,
+                            child: Text('Reintentar',
+                                style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        _loading ? 'Cargando lugares…' : 'Aún no hay lugares con ubicación en el mapa.',
+                        style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                      ),
               ),
             )
           else ...[
