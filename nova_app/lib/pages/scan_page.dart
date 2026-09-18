@@ -42,6 +42,7 @@ import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
 import '../widgets/qr_scanner_widget.dart';
 import 'success_page.dart';
+import 'recompensa_page.dart';
 
 // Colores del fondo oscuro — Figma
 const _kFondoOscuro = Color(0xFF13202B);
@@ -98,12 +99,32 @@ class _ScanPageState extends State<ScanPage> {
     setState(() => _isProcessing = true);
     final result = await ApiService.registerScan(code);
     // FIX: navegar y no hacer nada más — el widget se destruye con pushReplacement
-    if (mounted) {
+    if (mounted) _navigateAfterScan(code, result);
+    // FIX: eliminado Future.delayed(1s) + setState código muerto
+  }
+
+  // El Figma distingue "éxito de escaneo" (8:81) de "recompensa
+  // desbloqueada" (24) como pantallas separadas: si el backend devolvió
+  // una recompensa nueva, se muestra RecompensaPage; si no (o hay
+  // error), se mantiene SuccessPage tal como ya funcionaba.
+  void _navigateAfterScan(String code, Map<String, dynamic> result) {
+    final reward = result['reward'];
+    final place = result['place'];
+    if (result['error'] == null && reward is Map && place is Map) {
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (_) => RecompensaPage(
+          placeName: place['name']?.toString() ?? 'Lugar',
+          placeCity: place['lugar']?.toString() ?? '',
+          rewardName: reward['name']?.toString() ?? 'Recompensa',
+          rewardDescription: reward['description']?.toString(),
+          rewardId: reward['id'] is int ? reward['id'] as int : int.tryParse('${reward['id']}'),
+        )),
+      );
+    } else {
       Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (_) => SuccessPage(code: code, backendData: result)),
       );
     }
-    // FIX: eliminado Future.delayed(1s) + setState código muerto
   }
 
   Future<void> _scanFromGallery() async {
@@ -119,11 +140,7 @@ class _ScanPageState extends State<ScanPage> {
         final code = result.barcodes.first.rawValue;
         if (code != null) {
           final backendRes = await ApiService.registerScan(code);
-          if (mounted) {
-            Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (_) => SuccessPage(code: code, backendData: backendRes)),
-            );
-          }
+          if (mounted) _navigateAfterScan(code, backendRes);
           return;
         }
       }
