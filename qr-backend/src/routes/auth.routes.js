@@ -20,6 +20,7 @@ const bcrypt   = require('bcryptjs');
 const router   = express.Router();
 const prisma   = require('../config/prisma');
 const { authenticateToken, generateToken } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 /**
  * Construye el objeto de respuesta estándar para operaciones de autenticación.
@@ -84,7 +85,7 @@ const loginResponse = (user, token) => ({
  * @returns {401} Si las credenciales son incorrectas o la cuenta no existe
  * @returns {403} Si la cuenta está desactivada (is_active = false)
  */
-router.post('/login', async (req, res) => {
+router.post('/login', validate(schemas.login), async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -149,7 +150,7 @@ router.post('/login', async (req, res) => {
  * @returns {400} Si faltan campos requeridos o el email tiene formato inválido
  * @returns {409} Si el email o username ya están en uso por otro turista
  */
-router.post('/users/register', async (req, res) => {
+router.post('/users/register', validate(schemas.register), async (req, res) => {
   try {
     const {
       firstName, first_name,

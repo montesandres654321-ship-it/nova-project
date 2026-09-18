@@ -22,6 +22,7 @@ const express = require('express');
 const router  = express.Router();
 const prisma  = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 /**
  * Serializa los resultados de queries $queryRaw de Prisma.
@@ -79,7 +80,7 @@ function serializeRaw(rows) {
  * @returns {403} Si el usuario es administrador (no puede escanear)
  * @returns {404} Si el lugar no existe o está inactivo
  */
-router.post('/scan', authenticateToken, async (req, res) => {
+router.post('/scan', authenticateToken, validate(schemas.scan), async (req, res) => {
   try {
     const userId  = req.user.id;
     const placeId = parseInt(req.body.placeId || req.body.place_id);
