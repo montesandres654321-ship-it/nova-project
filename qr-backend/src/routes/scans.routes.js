@@ -108,6 +108,17 @@ router.post('/scan', authenticateToken, validate(schemas.scan), async (req, res)
       INSERT INTO scans (user_id, place_id, created_at) VALUES (${userId}, ${placeId}, NOW()) RETURNING id
     `;
 
+    // Registrar puntos por el escaneo — no debe fallar el scan si esto falla
+    // (ej. si la tabla point_transactions todavía no existe en este entorno)
+    try {
+      await prisma.$executeRaw`
+        INSERT INTO point_transactions (user_id, amount, concept, reference_id, notes)
+        VALUES (${userId}, 150, 'scan', ${scanId}, ${`Escaneo en ${place.name}`})
+      `;
+    } catch (pointsError) {
+      console.error('⚠️ Error registrando puntos del scan:', pointsError.message);
+    }
+
     let reward = null;
 
     if (place.has_reward && place.reward_name) {

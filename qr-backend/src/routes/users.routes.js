@@ -92,6 +92,32 @@ router.post('/users/me/password', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── GET /users/me/points ───────────────────────────────────
+router.get('/users/me/points', authenticateToken, async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`
+      SELECT
+        COALESCE(SUM(amount), 0)::int AS total_points,
+        COUNT(*) FILTER (WHERE amount > 0)::int AS total_scans
+      FROM point_transactions
+      WHERE user_id = ${req.user.id}
+    `;
+    const totalPoints = result[0]?.total_points || 0;
+    return res.json({
+      success: true,
+      data: {
+        totalPoints,
+        totalScans: result[0]?.total_scans || 0,
+        nextMilestone: 2000,
+        progress: Math.min(totalPoints / 2000, 1),
+      },
+    });
+  } catch (error) {
+    console.error('❌ Error en GET /users/me/points:', error);
+    return res.status(500).json({ success: false, error: 'Error al obtener puntos' });
+  }
+});
+
 // ─── GET /users ───────────────────────────────────────────
 router.get('/users', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
