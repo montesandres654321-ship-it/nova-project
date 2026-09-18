@@ -10,7 +10,9 @@
 /// Diseño Figma Septiembre 2026 (NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md,
 /// node 9:2) — encabezado degradado con puntos y barra de progreso,
 /// sección "Tus recompensas" (antes en una tab separada) y el historial
-/// de escaneos ya existente ([ScanHistoryCard]).
+/// de escaneos, agrupado por fecha (HOY / ESTA SEMANA / ANTERIORES) con
+/// tarjetas verde/azul según [NOVA_GPS_GEOCODIFICACION_PERFIL_PLAN.md]
+/// (node 42:299).
 ///
 /// NOTA DE ALCANCE: el Figma muestra un catálogo fijo de 3 premios por
 /// canjear (p.ej. "2.000 pts — experiencia deportiva"); el backend no
@@ -27,7 +29,6 @@ import '../models/scan_record.dart';
 import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
-import '../widgets/scan_history_card.dart';
 import '../widgets/scan_history_filters.dart';
 import '../widgets/scan_history_empty_state.dart';
 import '../widgets/history_empty_state.dart';
@@ -390,10 +391,147 @@ class _HistoryPageState extends State<HistoryPage> {
       );
     }
     return SliverPadding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-      sliver: SliverList.builder(
-        itemCount: filtered.length,
-        itemBuilder: (_, i) => ScanHistoryCard(scan: filtered[i], onTap: () {}),
+      padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: AppSpacing.xl),
+      sliver: SliverList.list(children: _buildGroupedItems(filtered)),
+    );
+  }
+
+  // Agrupación por fecha — HOY / ESTA SEMANA / ANTERIORES (Figma node 42:299)
+  List<Widget> _buildGroupedItems(List<ScanRecord> records) {
+    final hoy = <ScanRecord>[];
+    final estaSemana = <ScanRecord>[];
+    final anteriores = <ScanRecord>[];
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    for (final r in records) {
+      final d = r.time.toLocal();
+      final diffDias = todayDate.difference(DateTime(d.year, d.month, d.day)).inDays;
+      if (diffDias == 0) {
+        hoy.add(r);
+      } else if (diffDias <= 7) {
+        estaSemana.add(r);
+      } else {
+        anteriores.add(r);
+      }
+    }
+
+    final widgets = <Widget>[];
+    void addGrupo(String label, Color color, List<ScanRecord> items) {
+      if (items.isEmpty) return;
+      widgets.add(Padding(
+        padding: const EdgeInsets.only(bottom: 10, top: 4),
+        child: Text(
+          label,
+          style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.4),
+        ),
+      ));
+      for (final r in items) {
+        widgets.add(_buildItemEscaneo(r));
+        widgets.add(const SizedBox(height: 10));
+      }
+    }
+
+    addGrupo('HOY', AppColors.bienvenidaAzul, hoy);
+    addGrupo('ESTA SEMANA', AppColors.textSecondary, estaSemana);
+    addGrupo('ANTERIORES', AppColors.textSecondary, anteriores);
+    return widgets;
+  }
+
+  String _tipoLabel(String tipo) {
+    const labels = {
+      'hotel': 'Hotel',
+      'restaurant': 'Restaurante',
+      'bar': 'Bar',
+      'escenario_deportivo': 'Escenario deportivo',
+      'parque': 'Parque',
+      'naturaleza': 'Naturaleza',
+      'cultura': 'Cultura',
+      'artesania': 'Artesanía',
+      'playa': 'Playa',
+      'ruta': 'Ruta',
+      'gastronomia': 'Gastronomía',
+      'compras': 'Compras',
+      'servicio': 'Servicio',
+    };
+    return labels[tipo] ?? 'Lugar';
+  }
+
+  Widget _buildItemEscaneo(ScanRecord scan) {
+    final esVerde = scan.hasReward;
+    final colorFondoIcono = esVerde ? const Color(0xFFE7F4EB) : const Color(0xFFEAF7FF);
+    final colorTextoReward = esVerde ? AppColors.bienvenidaVerde : AppColors.bienvenidaAzul;
+    final hora = '${scan.time.toLocal().hour.toString().padLeft(2, '0')}:${scan.time.toLocal().minute.toString().padLeft(2, '0')}';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.bienvenidaBorde),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(color: colorFondoIcono, borderRadius: BorderRadius.circular(8)),
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: SvgPicture.asset(
+                    esVerde ? 'assets/icons/ic-map-pin-green.svg' : 'assets/icons/ic-map-pin-blue.svg',
+                    width: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      scan.local,
+                      style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${scan.place} · ${_tipoLabel(scan.type)}',
+                      style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Text(hora, style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
+            ],
+          ),
+          if (scan.hasReward) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: colorFondoIcono, borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                children: [
+                  SvgPicture.asset('assets/icons/ic-gift-green.svg', width: 12),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Beneficio registrado al escanear QR',
+                      style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: colorTextoReward),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
