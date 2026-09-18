@@ -40,6 +40,12 @@ flutter:
     - assets/images/
     - assets/images/logos/
     - assets/images/onboarding/
+    - assets/images/home/
+    - assets/images/municipios/
+    - assets/images/rutas/
+    - assets/images/naturaleza/
+    - assets/images/gastronomia/
+    - assets/images/lugares/
     - assets/icon/
     - assets/icons/
     - assets/icons/nav/
