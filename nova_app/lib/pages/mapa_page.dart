@@ -8,15 +8,15 @@
 // API key propia con facturación en Google Cloud).
 //
 // Marcadores reales desde ApiService.getAllPlaces() filtrados a los
-// que ya tienen latitud/longitud (por ahora solo los 4 lugares de
-// prueba de Sincelejo/Tolú/Coveñas — el resto de places.lugar='Sampués'
-// no tiene coordenadas aún).
+// que ya tienen latitud/longitud — los 24 places de producción están
+// geocodificados (4 en Sincelejo/Tolú/Coveñas + 20 en Sampués).
 //
-// El botón GPS centra el mapa en el golfo de Morrosquillo — no pide
-// permisos de ubicación real del dispositivo (fuera de alcance de esta
-// pasada; requeriría el paquete geolocator + permisos nativos nuevos).
+// El botón GPS usa la ubicación real del dispositivo (geolocator) —
+// pide permiso en tiempo de ejecución y cae de vuelta al centro del
+// golfo de Morrosquillo si el usuario la niega o falla la lectura.
 //
-// Diseño Figma Septiembre 2026 (NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md,
+// Diseño Figma Septiembre 2026 (NOVA_GPS_GEOCODIFICACION_PERFIL_PLAN.md
+// PARTE A, sobre la base de NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md
 // node 7:2).
 // ============================================================
 
@@ -25,6 +25,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
@@ -57,6 +58,8 @@ class _MapaPageState extends State<MapaPage> {
   bool _loading = true;
   String _filtroActivo = 'Todo';
   Place? _seleccionado;
+  LatLng? _userPosition;
+  bool _loadingGps = false;
 
   @override
   void initState() {
@@ -84,6 +87,51 @@ class _MapaPageState extends State<MapaPage> {
     final tipo = _kFiltroTipo[_filtroActivo];
     if (tipo == null) return _places;
     return _places.where((p) => p.tipo == tipo).toList();
+  }
+
+  Future<void> _centrarEnUbicacion() async {
+    setState(() => _loadingGps = true);
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _mostrarSnack('Activa la ubicación en tu dispositivo');
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          _mostrarSnack('Permiso de ubicación denegado');
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        _mostrarSnack('Permiso denegado permanentemente. Ve a Ajustes para activarlo.');
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
+      );
+      if (!mounted) return;
+      final userPos = LatLng(pos.latitude, pos.longitude);
+      setState(() => _userPosition = userPos);
+      _mapController.move(userPos, 14.0);
+    } catch (e) {
+      _mapController.move(_kCentroGolfo, _kZoomInicial);
+      _mostrarSnack('No se pudo obtener tu ubicación');
+    } finally {
+      if (mounted) setState(() => _loadingGps = false);
+    }
+  }
+
+  void _mostrarSnack(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: AppColors.bienvenidaAzul),
+    );
   }
 
   String _iconoPin(String tipo) {
@@ -126,6 +174,32 @@ class _MapaPageState extends State<MapaPage> {
                       child: GestureDetector(
                         onTap: () => setState(() => _seleccionado = p),
                         child: SvgPicture.asset(_iconoPin(p.tipo), width: 26, height: 26),
+                      ),
+                    ),
+                  if (_userPosition != null)
+                    Marker(
+                      point: _userPosition!,
+                      width: 72,
+                      height: 72,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(color: AppColors.bienvenidaAzul.withValues(alpha: 0.18), shape: BoxShape.circle),
+                          ),
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: AppColors.bienvenidaAzul,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [BoxShadow(color: AppColors.bienvenidaAzul.withValues(alpha: 0.4), blurRadius: 8)],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                 ],
@@ -183,12 +257,12 @@ class _MapaPageState extends State<MapaPage> {
             ),
           ),
 
-          // Botón GPS — centra el mapa en el golfo (sin ubicación real del dispositivo)
+          // Botón GPS — ubicación real del dispositivo (geolocator)
           Positioned(
             right: 20,
             bottom: 230,
             child: GestureDetector(
-              onTap: () => _mapController.move(_kCentroGolfo, _kZoomInicial),
+              onTap: _loadingGps ? null : _centrarEnUbicacion,
               child: Container(
                 width: 46,
                 height: 46,
@@ -197,7 +271,12 @@ class _MapaPageState extends State<MapaPage> {
                   shape: BoxShape.circle,
                   boxShadow: const [BoxShadow(color: Color(0x24000000), blurRadius: 10, offset: Offset(0, 3))],
                 ),
-                child: const Icon(Icons.my_location, color: AppColors.bienvenidaAzul, size: 22),
+                child: _loadingGps
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bienvenidaAzul),
+                      )
+                    : const Icon(Icons.my_location, color: AppColors.bienvenidaAzul, size: 22),
               ),
             ),
           ),
