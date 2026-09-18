@@ -18,6 +18,7 @@ import '../models/place_model.dart';
 import '../services/api_service.dart';
 import '../widgets/nova_chip.dart';
 import 'municipio_page.dart';
+import 'mapa_page.dart';
 
 class _MunicipioInfo {
   final String slug;
@@ -135,10 +136,27 @@ class _PlacesPageState extends State<PlacesPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset(
-            'assets/images/logos/logo-juegos-nacionales-2027.svg',
-            width: 122,
-            height: 55,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SvgPicture.asset(
+                'assets/images/logos/logo-juegos-nacionales-2027.svg',
+                width: 122,
+                height: 55,
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MapaPage())),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.bienvenidaFondoChip,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.map_outlined, color: AppColors.bienvenidaAzul, size: 22),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           Text(

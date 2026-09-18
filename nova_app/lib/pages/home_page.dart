@@ -31,6 +31,7 @@ import '../widgets/nova_lista_card.dart';
 import '../widgets/nova_chip.dart';
 import 'place_detail_page.dart';
 import 'municipio_page.dart';
+import 'rutas_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -202,7 +203,9 @@ class _HomePageState extends State<HomePage> {
               _buildSeccionCarrusel(
                 titulo: 'Rutas y recorridos',
                 verMasLabel: 'Ver rutas',
+                onVerMasTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RutasPage())),
                 items: _kRutaItems,
+                onTapItem: (_) => Navigator.push(context, MaterialPageRoute(builder: (_) => const RutasPage())),
               ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
@@ -591,6 +594,7 @@ class _HomePageState extends State<HomePage> {
     required List<_CarruselItem> items,
     bool tituloEspecial = false,
     String? verMasLabel,
+    VoidCallback? onVerMasTap,
     void Function(int index)? onTapItem,
   }) {
     return Column(
@@ -610,12 +614,15 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               if (verMasLabel != null)
-                Text(
-                  verMasLabel,
-                  style: GoogleFonts.openSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.bienvenidaAzul,
+                GestureDetector(
+                  onTap: onVerMasTap,
+                  child: Text(
+                    verMasLabel,
+                    style: GoogleFonts.openSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.bienvenidaAzul,
+                    ),
                   ),
                 ),
             ],
