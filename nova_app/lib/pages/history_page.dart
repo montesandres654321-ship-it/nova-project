@@ -1,21 +1,47 @@
-/// Página de historial de escaneos del turista autenticado.
+/// Página "Mis recompensas" del turista autenticado.
 ///
-/// Muestra todos los lugares que el turista ha visitado mediante escaneo QR,
-/// ordenados del más reciente al más antiguo, y sus recompensas obtenidas.
+/// Muestra un resumen de puntos (derivados del conteo real de escaneos),
+/// las recompensas que el turista ha obtenido (con acción de canje real
+/// contra el backend) y el historial completo de escaneos.
 ///
 /// Los datos se cargan desde [ApiService.getScanHistory] y
-/// [ApiService.getUserRewards]. La presentación de cada tab vive en
-/// [ScanHistoryList] y [RewardsHistoryList] (widgets/), respectivamente.
+/// [ApiService.getUserRewards]; el canje usa [ApiService.redeemReward].
+///
+/// Diseño Figma Septiembre 2026 (NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md,
+/// node 9:2) — encabezado degradado con puntos y barra de progreso,
+/// sección "Tus recompensas" (antes en una tab separada) y el historial
+/// de escaneos ya existente ([ScanHistoryCard]).
+///
+/// NOTA DE ALCANCE: el Figma muestra un catálogo fijo de 3 premios por
+/// canjear (p.ej. "2.000 pts — experiencia deportiva"); el backend no
+/// tiene ese catálogo, así que la sección "Tus recompensas" muestra las
+/// recompensas REALES que el turista ya ganó al escanear, con su estado
+/// real (pendiente/canjeada) — no se inventan premios ni puntos de canje
+/// que la API no respalda.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/scan_record.dart';
 import '../services/api_service.dart';
-import '../core/design/app_back_button.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
-import '../widgets/scan_history_list.dart';
-import '../widgets/rewards_history_list.dart';
+import '../widgets/scan_history_card.dart';
+import '../widgets/scan_history_filters.dart';
+import '../widgets/scan_history_empty_state.dart';
+import '../widgets/history_empty_state.dart';
+import 'places_page.dart';
+
+const _kPuntosPorEscaneo = 150;
+const _kMilestones = [500, 1000, 2000, 3500, 5000, 10000];
+
+// Colores cíclicos de las tarjetas de premio (azul/verde/coral del Figma)
+const _kPremioColores = [
+  (bg: Color(0xFFE6F2FA), fg: AppColors.bienvenidaAzul, icon: 'assets/icons/ic-gift-blue.svg'),
+  (bg: Color(0xFFE7F4EB), fg: AppColors.bienvenidaVerde, icon: 'assets/icons/ic-gift-green.svg'),
+  (bg: Color(0xFFFDF1E3), fg: AppColors.bienvenidaCoral, icon: 'assets/icons/ic-gift-orange.svg'),
+];
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -29,12 +55,19 @@ class _HistoryPageState extends State<HistoryPage> {
   bool _loading = true;
   String _error = '';
 
-  // Recompensas del turista
   List<Map<String, dynamic>> _rewards = [];
   bool _rewardsLoading = true;
   String _rewardsError = '';
+  int? _redeemingId;
+  String? _searchQuery;
 
-  // ── Lifecycle ──────────────────────────────────────────────
+  List<ScanRecord> get _filteredRecords {
+    final query = _searchQuery?.trim().toLowerCase();
+    if (query == null || query.isEmpty) return _records;
+    return _records
+        .where((r) => r.local.toLowerCase().contains(query) || r.place.toLowerCase().contains(query))
+        .toList();
+  }
 
   @override
   void initState() {
@@ -42,8 +75,6 @@ class _HistoryPageState extends State<HistoryPage> {
     _loadHistory();
     _loadRewards();
   }
-
-  // ── Data ───────────────────────────────────────────────────
 
   Future<void> _loadHistory() async {
     setState(() {
@@ -75,69 +106,294 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  // ── Build ──────────────────────────────────────────────────
+  Future<void> _redeem(Map<String, dynamic> reward) async {
+    final id = reward['id'];
+    if (id == null || _redeemingId != null) return;
+    setState(() => _redeemingId = id as int);
+    final result = await ApiService.redeemReward(id);
+    if (!mounted) return;
+    if (result['success'] == true) {
+      await _loadRewards();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result['error']?.toString() ?? 'Error al canjear'),
+        backgroundColor: AppColors.error,
+      ));
+    }
+    if (mounted) setState(() => _redeemingId = null);
+  }
+
+  int get _totalPoints => _records.length * _kPuntosPorEscaneo;
+
+  int get _nextMilestone =>
+      _kMilestones.firstWhere((m) => m > _totalPoints, orElse: () => _kMilestones.last);
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: AppColors.surface,
-        appBar: AppBar(
-          title: const Text('Historial'),
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.textPrimary,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          surfaceTintColor: AppColors.surface,
-          automaticallyImplyLeading: false,
-          leadingWidth: 52,
-          leading: Navigator.canPop(context)
-              ? const Padding(
-                  padding: EdgeInsets.only(left: AppSpacing.sm),
-                  child: Center(child: AppBackButton()),
-                )
-              : null,
-          titleTextStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded, size: 22),
-              onPressed: _loadHistory,
-              tooltip: 'Actualizar',
-              color: AppColors.textSecondary,
-            ),
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildEncabezado()),
+            SliverToBoxAdapter(child: _buildRecompensas()),
+            SliverToBoxAdapter(child: _buildHistorialTitulo()),
+            _buildHistorialSliver(),
           ],
-          bottom: const TabBar(
-            indicatorColor: AppColors.primary,
-            labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textSecondary,
-            indicatorSize: TabBarIndicatorSize.tab,
-            tabs: [
-              Tab(text: 'Escaneos'),
-              Tab(text: 'Recompensas'),
+        ),
+      ),
+    );
+  }
+
+  // ENCABEZADO DEGRADADO + TARJETA DE PUNTOS
+  Widget _buildEncabezado() {
+    final progreso = (_totalPoints / _nextMilestone).clamp(0.0, 1.0);
+    final restantes = (_nextMilestone - _totalPoints).clamp(0, _nextMilestone);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0071BD), Color(0xFF005A96)],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Mis beneficios · Juegos 2027',
+            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$_totalPoints',
+                  style: GoogleFonts.openSans(fontSize: 40, fontWeight: FontWeight.w800, color: Colors.white),
+                ),
+                Text(
+                  'puntos Nova acumulados',
+                  style: GoogleFonts.openSans(fontSize: 13, color: AppColors.bienvenidaAzulClaro),
+                ),
+                const SizedBox(height: 14),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: progreso,
+                    minHeight: 6,
+                    backgroundColor: Colors.white.withValues(alpha: 0.25),
+                    valueColor: const AlwaysStoppedAnimation(Color(0xFF4ADE80)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  restantes > 0
+                      ? '$restantes puntos más para tu próximo nivel'
+                      : '¡Alcanzaste el nivel máximo por ahora!',
+                  style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // TUS RECOMPENSAS (datos reales de getUserRewards)
+  Widget _buildRecompensas() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tus recompensas',
+            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+          ),
+          const SizedBox(height: 12),
+          if (_rewardsLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: LinearProgressIndicator(minHeight: 2),
+            )
+          else if (_rewardsError.isNotEmpty)
+            Text(_rewardsError, style: GoogleFonts.openSans(fontSize: 13, color: AppColors.error))
+          else if (_rewards.isEmpty)
+            Text(
+              'Escanea QR en los establecimientos aliados para ganar recompensas.',
+              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+            )
+          else
+            Column(
+              children: [
+                for (var i = 0; i < _rewards.length; i++) ...[
+                  _buildPremio(_rewards[i], _kPremioColores[i % _kPremioColores.length]),
+                  if (i != _rewards.length - 1) const SizedBox(height: 10),
+                ],
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremio(
+    Map<String, dynamic> reward,
+    ({Color bg, Color fg, String icon}) colores,
+  ) {
+    final isRedeemed = reward['is_redeemed'] == true;
+    final id = reward['id'] as int?;
+    final isRedeeming = _redeemingId == id;
+    final nombre = reward['reward_name']?.toString() ?? 'Recompensa';
+    final lugar = reward['place_name']?.toString() ?? '';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(color: colores.bg, borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: SvgPicture.asset(colores.icon, width: 22),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  nombre,
+                  style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  lugar,
+                  style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: colores.fg),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (isRedeemed)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+              child: Text('Canjeada', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.success)),
+            )
+          else
+            GestureDetector(
+              onTap: isRedeeming ? null : () => _redeem(reward),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(color: const Color(0xFFF0F3F7), borderRadius: BorderRadius.circular(999)),
+                child: isRedeeming
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                    : Text('Canjear', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoMedio)),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistorialTitulo() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Historial de escaneos',
+                style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textSecondary),
+                onPressed: _loadHistory,
+                tooltip: 'Actualizar',
+              ),
             ],
           ),
-        ),
-        body: TabBarView(
-          children: [
-            ScanHistoryList(
-              loading: _loading,
-              error: _error,
-              records: _records,
-              onRefresh: _loadHistory,
-            ),
-            RewardsHistoryList(
-              loading: _rewardsLoading,
-              error: _rewardsError,
-              rewards: _rewards,
-              onRefresh: _loadRewards,
+          if (!_loading && _records.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ScanHistoryFilters(
+              onSearchChange: (v) => setState(() => _searchQuery = v),
+              onReset: () => setState(() => _searchQuery = null),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistorialSliver() {
+    if (_loading) {
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
         ),
+      );
+    }
+    if (_records.isEmpty) {
+      final isRealEmpty = _error == 'No hay escaneos registrados';
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: isRealEmpty
+              ? ScanHistoryEmptyState(
+                  onExplore: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PlacesPage())),
+                )
+              : HistoryEmptyState(
+                  icon: Icons.cloud_off_rounded,
+                  iconColor: AppColors.error,
+                  iconBackgroundColor: AppColors.error.withValues(alpha: 0.08),
+                  title: 'No se pudo cargar el historial',
+                  message: _error,
+                  onRetry: _loadHistory,
+                ),
+        ),
+      );
+    }
+    final filtered = _filteredRecords;
+    if (filtered.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Center(
+            child: Text('Sin resultados para tu búsqueda', style: GoogleFonts.openSans(color: AppColors.textSecondary)),
+          ),
+        ),
+      );
+    }
+    return SliverPadding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+      sliver: SliverList.builder(
+        itemCount: filtered.length,
+        itemBuilder: (_, i) => ScanHistoryCard(scan: filtered[i], onTap: () {}),
       ),
     );
   }
