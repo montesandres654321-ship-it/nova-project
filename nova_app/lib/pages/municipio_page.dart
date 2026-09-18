@@ -21,6 +21,7 @@ import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
 import '../widgets/nova_lista_card.dart';
+import '../widgets/error_display_widget.dart';
 import 'place_detail_page.dart';
 
 class _TimelineEntry {
@@ -150,6 +151,7 @@ class MunicipioPage extends StatefulWidget {
 class _MunicipioPageState extends State<MunicipioPage> {
   List<Place> _lugares = [];
   bool _loading = true;
+  String? _error;
 
   _MunicipioData get _data => _kMunicipios[widget.municipio] ?? _kMunicipios['sincelejo']!;
 
@@ -160,12 +162,19 @@ class _MunicipioPageState extends State<MunicipioPage> {
   }
 
   Future<void> _loadLugares() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final lugares = await ApiService.getPlacesByMunicipio(widget.municipio);
       if (!mounted) return;
       setState(() => _lugares = lugares);
     } catch (e) {
       debugPrint('Error cargando lugares de ${widget.municipio}: $e');
+      if (mounted) {
+        setState(() => _error = 'No pudimos cargar los lugares. Verifica tu conexión.');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -435,6 +444,8 @@ class _MunicipioPageState extends State<MunicipioPage> {
           const SizedBox(height: 12),
           if (_loading)
             const LinearProgressIndicator(minHeight: 2)
+          else if (_error != null)
+            ErrorDisplayWidget(mensaje: _error!, onRetry: _loadLugares)
           else if (_lugares.isEmpty)
             Text(
               'Aún no hay lugares registrados en este municipio.',
