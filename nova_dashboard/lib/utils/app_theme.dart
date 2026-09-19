@@ -97,6 +97,22 @@ class AppTheme {
   static const Color border = AppColors.border;
 
   // ============================================================
+  // PALETA "SLATE" — alias semánticos (Sprint 4, Parte A)
+  // Valores EXACTOS tomados de los *_tokens.dart (admin, places,
+  // place_details, profile, settings) — no se aproximan a gray50-900.
+  // ============================================================
+  static const Color slateTextHead  = AppColors.slateTextHead;
+  static const Color slateTextMuted = AppColors.slateTextMuted;
+  static const Color slateTextSub   = AppColors.slateTextSub;
+  static const Color slateBorder    = AppColors.slateBorder;
+  static const Color slateBgPage    = AppColors.slateBgPage;
+  static const Color slateBgCard    = AppColors.slateBgCard;
+  static const Color slateBlue      = AppColors.slateBlue;
+  static const Color slateAmber     = AppColors.slateAmber;
+  static const Color slateGreen     = AppColors.slateGreen;
+  static const Color slateRed       = AppColors.slateRed;
+
+  // ============================================================
   // ESPACIADO — escala oficial de 8
   // ============================================================
   static const double space4  = AppSpacing.space4;

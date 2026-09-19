@@ -62,4 +62,25 @@ class AppColors {
   // BORDE
   // ============================================================
   static const Color border = gray200;
+
+  // ============================================================
+  // PALETA "SLATE" — alias semánticos (Sprint 4, Parte A)
+  // ============================================================
+  // Escala tipo Tailwind slate, duplicada de forma idéntica en ~6
+  // archivos *_tokens.dart de páginas del dashboard (admin, places,
+  // place_details, profile, settings). NO coincide exactamente con la
+  // escala gray50-900 de arriba (p.ej. slateBorder 0xFFE2E8F0 vs
+  // border 0xFFE2E8E9) — por decisión de CTO se preserva como alias
+  // propio en vez de forzarla a la escala teal existente, para no
+  // cambiar el valor exacto que ya usan esas páginas.
+  static const Color slateTextHead  = Color(0xFF0F172A);
+  static const Color slateTextMuted = Color(0xFF64748B);
+  static const Color slateTextSub   = Color(0xFF94A3B8);
+  static const Color slateBorder    = Color(0xFFE2E8F0);
+  static const Color slateBgPage    = Color(0xFFF1F5F9);
+  static const Color slateBgCard    = Color(0xFFF8FAFC);
+  static const Color slateBlue      = Color(0xFF3B82F6);
+  static const Color slateAmber     = Color(0xFFF59E0B);
+  static const Color slateGreen     = Color(0xFF10B981);
+  static const Color slateRed       = Color(0xFFEF4444);
 }
