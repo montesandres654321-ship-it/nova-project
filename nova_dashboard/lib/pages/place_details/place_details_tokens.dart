@@ -4,14 +4,14 @@ import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 const kPlaceDetailsPrimary   = AppTheme.primary;
-const kPlaceDetailsBgPage    = Color(0xFFF1F5F9);
-const kPlaceDetailsTextHead  = Color(0xFF0F172A);
-const kPlaceDetailsTextMuted = Color(0xFF64748B);
-const kPlaceDetailsTextSub   = Color(0xFF94A3B8);
-const kPlaceDetailsBorder    = Color(0xFFE2E8F0);
-const kPlaceDetailsBlue      = Color(0xFF3B82F6);
-const kPlaceDetailsGreen     = Color(0xFF10B981);
-const kPlaceDetailsAmber     = Color(0xFFF59E0B);
+const kPlaceDetailsBgPage    = AppTheme.slateBgPage;
+const kPlaceDetailsTextHead  = AppTheme.slateTextHead;
+const kPlaceDetailsTextMuted = AppTheme.slateTextMuted;
+const kPlaceDetailsTextSub   = AppTheme.slateTextSub;
+const kPlaceDetailsBorder    = AppTheme.slateBorder;
+const kPlaceDetailsBlue      = AppTheme.slateBlue;
+const kPlaceDetailsGreen     = AppTheme.slateGreen;
+const kPlaceDetailsAmber     = AppTheme.slateAmber;
 
 Color placeDetailsTypeColor(String tipo) {
   switch (tipo.toLowerCase()) {

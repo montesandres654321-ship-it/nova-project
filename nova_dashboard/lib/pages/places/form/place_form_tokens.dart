@@ -5,4 +5,4 @@ import 'package:flutter/material.dart';
 
 const kPlaceFormTeal   = AppTheme.primary;
 const kPlaceFormBorder = Color(0xFFE5E7EB);
-const kPlaceFormBg     = Color(0xFFF8FAFC);
+const kPlaceFormBg     = AppTheme.slateBgCard;
