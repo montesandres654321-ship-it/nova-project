@@ -9,7 +9,14 @@
     "dev": "nodemon index.js",
     "postinstall": "prisma generate",
     "migrate": "node scripts/migrate-supabase.js",
-    "start:prod": "NODE_ENV=production node index.js"
+    "start:prod": "NODE_ENV=production node index.js",
+    "test": "jest --detectOpenHandles --forceExit"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   },
   "keywords": [
     "qr",
@@ -37,8 +44,10 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "jest": "^30.5.2",
     "nodemon": "^3.0.2",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "supertest": "^7.2.2"
   },
   "engines": {
     "node": "20.x"

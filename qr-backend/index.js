@@ -180,16 +180,22 @@ app.use((req, res) => {
 });
 
 // ── Start ────────────────────────────────────────────────
-app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n🚀 NOVA APP BACKEND listo');
-  console.log(`📡  http://localhost:${PORT}`);
-  console.log('📱  /login  /scan  /places  /places/:id  /places/type/:type');
-  console.log('🖥️   /admin/users  /users/me/profile  /users/me/password');
-  console.log('📊  /analytics/*  /dashboard/summary  /owner/stats');
-  console.log('📤  /admin/upload-image\n');
-});
+// Solo escuchar si este archivo se ejecuta directamente (node index.js),
+// no cuando lo importa un test con require('../index').
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log('\n🚀 NOVA APP BACKEND listo');
+    console.log(`📡  http://localhost:${PORT}`);
+    console.log('📱  /login  /scan  /places  /places/:id  /places/type/:type');
+    console.log('🖥️   /admin/users  /users/me/profile  /users/me/password');
+    console.log('📊  /analytics/*  /dashboard/summary  /owner/stats');
+    console.log('📤  /admin/upload-image\n');
+  });
 
-process.on('SIGINT', () => {
-  try { require('./src/config/database').end(); } catch (e) {}
-  process.exit(0);
-});
+  process.on('SIGINT', () => {
+    try { require('./src/config/database').end(); } catch (e) {}
+    process.exit(0);
+  });
+}
+
+module.exports = app;
