@@ -218,6 +218,28 @@ class AuthService {
   /// Cerrar sesión — limpiar datos locales
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    final token = prefs.getString(AppConstants.keyToken);
+
+    if (token != null && token.isNotEmpty) {
+      try {
+        await http.post(
+          Uri.parse(AppConstants.buildUrl('/logout')),
+          headers: {'Authorization': 'Bearer $token'},
+        ).timeout(AppConstants.timeoutShort);
+      } catch (e) {
+        debugPrint('⚠️ No se pudo revocar el token en el servidor: $e');
+        // No bloquear el logout local si falla la red
+      }
+    }
+
+    // Borrar solo los datos de sesión — mantener onboarding_complete
+    // (no repetir el flujo de bienvenida) y las prefs de "recordarme".
+    await prefs.remove(AppConstants.keyToken);
+    await prefs.remove(AppConstants.keyUserId);
+    await prefs.remove(AppConstants.keyUser);
+    await prefs.remove(AppConstants.keyUsername);
+    await prefs.remove(AppConstants.keyEmail);
+    await prefs.remove(AppConstants.keyFirstName);
+    await prefs.remove(AppConstants.keyAuthProvider);
   }
 }
