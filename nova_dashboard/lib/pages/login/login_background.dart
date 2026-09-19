@@ -1,6 +1,7 @@
 // lib/pages/login/login_background.dart
 // Extraído de login_page.dart (fondo gradiente + círculos decorativos)
 // sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class LoginBackground extends StatelessWidget {
@@ -17,7 +18,7 @@ class LoginBackground extends StatelessWidget {
             end:   Alignment.bottomRight,
             colors: [
               Color(0xFF0F766E), // teal oscuro
-              Color(0xFF06B6A4), // primary
+              AppTheme.primary, // primary
               Color(0xFF67E8F9), // light accent
             ],
           ),

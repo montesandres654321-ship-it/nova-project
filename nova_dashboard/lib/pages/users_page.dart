@@ -9,6 +9,7 @@
 // REFACTOR: tarjeta de usuario y diálogos extraídos a lib/pages/users/
 // para bajar de 524 a <300 líneas.
 
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../models/user_model.dart';
@@ -164,7 +165,7 @@ class _UsersPageState extends State<UsersPage> {
                 ElevatedButton(
                     onPressed: _loadUsers,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF06B6A4)),
+                        backgroundColor: AppTheme.primary),
                     child: const Text('Reintentar',
                         style: TextStyle(color: Colors.white))),
               ]))

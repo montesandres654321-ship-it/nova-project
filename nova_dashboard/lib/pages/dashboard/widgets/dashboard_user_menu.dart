@@ -1,10 +1,11 @@
 // lib/pages/dashboard/widgets/dashboard_user_menu.dart
 // Extraído de dashboard_page.dart (_buildUserMenu) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 
-const kDashboardTeal = Color(0xFF06B6A4);
+const kDashboardTeal = AppTheme.primary;
 
 class DashboardUserMenu extends StatelessWidget {
   final bool compact;

@@ -17,6 +17,7 @@
 ///
 /// Los datos se cargan desde [AnalyticsService.getRewardsStats] y
 /// [AnalyticsService.getRewardsByDay].
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/analytics_service.dart';
@@ -35,8 +36,8 @@ class _RewardsPageState extends State<RewardsPage> {
   Map<String, dynamic>? _stats; List<Map<String, dynamic>> _rewardsByDay = [];
   bool _loading = true; String? _error; int _selectedDays = 0;
   final List<int> _daysOptions = [7, 15, 30, 60, 90, 0];
-  static const _teal = Color(0xFF06B6A4), _green = Color(0xFF059669),
-      _amber = Color(0xFFD97706), _blue = Color(0xFF2563EB);
+  static const _teal = AppTheme.primary, _green = Color(0xFF059669),
+      _amber = AppTheme.warning, _blue = AppTheme.info;
 
   @override
   void initState() { super.initState(); _loadData(); }

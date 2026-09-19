@@ -1,9 +1,10 @@
 // lib/pages/admins/admin_tokens.dart
 // Tokens de color compartidos entre list_tab.dart y los widgets/diálogos
 // extraídos de él. Mismos valores que existían inline en list_tab.dart.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
-const kAdminPrimary   = Color(0xFF06B6A4);
+const kAdminPrimary   = AppTheme.primary;
 const kAdminBgPage    = Color(0xFFF1F5F9);
 const kAdminTextHead  = Color(0xFF0F172A);
 const kAdminTextMuted = Color(0xFF64748B);

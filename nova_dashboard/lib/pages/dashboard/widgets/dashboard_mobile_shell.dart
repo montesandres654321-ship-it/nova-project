@@ -1,11 +1,12 @@
 // lib/pages/dashboard/widgets/dashboard_mobile_shell.dart
 // Extraído de dashboard_page.dart (_buildMobileAppBar/_buildMobileDrawer)
 // sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../dashboard_nav_item.dart';
 import 'dashboard_logo.dart';
 
-const kDashboardMobileTeal = Color(0xFF06B6A4);
+const kDashboardMobileTeal = AppTheme.primary;
 
 PreferredSizeWidget dashboardMobileAppBar({
   required Widget userMenu,

@@ -1,12 +1,13 @@
 // lib/pages/dashboard/widgets/dashboard_desktop_topbar.dart
 // Extraído de dashboard_page.dart (_buildDesktopTopBar) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../dashboard_nav_item.dart';
 import 'dashboard_logo.dart';
 import 'dashboard_user_menu.dart';
 
-const kDashboardDesktopTeal = Color(0xFF06B6A4);
+const kDashboardDesktopTeal = AppTheme.primary;
 
 class DashboardDesktopTopBar extends StatelessWidget implements PreferredSizeWidget {
   final List<NavItem> navItems;

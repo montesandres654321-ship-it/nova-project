@@ -1,6 +1,7 @@
 // lib/pages/login/login_header.dart
 // Extraído de login_page.dart (logo badge + título + subtítulo) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class LoginHeader extends StatelessWidget {
@@ -16,14 +17,14 @@ class LoginHeader extends StatelessWidget {
           width: 64, height: 64,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF0F766E), Color(0xFF06B6A4)],
+              colors: [Color(0xFF0F766E), AppTheme.primary],
               begin: Alignment.topLeft,
               end:   Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF06B6A4).withOpacity(0.40),
+                color: AppTheme.primary.withOpacity(0.40),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),

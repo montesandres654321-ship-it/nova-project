@@ -3,6 +3,7 @@
 // Evita que el botón ← lleve a sesiones de otros usuarios
 // REFACTOR: fondo, header y campos del formulario extraídos a
 // lib/pages/login/ para bajar de 446 a <300 líneas.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import 'login/login_background.dart';
@@ -191,10 +192,10 @@ class _LoginPageState extends State<LoginPage>
                                 child: ElevatedButton(
                                   onPressed: _loading ? null : _login,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF06B6A4),
+                                    backgroundColor: AppTheme.primary,
                                     foregroundColor: Colors.white,
                                     disabledBackgroundColor:
-                                        const Color(0xFF06B6A4).withOpacity(0.55),
+                                        AppTheme.primary.withOpacity(0.55),
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12)),
                                     elevation: 0,

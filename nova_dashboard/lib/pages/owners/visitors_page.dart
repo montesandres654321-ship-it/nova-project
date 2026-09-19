@@ -3,6 +3,7 @@
 // Usa GET /places/my-place/visitors
 // Campos: Avatar | Nombre | Email | Nº visitas | Última visita
 
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
@@ -16,7 +17,7 @@ class OwnerVisitorsPage extends StatefulWidget {
 }
 
 class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
-  static const _teal  = Color(0xFF06B6A4);
+  static const _teal  = AppTheme.primary;
   static const _teal2 = Color(0xFF0891B2);
 
   bool   _loading = true;
@@ -174,7 +175,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
 
     // Color del ranking top 3
     Color rankColor = _teal;
-    if (rank == 1) rankColor = const Color(0xFFD97706);
+    if (rank == 1) rankColor = AppTheme.warning;
     if (rank == 2) rankColor = Colors.grey[600]!;
     if (rank == 3) rankColor = const Color(0xFF92400E);
 

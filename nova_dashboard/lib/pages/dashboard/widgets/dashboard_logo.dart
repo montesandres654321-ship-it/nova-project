@@ -1,6 +1,7 @@
 // lib/pages/dashboard/widgets/dashboard_logo.dart
 // Extraído de dashboard_page.dart (_buildLogo) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class DashboardLogo extends StatelessWidget {
@@ -36,7 +37,7 @@ class DashboardLogo extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Icon(
                 Icons.travel_explore_rounded,
-                color: const Color(0xFF06B6A4),
+                color: AppTheme.primary,
                 size: iconSize * 0.62,
               ),
             ),

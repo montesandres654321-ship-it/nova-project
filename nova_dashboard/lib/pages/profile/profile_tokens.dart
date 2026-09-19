@@ -1,8 +1,9 @@
 // lib/pages/profile/profile_tokens.dart
 // Tokens de color compartidos por profile_page.dart y sus widgets extraídos.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
-const kProfilePrimary   = Color(0xFF06B6A4);
+const kProfilePrimary   = AppTheme.primary;
 const kProfileBgPage    = Color(0xFFF1F5F9);
 const kProfileTextHead  = Color(0xFF0F172A);
 const kProfileTextMuted = Color(0xFF64748B);

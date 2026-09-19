@@ -1,6 +1,7 @@
 // lib/pages/profile/widgets/profile_header.dart
 // Extraído de profile_page.dart (_buildProfileHeader) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 import '../profile_tokens.dart';
@@ -35,7 +36,7 @@ class ProfileHeader extends StatelessWidget {
           width: 72, height: 72,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF06B6A4), Color(0xFF0891B2)],
+              colors: [AppTheme.primary, Color(0xFF0891B2)],
               begin: Alignment.topLeft, end: Alignment.bottomRight,
             ),
             shape: BoxShape.circle,

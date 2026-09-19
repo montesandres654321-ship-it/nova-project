@@ -1,6 +1,7 @@
 // lib/pages/user_detail/widgets/user_detail_layouts.dart
 // Extraído de user_detail_page.dart (_buildContent/_buildLayout/
 // _buildSectionTitle) sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 import 'user_compact_stats.dart';
@@ -85,7 +86,7 @@ class UserDetailContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sectionTitle('Lugares Más Visitados',
-                    Icons.place_rounded, const Color(0xFF06B6A4)),
+                    Icons.place_rounded, AppTheme.primary),
                 const SizedBox(height: 12),
                 UserTopPlacesCard(topPlaces: topPlaces),
               ],

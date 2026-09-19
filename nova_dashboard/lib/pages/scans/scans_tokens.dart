@@ -1,8 +1,9 @@
 // lib/pages/scans/scans_tokens.dart
 // Tokens y helpers compartidos por scans_page.dart y sus widgets.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
-const kScansPrimary = Color(0xFF06B6A4);
+const kScansPrimary = AppTheme.primary;
 
 Color scansPlaceColor(String? tipo) {
   switch (tipo) {

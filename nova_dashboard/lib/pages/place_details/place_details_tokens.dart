@@ -1,8 +1,9 @@
 // lib/pages/place_details/place_details_tokens.dart
 // Tokens de color compartidos por place_details_page.dart y sus widgets.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
-const kPlaceDetailsPrimary   = Color(0xFF06B6A4);
+const kPlaceDetailsPrimary   = AppTheme.primary;
 const kPlaceDetailsBgPage    = Color(0xFFF1F5F9);
 const kPlaceDetailsTextHead  = Color(0xFF0F172A);
 const kPlaceDetailsTextMuted = Color(0xFF64748B);

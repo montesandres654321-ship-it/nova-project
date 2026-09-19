@@ -1,6 +1,7 @@
 // lib/pages/login/login_form_fields.dart
 // Extraído de login_page.dart (_inputDec + campos de email/contraseña)
 // sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 InputDecoration loginInputDecoration({
@@ -26,7 +27,7 @@ InputDecoration loginInputDecoration({
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Color(0xFF06B6A4), width: 2),
+      borderSide: const BorderSide(color: AppTheme.primary, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),

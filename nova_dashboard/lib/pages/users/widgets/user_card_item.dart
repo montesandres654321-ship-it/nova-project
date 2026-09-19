@@ -1,6 +1,7 @@
 // lib/pages/users/widgets/user_card_item.dart
 // Extraído de users_page.dart (_UserCardItem/_UserCardItemState) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 
@@ -44,7 +45,7 @@ class _UserCardItemState extends State<UserCardItem> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: _hovered
-                  ? const Color(0xFF06B6A4).withOpacity(0.35)
+                  ? AppTheme.primary.withOpacity(0.35)
                   : const Color(0xFFE2E8F0),
             ),
             boxShadow: [
@@ -62,11 +63,11 @@ class _UserCardItemState extends State<UserCardItem> {
               CircleAvatar(
                 radius: 22,
                 backgroundColor: user.isActive
-                    ? const Color(0xFF06B6A4).withOpacity(0.12)
+                    ? AppTheme.primary.withOpacity(0.12)
                     : Colors.grey.shade200,
                 child: Icon(
                     user.isGoogleUser ? Icons.g_mobiledata : Icons.person,
-                    color: user.isActive ? const Color(0xFF06B6A4) : Colors.grey,
+                    color: user.isActive ? AppTheme.primary : Colors.grey,
                     size: 22),
               ),
               const SizedBox(width: 14),

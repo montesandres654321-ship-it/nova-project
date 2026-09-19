@@ -1,9 +1,10 @@
 // lib/pages/places/places_tokens.dart
 // Tokens de color compartidos entre list_tab.dart y los widgets extraídos
 // de él (consistentes con stats_dashboard_page, igual que antes).
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
-const kPlacesPrimary   = Color(0xFF06B6A4);
+const kPlacesPrimary   = AppTheme.primary;
 const kPlacesBgPage    = Color(0xFFF1F5F9);
 const kPlacesTextHead  = Color(0xFF0F172A);
 const kPlacesTextMuted = Color(0xFF64748B);

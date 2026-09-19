@@ -3,6 +3,7 @@
 // Llama PATCH /places/my-place/reward (solo user_place)
 // Campos: selector de ícono, nombre, descripción, stock disponible
 
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../services/place_service.dart';
 
@@ -27,8 +28,8 @@ class OwnerRewardDialog extends StatefulWidget {
 }
 
 class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
-  static const _teal  = Color(0xFF06B6A4);
-  static const _amber = Color(0xFFD97706);
+  static const _teal  = AppTheme.primary;
+  static const _amber = AppTheme.warning;
 
   late TextEditingController _nameCtrl;
   late TextEditingController _descCtrl;
