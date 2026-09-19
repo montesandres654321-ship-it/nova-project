@@ -1,6 +1,7 @@
 // lib/pages/owners/place_edit/place_edit_image_section.dart
 // Extraído de place_edit_page.dart (sección "🖼️ Imagen del Lugar") sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'place_edit_fields.dart';
@@ -60,10 +61,10 @@ List<Widget> buildPlaceEditImageSection({
         decoration: BoxDecoration(
             color: Colors.green[50],
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.green)),
+            border: Border.all(color: AppTheme.success)),
         child: Row(children: [
           const Icon(Icons.check_circle,
-              color: Colors.green, size: 18),
+              color: AppTheme.success, size: 18),
           const SizedBox(width: 8),
           Expanded(child: Text(
               '${selectedImageFile.name} (${(selectedImageFile.size / 1024).toStringAsFixed(0)} KB)',
@@ -71,7 +72,7 @@ List<Widget> buildPlaceEditImageSection({
               overflow: TextOverflow.ellipsis)),
           IconButton(
               icon: const Icon(Icons.close,
-                  color: Colors.red, size: 18),
+                  color: AppTheme.error, size: 18),
               onPressed: onClearImage,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints()),

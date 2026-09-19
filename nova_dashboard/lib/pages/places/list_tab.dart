@@ -5,6 +5,7 @@
 // REFACTOR: header, tarjeta y estado vacío extraídos a
 // lib/pages/places/widgets/ para bajar de 700 a <300 líneas.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../models/place.dart';
 import '../../services/place_service.dart';
@@ -81,7 +82,7 @@ class _PlacesListTabState extends State<PlacesListTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Error cargando lugares: $e'),
-            backgroundColor: Colors.red));
+            backgroundColor: AppTheme.error));
       }
     } finally {
       setState(() => _loading = false);
@@ -124,7 +125,7 @@ class _PlacesListTabState extends State<PlacesListTab> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(result['success'] == true ? result['message'] ?? 'Estado actualizado' : result['error'] ?? 'Error'),
-      backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+      backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error,
     ));
     if (result['success'] == true) _loadPlaces();
   }
@@ -137,7 +138,7 @@ class _PlacesListTabState extends State<PlacesListTab> {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
         TextButton(
             onPressed: () { Navigator.pop(context); _deletePlace(place.id); },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.error),
             child: const Text('Eliminar')),
       ],
     ));
@@ -149,7 +150,7 @@ class _PlacesListTabState extends State<PlacesListTab> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(result['success'] == true
             ? 'Lugar desactivado' : result['error'] ?? 'Error'),
-        backgroundColor: result['success'] == true ? Colors.green : Colors.red));
+        backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error));
     if (result['success'] == true) _loadPlaces();
   }
 

@@ -3,6 +3,7 @@
 // Lógica, endpoints y modelos sin cambios
 // REFACTOR: tarjetas y layouts extraídos a lib/pages/user_detail/ para
 // bajar de 574 a <300 líneas.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 import '../services/reward_service.dart';
@@ -55,12 +56,12 @@ class _UserDetailPageState extends State<UserDetailPage> {
         content: Text(result['success'] == true
             ? 'Recompensa entregada correctamente'
             : result['error'] ?? 'Error al entregar'),
-        backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+        backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error,
       ));
       if (result['success'] == true) _loadUserDetail();
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'), backgroundColor: Colors.red,
+        content: Text('Error: $e'), backgroundColor: AppTheme.error,
       ));
     }
   }
@@ -100,7 +101,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   Widget _buildError() => Center(child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      const Icon(Icons.error_outline, size: 60, color: Colors.red),
+      const Icon(Icons.error_outline, size: 60, color: AppTheme.error),
       const SizedBox(height: 16),
       Text('Error: $_error', textAlign: TextAlign.center),
       const SizedBox(height: 16),

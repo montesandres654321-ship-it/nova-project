@@ -3,6 +3,7 @@
 // _buildRecompensa/_buildPropietario) sin cambios de comportamiento ni de
 // estilo. Cada función recibe exactamente los valores/callbacks que necesita
 // en vez de leerlos de campos privados de la página.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../../models/admin_model.dart';
@@ -78,16 +79,16 @@ List<Widget> buildImagenSection({
         decoration: BoxDecoration(
             color: Colors.green[50],
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.green)),
+            border: Border.all(color: AppTheme.success)),
         child: Row(children: [
-          const Icon(Icons.check_circle, color: Colors.green, size: 18),
+          const Icon(Icons.check_circle, color: AppTheme.success, size: 18),
           const SizedBox(width: 8),
           Expanded(child: Text(
               '${selectedImageFile.name} (${(selectedImageFile.size / 1024).toStringAsFixed(0)} KB)',
               style: const TextStyle(fontSize: 12),
               overflow: TextOverflow.ellipsis)),
           IconButton(
-              icon: const Icon(Icons.close, color: Colors.red, size: 18),
+              icon: const Icon(Icons.close, color: AppTheme.error, size: 18),
               onPressed: onClearImage,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints()),

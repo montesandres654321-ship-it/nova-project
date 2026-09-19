@@ -3,6 +3,7 @@
 // comportamiento.
 // FIX: Descarga real — fetch la imagen y crear blob para download
 // ignore: avoid_web_libraries_in_flutter
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ Future<void> downloadQrImage(BuildContext context, Place place) async {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Preparando descarga...'),
-            backgroundColor: Colors.blue,
+            backgroundColor: AppTheme.primary,
             duration: Duration(seconds: 1),
           ),
         );
@@ -48,7 +49,7 @@ Future<void> downloadQrImage(BuildContext context, Place place) async {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('✅ QR de "${place.name}" descargado'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppTheme.success,
               duration: const Duration(seconds: 2),
             ),
           );
@@ -62,7 +63,7 @@ Future<void> downloadQrImage(BuildContext context, Place place) async {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al descargar: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.error,
         ),
       );
     }

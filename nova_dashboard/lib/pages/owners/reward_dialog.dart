@@ -106,7 +106,7 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
         widget.onSaved();
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('✅ Recompensa actualizada correctamente'),
-            backgroundColor: Colors.green));
+            backgroundColor: AppTheme.success));
       } else {
         _showError(result['error']?.toString() ?? 'Error al actualizar');
       }
@@ -119,7 +119,7 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
 
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(msg), backgroundColor: Colors.red));
+        content: Text(msg), backgroundColor: AppTheme.error));
   }
 
   @override

@@ -17,6 +17,7 @@
 /// lib/pages/scans/ para bajar de 514 a <300 líneas.
 library;
 
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../services/analytics_service.dart';
 import 'scans/scans_tokens.dart';
@@ -164,7 +165,7 @@ class _ScansPageState extends State<ScansPage> {
   Widget _buildError() => Center(child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      const Icon(Icons.error_outline, size: 40, color: Colors.red),
+      const Icon(Icons.error_outline, size: 40, color: AppTheme.error),
       const SizedBox(height: 12),
       Text(_error, textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 13)),

@@ -5,6 +5,7 @@
 // REFACTOR: fila de tabla, tarjeta móvil y barras de filtro extraídas a
 // lib/pages/rewards/ para bajar de 661 a <300 líneas.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'rewards/rewards_detail_tokens.dart';
 import 'rewards/widgets/reward_mobile_card.dart';
@@ -151,7 +152,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
       setState(() => _loadingIds.remove(reward.id));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error: ${result['error'] ?? 'No se pudo entregar'}'),
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.error,
       ));
     }
   }
@@ -259,7 +260,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
   }
 
   Widget _buildError() => Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-    const Icon(Icons.error_outline, size: 56, color: Colors.red),
+    const Icon(Icons.error_outline, size: 56, color: AppTheme.error),
     const SizedBox(height: 16), Text(_error!, textAlign: TextAlign.center),
     const SizedBox(height: 20),
     ElevatedButton.icon(onPressed: _loadData, icon: const Icon(Icons.refresh), label: const Text('Reintentar'),

@@ -10,6 +10,7 @@
 //     (widgets/admins_header.dart, dialogs/*.dart) para bajar de
 //     886 a <300 líneas, sin cambiar comportamiento.
 
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../models/admin_stats_model.dart';
 import '../../models/place.dart';
@@ -155,7 +156,7 @@ class _AdminsListTabState extends State<AdminsListTab> {
     if (placeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Este usuario no tiene un lugar asignado'),
-          backgroundColor: Colors.orange));
+          backgroundColor: AppTheme.warning));
       return;
     }
     Navigator.of(context).pushNamed('/owner-dashboard', arguments: {

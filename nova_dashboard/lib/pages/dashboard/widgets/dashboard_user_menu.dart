@@ -93,8 +93,8 @@ class DashboardUserMenu extends StatelessWidget {
             contentPadding: EdgeInsets.zero, dense: true)),
         const PopupMenuDivider(),
         const PopupMenuItem(value: 'logout', child: ListTile(
-            leading: Icon(Icons.logout_rounded, color: Colors.red),
-            title: Text('Cerrar Sesión', style: TextStyle(color: Colors.red)),
+            leading: Icon(Icons.logout_rounded, color: AppTheme.error),
+            title: Text('Cerrar Sesión', style: TextStyle(color: AppTheme.error)),
             contentPadding: EdgeInsets.zero, dense: true)),
       ],
       onSelected: (v) {

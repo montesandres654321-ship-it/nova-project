@@ -1,6 +1,7 @@
 // lib/pages/profile/settings/dialogs/clear_cache_dialog.dart
 // Extraído de settings_page.dart (_clearCache) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../settings_tokens.dart';
 
@@ -68,6 +69,6 @@ Future<void> showClearCacheDialog(BuildContext context) async {
   if (confirm == true && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Caché limpiado'),
-        backgroundColor: Colors.green));
+        backgroundColor: AppTheme.success));
   }
 }

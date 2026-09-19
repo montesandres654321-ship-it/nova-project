@@ -57,7 +57,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(result['message'] ?? 'Contraseña actualizada exitosamente'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppTheme.success,
             ),
           );
         } else {
@@ -65,7 +65,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(result['error'] ?? 'Error al cambiar contraseña'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.error,
             ),
           );
         }
@@ -76,7 +76,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.error,
           ),
         );
       }

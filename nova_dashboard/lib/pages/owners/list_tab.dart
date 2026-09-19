@@ -87,7 +87,7 @@ class _OwnersListTabState extends State<OwnersListTab> {
               ElevatedButton(
                   onPressed: () => Navigator.pop(ctx, true),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: owner.isActive ? Colors.red : Colors.green,
+                      backgroundColor: owner.isActive ? AppTheme.error : AppTheme.success,
                       foregroundColor: Colors.white),
                   child: Text(owner.isActive ? 'Desactivar' : 'Activar')),
             ]));
@@ -111,10 +111,10 @@ class _OwnersListTabState extends State<OwnersListTab> {
   }
 
   void _showSuccess(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.green));
+      SnackBar(content: Text(msg), backgroundColor: AppTheme.success));
 
   void _showError(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.red));
+      SnackBar(content: Text(msg), backgroundColor: AppTheme.error));
 
   @override
   Widget build(BuildContext context) {
@@ -183,13 +183,13 @@ class _OwnersListTabState extends State<OwnersListTab> {
     final owners  = _owners.where((o) => o.role == 'user_place').length;
 
     return Row(children: [
-      _statChip('Total',   total,   Colors.blue),
+      _statChip('Total',   total,   AppTheme.primary),
       const SizedBox(width: 6),
       _statChip('Admin',   admins,  Colors.purple),
       const SizedBox(width: 6),
       _statChip('General', general, AppTheme.primary),
       const SizedBox(width: 6),
-      _statChip('Owners',  owners,  Colors.orange),
+      _statChip('Owners',  owners,  AppTheme.warning),
     ]);
   }
 
@@ -216,7 +216,7 @@ class _OwnersListTabState extends State<OwnersListTab> {
     final roleColors = {
       'admin_general': Colors.purple,
       'user_general':  AppTheme.primary,
-      'user_place':    Colors.orange,
+      'user_place':    AppTheme.warning,
     };
     final color = roleColors[owner.role] ?? Colors.grey;
 
@@ -237,10 +237,10 @@ class _OwnersListTabState extends State<OwnersListTab> {
                 _badge(owner.roleLabel, color),
                 const SizedBox(width: 6),
                 _badge(owner.isActive ? 'Activo' : 'Inactivo',
-                    owner.isActive ? Colors.green : Colors.red),
+                    owner.isActive ? AppTheme.success : AppTheme.error),
                 if (owner.placeId != null) ...[
                   const SizedBox(width: 6),
-                  _badge('Lugar #${owner.placeId}', Colors.blue),
+                  _badge('Lugar #${owner.placeId}', AppTheme.primary),
                 ],
               ]),
             ]),
@@ -258,7 +258,7 @@ class _OwnersListTabState extends State<OwnersListTab> {
                       child: Row(children: [
                         Icon(owner.isActive ? Icons.block : Icons.check_circle,
                             size: 20,
-                            color: owner.isActive ? Colors.red : Colors.green),
+                            color: owner.isActive ? AppTheme.error : AppTheme.success),
                         const SizedBox(width: 8),
                         Text(owner.isActive ? 'Desactivar' : 'Activar')])),
                 ])
@@ -277,7 +277,7 @@ class _OwnersListTabState extends State<OwnersListTab> {
   Widget _buildError() => Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+        const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
         const SizedBox(height: 12),
         Text(_error, textAlign: TextAlign.center),
         const SizedBox(height: 16),

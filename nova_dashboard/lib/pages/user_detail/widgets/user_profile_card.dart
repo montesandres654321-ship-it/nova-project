@@ -1,6 +1,7 @@
 // lib/pages/user_detail/widgets/user_profile_card.dart
 // Extraído de user_detail_page.dart (_buildProfileCard/_badge) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 import '../user_detail_tokens.dart';
@@ -50,7 +51,7 @@ class UserProfileCard extends StatelessWidget {
             userDetailBadge(
               user.isActive ? '✓' : '✗',
               user.isActive ? 'Activo' : 'Inactivo',
-              user.isActive ? kUserDetailGreen : Colors.red,
+              user.isActive ? kUserDetailGreen : AppTheme.error,
             ),
           ],
         ),

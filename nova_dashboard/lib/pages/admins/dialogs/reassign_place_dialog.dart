@@ -53,7 +53,7 @@ Future<void> showReassignPlaceDialog(
                               ? 'Lugar asignado correctamente'
                               : result['error'] ?? 'Error'),
                           backgroundColor: result['success'] == true
-                              ? Colors.green : Colors.red));
+                              ? AppTheme.success : AppTheme.error));
                       if (result['success'] == true) onSuccess();
                     },
                     style: ElevatedButton.styleFrom(

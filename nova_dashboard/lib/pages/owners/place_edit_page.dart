@@ -9,6 +9,7 @@
 // REFACTOR: secciones y subida de imagen extraídas a
 // lib/pages/owners/place_edit/ para bajar de 624 a <300 líneas.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../models/place.dart';
@@ -151,7 +152,7 @@ class _OwnerPlaceEditPageState extends State<OwnerPlaceEditPage> {
       if (result['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('✅ Información actualizada correctamente'),
-            backgroundColor: Colors.green));
+            backgroundColor: AppTheme.success));
         widget.onSaved();
         Navigator.pop(context, true);
       } else {
@@ -165,7 +166,7 @@ class _OwnerPlaceEditPageState extends State<OwnerPlaceEditPage> {
   }
 
   void _showError(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.red,
+      SnackBar(content: Text(msg), backgroundColor: AppTheme.error,
           duration: const Duration(seconds: 4)));
 
   @override

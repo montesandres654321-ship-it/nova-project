@@ -1,6 +1,7 @@
 // lib/pages/admins/dialogs/deactivate_admin_dialog.dart
 // Extraído de list_tab.dart (_deactivateAdmin) sin cambios de comportamiento.
 // Soft delete: preserva historial. Con 2 advertencias claras.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/admin_stats_model.dart';
 import '../../../services/admin_service.dart';
@@ -11,7 +12,7 @@ Future<void> showDeactivateAdminDialog(
       context: context,
       builder: (ctx) => AlertDialog(
           title: Row(children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const Icon(Icons.warning_amber_rounded, color: AppTheme.warning),
             const SizedBox(width: 8),
             const Text('Desactivar usuario'),
           ]),
@@ -47,7 +48,7 @@ Future<void> showDeactivateAdminDialog(
                 child: const Text('Cancelar')),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, foregroundColor: Colors.white),
+                    backgroundColor: AppTheme.error, foregroundColor: Colors.white),
                 onPressed: () => Navigator.pop(ctx, true),
                 child: const Text('Desactivar')),
           ]));
@@ -62,10 +63,10 @@ Future<void> showDeactivateAdminDialog(
         content: Text(result['success'] == true
             ? result['message'] ?? '${a.admin.displayName} desactivado'
             : result['error'] ?? 'Error al desactivar'),
-        backgroundColor: result['success'] == true ? Colors.green : Colors.red));
+        backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error));
     if (result['success'] == true) onSuccess();
   } catch (e) {
     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'), backgroundColor: Colors.red));
+        content: Text('Error: $e'), backgroundColor: AppTheme.error));
   }
 }

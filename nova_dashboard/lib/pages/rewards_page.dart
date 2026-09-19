@@ -211,7 +211,7 @@ class _RewardsPageState extends State<RewardsPage> {
         Text(msg, style: TextStyle(fontSize: 12, color: Colors.grey[500]))])));
 
   Widget _buildError() => Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-    const Icon(Icons.error_outline, size: 56, color: Colors.red), const SizedBox(height: 16),
+    const Icon(Icons.error_outline, size: 56, color: AppTheme.error), const SizedBox(height: 16),
     Text(_error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14)),
     const SizedBox(height: 20),
     ElevatedButton.icon(onPressed: _loadData, icon: const Icon(Icons.refresh), label: const Text('Reintentar'),

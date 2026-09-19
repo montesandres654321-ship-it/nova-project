@@ -1,6 +1,7 @@
 // lib/pages/dashboard/dialogs/dashboard_logout_dialog.dart
 // Extraído de dashboard_page.dart (_confirmLogout) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 void showDashboardLogoutDialog(BuildContext context, Future<void> Function() onConfirm) {
@@ -16,7 +17,7 @@ void showDashboardLogoutDialog(BuildContext context, Future<void> Function() onC
         ElevatedButton(
           onPressed: onConfirm,
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red, foregroundColor: Colors.white),
+              backgroundColor: AppTheme.error, foregroundColor: Colors.white),
           child: const Text('Salir'),
         ),
       ],

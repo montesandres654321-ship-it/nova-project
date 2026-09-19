@@ -3,6 +3,7 @@
 // extrajeron a lib/pages/places/form/ (place_form_sections.dart,
 // place_form_fields.dart, place_form_tokens.dart) para bajar de 726 a
 // <300 líneas, sin cambiar comportamiento.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../models/place.dart';
@@ -189,7 +190,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
               child: const Text('Cancelar')),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              style: TextButton.styleFrom(foregroundColor: AppTheme.error),
               child: const Text('Eliminar')),
         ],
       ),
@@ -208,11 +209,11 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   }
 
   void _showSuccess(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.green,
+      SnackBar(content: Text(msg), backgroundColor: AppTheme.success,
           duration: const Duration(seconds: 3)));
 
   void _showError(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.red,
+      SnackBar(content: Text(msg), backgroundColor: AppTheme.error,
           duration: const Duration(seconds: 4)));
 
   // ── BUILD ────────────────────────────────────────────────────

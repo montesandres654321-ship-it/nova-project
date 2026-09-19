@@ -1,6 +1,7 @@
 // lib/pages/users/dialogs/toggle_user_status_dialog.dart
 // Extraído de users_page.dart (_toggleUserStatus) sin cambios de
 // comportamiento.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 import '../../../services/admin_service.dart';
@@ -24,7 +25,7 @@ Future<void> showToggleUserStatusDialog(
                 child: const Text('Cancelar')),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: user.isActive ? Colors.red : Colors.green),
+                    backgroundColor: user.isActive ? AppTheme.error : AppTheme.success),
                 onPressed: () => Navigator.pop(ctx, true),
                 child: Text(user.isActive ? 'Desactivar' : 'Activar',
                     style: const TextStyle(color: Colors.white))),
@@ -39,10 +40,10 @@ Future<void> showToggleUserStatusDialog(
         content: Text(result['success'] == true
             ? result['message'] ?? 'Estado actualizado'
             : result['error']   ?? 'Error'),
-        backgroundColor: result['success'] == true ? Colors.green : Colors.red));
+        backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error));
     if (result['success'] == true) onSuccess();
   } catch (e) {
     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'), backgroundColor: Colors.red));
+        content: Text('Error: $e'), backgroundColor: AppTheme.error));
   }
 }

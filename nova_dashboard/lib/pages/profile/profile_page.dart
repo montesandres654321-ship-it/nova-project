@@ -5,6 +5,7 @@
 // REFACTOR: tarjetas y diálogo de logout extraídos a
 // lib/pages/profile/widgets/ para bajar de 694 a <300 líneas.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/constants.dart';
@@ -93,21 +94,21 @@ class _ProfilePageState extends State<ProfilePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(result['message'] ?? 'Perfil actualizado'),
-              backgroundColor: Colors.green));
+              backgroundColor: AppTheme.success));
         }
       } else {
         setState(() => _loading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(result['error'] ?? 'Error'),
-              backgroundColor: Colors.red));
+              backgroundColor: AppTheme.error));
         }
       }
     } catch (e) {
       setState(() => _loading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error: $e'), backgroundColor: Colors.red));
+            content: Text('Error: $e'), backgroundColor: AppTheme.error));
       }
     }
   }
@@ -116,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('No se pudo obtener el ID'),
-          backgroundColor: Colors.red));
+          backgroundColor: AppTheme.error));
       return;
     }
     showDialog(context: context,

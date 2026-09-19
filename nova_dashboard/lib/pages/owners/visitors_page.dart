@@ -261,7 +261,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
   Widget _buildError() => Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.error_outline, size: 56, color: Colors.red),
+        const Icon(Icons.error_outline, size: 56, color: AppTheme.error),
         const SizedBox(height: 12),
         Text(_error, textAlign: TextAlign.center),
         const SizedBox(height: 16),

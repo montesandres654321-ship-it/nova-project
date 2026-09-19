@@ -101,7 +101,7 @@ class _UserCardItemState extends State<UserCardItem> {
                                   fontSize: 11, fontWeight: FontWeight.w600,
                                   color: user.isActive
                                       ? const Color(0xFF059669)
-                                      : Colors.red))),
+                                      : AppTheme.error))),
                       const SizedBox(width: 8),
                       Text('${user.scansCount} escaneos',
                           style: const TextStyle(
@@ -149,7 +149,7 @@ class _UserCardItemState extends State<UserCardItem> {
                           Icon(
                               user.isActive ? Icons.block : Icons.check_circle,
                               size: 20,
-                              color: user.isActive ? Colors.red : Colors.green),
+                              color: user.isActive ? AppTheme.error : AppTheme.success),
                           const SizedBox(width: 8),
                           Text(user.isActive ? 'Desactivar' : 'Activar'),
                         ])),

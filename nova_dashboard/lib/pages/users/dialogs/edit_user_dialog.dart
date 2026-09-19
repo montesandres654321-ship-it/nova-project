@@ -95,7 +95,7 @@ void showEditUserDialog(
                           ? 'Turista actualizado correctamente'
                           : result['error'] ?? 'Error al actualizar'),
                       backgroundColor: result['success'] == true
-                          ? Colors.green : Colors.red));
+                          ? AppTheme.success : AppTheme.error));
                   if (result['success'] == true) onSuccess();
                 },
                 child: const Text('Guardar')),

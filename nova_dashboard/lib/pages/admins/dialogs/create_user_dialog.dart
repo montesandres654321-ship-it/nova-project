@@ -2,6 +2,7 @@
 // Extraído de list_tab.dart (_showCreateUserDialog) sin cambios de
 // comportamiento ni de estilo. Antes era un StatefulBuilder anónimo de
 // ~380 líneas dentro de list_tab.dart; ahora es su propio StatefulWidget.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
 import '../../../services/admin_service.dart';
@@ -54,7 +55,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
         content: Text(result['success'] == true
             ? '✅ Usuario creado exitosamente'
             : result['error'] ?? 'Error al crear usuario'),
-        backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+        backgroundColor: result['success'] == true ? AppTheme.success : AppTheme.error,
         duration: const Duration(seconds: 3)));
     if (result['success'] == true) widget.onSuccess();
   }
