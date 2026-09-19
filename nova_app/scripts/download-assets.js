@@ -660,6 +660,35 @@ const assetsToDownload = [
   // multi-foto, pero places.image_url en la BD es un solo string (no hay
   // modelo de galería) — no se descarga para no dejar un asset sin usar.
 
+  // ═══════════════════════════════════════════════════════════
+  // SISTEMA DE DISEÑO — ICONOGRAFÍA OFICIAL (node 11:2)
+  // carpeta: assets/icons/sistema/
+  // ═══════════════════════════════════════════════════════════
+  { filename: 'icons/sistema/ic-buscar.svg',      url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/29a06.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-tiquete.svg',     url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/b6831.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-agenda.svg',      url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/4ea34.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-informacion.svg', url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/e96ca.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-ubicacion.svg',   url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/1630e.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-transporte.svg',  url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/10372.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-hospedaje.svg',   url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/434cf.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-gastronomia.svg', url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/0700b.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-guia.svg',        url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/88850.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-seguro.svg',      url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/c10d3.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-patrimonio.svg',  url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/17e27.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-naturaleza.svg',  url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/e6e5e.svg', pantalla: 'Sistema de diseño (iconografía)' },
+  { filename: 'icons/sistema/ic-compras.svg',     url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/946c0.svg', pantalla: 'Sistema de diseño (iconografía)' },
+
+  // ═══════════════════════════════════════════════════════════
+  // SISTEMA DE DISEÑO — LOGOS oficiales en todos los tamaños (node 11:2)
+  // logo-nova-verde.svg y logo-nova-blanco.svg SE SOBRESCRIBEN con la
+  // versión canónica del sistema de diseño (mismo nombre, ya existían).
+  // ═══════════════════════════════════════════════════════════
+  { filename: 'images/logos/logo-nova-verde-l.svg', url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/9292b.svg', pantalla: 'Sistema de diseño (logo L 144x86 — Splash)' },
+  { filename: 'images/logos/logo-nova-verde-m.svg', url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/03092.svg', pantalla: 'Sistema de diseño (logo M 112x67 — Onboarding, Acerca de)' },
+  { filename: 'images/logos/logo-nova-verde-s.svg', url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/f9009.svg', pantalla: 'Sistema de diseño (logo S 88x53 — Login, Registro, Permisos)' },
+  { filename: 'images/logos/logo-nova-verde.svg',   url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/58185.svg', pantalla: 'Sistema de diseño (logo verde, fondo claro)' },
+  { filename: 'images/logos/logo-nova-blanco.svg',  url: 'https://www.figma.com/api/mcp/asset/71d1d51c-a847-4d86-b233-80024e221b00/b0e41.svg', pantalla: 'Sistema de diseño (logo blanco, sobre foto/color de marca)' },
+
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -685,7 +714,7 @@ async function downloadAssets() {
     'images/logos', 'images/onboarding', 'icons', 'icons/nav',
     'images/home', 'images/municipios', 'images/rutas',
     'images/naturaleza', 'images/gastronomia', 'images/lugares',
-    'icons/mapa', 'icons/rutas',
+    'icons/mapa', 'icons/rutas', 'icons/sistema',
   ];
   for (const carpeta of subcarpetas) {
     await fs.mkdir(path.join(ASSETS_DIR, carpeta), { recursive: true });

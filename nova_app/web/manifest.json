@@ -1,7 +1,7 @@
 {
-    "name": "Nova Dashboard",
-    "short_name": "Nova Admin",
-    "description": "Dashboard administrativo para Nova App",
+    "name": "Nova App",
+    "short_name": "Nova",
+    "description": "Nova App - Turismo digital del Golfo de Morrosquillo, Sucre",
     "start_url": ".",
     "display": "standalone",
     "theme_color": "#06B6A4",
