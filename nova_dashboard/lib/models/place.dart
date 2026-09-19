@@ -141,24 +141,60 @@ class Place {
     };
   }
 
-  // ── Getters ──────────────────────────────────────────
-  String get tipoEmoji {
-    switch (tipo.toLowerCase()) {
-      case 'hotel':      return '🏨';
-      case 'restaurant': return '🍽️';
-      case 'bar':        return '🍹';
-      default:           return '📍';
-    }
-  }
+  // ── Categorías de lugar (CHECK constraint de la BD) ───
+  // Las 13 categorías validas de places.tipo — ver A5 de PROMPT_SPRINT2.md.
+  static const List<String> tiposValidos = [
+    'hotel',
+    'restaurant',
+    'bar',
+    'escenario_deportivo',
+    'parque',
+    'naturaleza',
+    'cultura',
+    'artesania',
+    'playa',
+    'ruta',
+    'gastronomia',
+    'compras',
+    'servicio',
+  ];
 
-  String get tipoLabel {
-    switch (tipo.toLowerCase()) {
-      case 'hotel':      return 'Hotel';
-      case 'restaurant': return 'Restaurante';
-      case 'bar':        return 'Bar';
-      default:           return 'Lugar';
-    }
-  }
+  static const Map<String, String> tiposLabels = {
+    'hotel':               'Hotel',
+    'restaurant':          'Restaurante',
+    'bar':                 'Bar',
+    'escenario_deportivo': 'Escenario deportivo',
+    'parque':              'Parque',
+    'naturaleza':          'Naturaleza',
+    'cultura':             'Cultura',
+    'artesania':           'Artesanía',
+    'playa':               'Playa',
+    'ruta':                'Ruta turística',
+    'gastronomia':         'Gastronomía',
+    'compras':             'Compras',
+    'servicio':            'Servicio',
+  };
+
+  static const Map<String, String> tiposEmoji = {
+    'hotel':               '🏨',
+    'restaurant':          '🍽️',
+    'bar':                 '🍹',
+    'escenario_deportivo': '🏟️',
+    'parque':              '🌳',
+    'naturaleza':          '🌿',
+    'cultura':             '🏛️',
+    'artesania':           '🧶',
+    'playa':               '🏖️',
+    'ruta':                '🗺️',
+    'gastronomia':         '🍲',
+    'compras':             '🛍️',
+    'servicio':            '🛎️',
+  };
+
+  // ── Getters ──────────────────────────────────────────
+  String get tipoEmoji => tiposEmoji[tipo.toLowerCase()] ?? '📍';
+
+  String get tipoLabel => tiposLabels[tipo.toLowerCase()] ?? 'Lugar';
 
   String get typeEmoji  => tipoEmoji;
   String get displayName => '$tipoEmoji $name';

@@ -57,10 +57,9 @@ class _PlacesListTabState extends State<PlacesListTab> {
   int get _totalPages => (_filteredPlaces.length / _pageSize).ceil().clamp(1, 999999);
 
   final List<Map<String, dynamic>> _filters = [
-    {'value': 'all',        'label': '🗺️ Todos'},
-    {'value': 'hotel',      'label': '🏨 Hoteles'},
-    {'value': 'restaurant', 'label': '🍽️ Restaurantes'},
-    {'value': 'bar',        'label': '🍹 Bares'},
+    {'value': 'all', 'label': '🗺️ Todos'},
+    for (final tipo in Place.tiposValidos)
+      {'value': tipo, 'label': '${Place.tiposEmoji[tipo]} ${Place.tiposLabels[tipo]}'},
   ];
 
   @override

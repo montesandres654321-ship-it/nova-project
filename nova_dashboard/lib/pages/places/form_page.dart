@@ -47,7 +47,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   bool   _hasReward          = true;
   String _selectedRewardIcon = '☕';
 
-  final List<String> _types = ['hotel', 'restaurant', 'bar'];
+  final List<String> _types = Place.tiposValidos;
 
   final List<Map<String, String>> _rewardIcons = [
     {'icon': '☕', 'label': 'Café'},

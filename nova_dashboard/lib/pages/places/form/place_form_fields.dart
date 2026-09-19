@@ -3,6 +3,7 @@
 // (_sectionCard/_responsiveFieldRow/_inputDecoration/_field/_dropdown)
 // sin cambios de comportamiento ni de estilo.
 import 'package:flutter/material.dart';
+import '../../../models/place.dart';
 import 'place_form_tokens.dart';
 
 Widget placeFormSectionCard(String title, List<Widget> children) {
@@ -112,13 +113,12 @@ Widget placeFormTypeDropdown({
   required List<String> items,
   required void Function(String?) onChanged,
 }) {
-  final labels = {'hotel': 'Hotel', 'restaurant': 'Restaurante', 'bar': 'Bar'};
   return DropdownButtonFormField<String>(
     value: value,
     decoration: placeFormInputDecoration(label, icon),
     style: const TextStyle(fontSize: 13, color: Colors.black87),
     items: items
-        .map((t) => DropdownMenuItem(value: t, child: Text(labels[t] ?? t)))
+        .map((t) => DropdownMenuItem(value: t, child: Text(Place.tiposLabels[t] ?? t)))
         .toList(),
     onChanged: onChanged,
   );
