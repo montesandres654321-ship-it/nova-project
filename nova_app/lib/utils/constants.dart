@@ -37,6 +37,7 @@ class AppConstants {
   static const String qrValidateEndpoint  = '/qr/validate';
 
   // ─── Endpoints USER ─────────────────────────────────────
+  static const String userMeEndpoint       = '/users/me';
   static const String userProfileEndpoint  = '/users/me/profile';
   static const String userPasswordEndpoint = '/users/me/password';
   static const String userRewardsEndpoint  = '/rewards/user'; // + /{userId}

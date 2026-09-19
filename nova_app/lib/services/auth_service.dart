@@ -212,6 +212,27 @@ class AuthService {
   }
 
   // ═══════════════════════════════════════════════════════
+  // VALIDACIÓN DE SESIÓN — usado por SplashPage
+  // ═══════════════════════════════════════════════════════
+
+  /// Verifica contra el backend si el token guardado sigue siendo válido
+  /// (no expiró y no fue revocado). Fail-open: si la petición falla por
+  /// red (sin conexión), retorna true para no bloquear al usuario —
+  /// la propia expiración del JWT sigue siendo la barrera real.
+  static Future<bool> validateToken(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse(AppConstants.buildUrl(AppConstants.userMeEndpoint)),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(AppConstants.timeoutNormal);
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('⚠️ No se pudo validar el token (¿sin conexión?): $e');
+      return true;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
   // LOGOUT
   // ═══════════════════════════════════════════════════════
 

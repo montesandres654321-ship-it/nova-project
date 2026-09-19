@@ -16,6 +16,24 @@ function serializeRaw(rows) {
   });
 }
 
+// ─── GET /users/me ─────────────────────────────────────────
+// Usado por SplashPage (app móvil) para validar que el token
+// guardado localmente sigue siendo válido antes de ir al Home.
+// authenticateToken ya verifica firma/expiración, revocación e is_active.
+router.get('/users/me', authenticateToken, async (req, res) => {
+  try {
+    const user = (await prisma.$queryRaw`
+      SELECT id, username, email, first_name, last_name, role, phone, place_id, is_active
+      FROM users WHERE id = ${req.user.id}
+    `)[0];
+    if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+    return res.json({ success: true, data: user });
+  } catch (error) {
+    console.error('❌ Error en GET /users/me:', error);
+    return res.status(500).json({ success: false, error: 'Error al obtener usuario' });
+  }
+});
+
 // ─── PATCH /users/me/profile ──────────────────────────────
 router.patch('/users/me/profile', authenticateToken, async (req, res) => {
   try {

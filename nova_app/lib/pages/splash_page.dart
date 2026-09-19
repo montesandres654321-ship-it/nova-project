@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/design/app_colors.dart';
+import '../services/auth_service.dart';
 import '../utils/constants.dart';
 import 'permissions_page.dart';
 import 'login_page.dart';
@@ -28,18 +29,29 @@ class _SplashPageState extends State<SplashPage> {
     await Future.delayed(const Duration(milliseconds: 2500));
     final prefs = await SharedPreferences.getInstance();
     final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
-    final hasToken = (prefs.getString(AppConstants.keyToken) ?? '').isNotEmpty;
+    final token = prefs.getString(AppConstants.keyToken);
     if (!mounted) return;
 
     Widget destination;
     if (!onboardingComplete) {
       destination = const PermissionsPage();
-    } else if (hasToken) {
-      destination = const MainNavigationPage();
+    } else if (token != null && token.isNotEmpty) {
+      // Un token guardado no basta: puede haber expirado o haber sido
+      // revocado (logout en otro dispositivo, Sprint 4). Validarlo contra
+      // el backend antes de entrar directo al Home.
+      final valid = await AuthService.validateToken(token);
+      if (!mounted) return;
+      if (valid) {
+        destination = const MainNavigationPage();
+      } else {
+        await AuthService.logout();
+        destination = const LoginPage();
+      }
     } else {
       destination = const LoginPage();
     }
 
+    if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => destination),
     );
