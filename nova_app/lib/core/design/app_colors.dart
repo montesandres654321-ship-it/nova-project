@@ -54,4 +54,44 @@ class AppColors {
   static const Color bienvenidaCoral      = Color(0xFFE8622A); // Banner Juegos 2027
   static const Color bienvenidaFondoChip  = Color(0xFFF0F3F7); // Chips inactivos Explorar
   static const Color bienvenidaAzulOferta = Color(0xFFEAF4FB); // Card "Oferta integral"
+
+  // ─────────────────────────────────────────────────────────
+  // SISTEMA DE DISEÑO OFICIAL (Figma node 11:2) — 2 modos:
+  // BASE·SUCRE (uso normal) y EVENTO·JUEGOS 2027 (branding especial
+  // para pantallas/momentos ligados a los Juegos Nacionales).
+  //
+  // La mitad de los tokens BASE del Figma ya existían con otro nombre
+  // (acumulados pantalla por pantalla) con el MISMO valor exacto — se
+  // reutilizan esos en vez de duplicarlos:
+  //   azul-marca BASE   #0071BD → bienvenidaAzul
+  //   verde-marca BASE  #078930 → bienvenidaVerde
+  //   coral-acento BASE #E8622A → bienvenidaCoral
+  //   dorado-estrella   #F5A623 → bienvenidaDorado
+  //   fondo BASE        #F7F9FB → bienvenidaFondoInput
+  //   rojo-juegos       #BD0412 → bienvenidaRojo (= coral-acento en modo JUEGOS)
+  //   texto-medio       #6B7280 → textSecondary
+  //   texto-suave       #9CA3AF → textHint
+  //   superficie        #FFFFFF → surface
+  //   borde             #E3E8EE → bienvenidaBorde
+  //   texto-fuerte      #3C3C3C → bienvenidaTextoFuerte (#3D3D3D — 1 dígito
+  //     de diferencia ya aceptado en sprints anteriores; no se crea un
+  //     tercer token para el mismo concepto por 1 dígito de hex).
+  // Solo se agregan abajo los valores que NO tenían ya un token exacto.
+  // ─────────────────────────────────────────────────────────
+
+  // BASE·SUCRE — valores nuevos
+  static const Color sistemaAzulOscuro = Color(0xFF005A96);
+  static const Color sistemaAzulClaro  = Color(0xFFE6F2FA); // distinto de bienvenidaAzulClaro (#EAF7FF, uso específico botón atrás)
+  static const Color sistemaVerdeClaro = Color(0xFFE7F4EB);
+  static const Color sistemaArena      = Color(0xFFF4EFE6);
+
+  // EVENTO · JUEGOS 2027 — variantes de marca (ninguna existía antes)
+  static const Color azulMarcaJuegos  = Color(0xFF0170BA);
+  static const Color azulOscuroJuegos = Color(0xFF005490);
+  static const Color azulClaroJuegos  = Color(0xFFE4F0F9);
+  static const Color verdeMarcaJuegos = Color(0xFF0B8631);
+  static const Color verdeClaroJuegos = Color(0xFFE6F4EA);
+  static const Color doradoJuegos     = Color(0xFFFCA700);
+  static const Color arenaJuegos      = Color(0xFFFFF4E0);
+  static const Color fondoJuegos      = Color(0xFFF5F7FA);
 }
