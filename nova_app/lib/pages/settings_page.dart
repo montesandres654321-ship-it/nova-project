@@ -105,9 +105,11 @@ class SettingsPage extends StatelessWidget {
   Widget _buildEncabezado(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.bienvenidaBorde))),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AppColors.bienvenidaBorde)),
+      ),
       child: Row(
         children: [
           GestureDetector(
