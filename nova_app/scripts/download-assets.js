@@ -614,6 +614,52 @@ const assetsToDownload = [
     pantalla: '14 Historial (escaneo sin recompensa)'
   },
 
+  // ═══════════════════════════════════════════════════════════
+  // ACERCA DE — carpeta: assets/icons
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-external-link.svg',
+    url: 'https://www.figma.com/api/mcp/asset/be6a3c30-67df-4120-9956-ff367fc78a2a/064d9.svg',
+    pantalla: '17 Acerca de Nova (más información)'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // DETALLE ESCENARIO — carpeta: assets/icons, images/lugares
+  // ═══════════════════════════════════════════════════════════
+  {
+    filename: 'icons/ic-clock.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/a1a28.svg',
+    pantalla: '12 Detalle escenario (horarios)'
+  },
+  {
+    filename: 'icons/ic-arrow-right.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/c0069.svg',
+    pantalla: '12 Detalle escenario (escanear QR)'
+  },
+  {
+    filename: 'icons/ic-acceso.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/f271c.svg',
+    pantalla: '12 Detalle escenario (servicio: acceso)'
+  },
+  {
+    filename: 'icons/ic-info-visitante.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/5c7b4.svg',
+    pantalla: '12 Detalle escenario (servicio: información al visitante)'
+  },
+  {
+    filename: 'icons/ic-orientacion.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/de787.svg',
+    pantalla: '12 Detalle escenario (servicio: orientación)'
+  },
+  {
+    filename: 'icons/ic-info-circle.svg',
+    url: 'https://www.figma.com/api/mcp/asset/d8d74717-7bb8-40a9-ab40-a4dcd01bb5ac/fb49b.svg',
+    pantalla: '12 Detalle escenario (acceso y horarios)'
+  },
+  // NOTA: el Figma también trae 'galeria-estadio-2.png' para una galería
+  // multi-foto, pero places.image_url en la BD es un solo string (no hay
+  // modelo de galería) — no se descarga para no dejar un asset sin usar.
+
 ];
 
 // ─────────────────────────────────────────────────────────────

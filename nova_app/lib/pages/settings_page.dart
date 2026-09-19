@@ -1,128 +1,162 @@
+/// Página "Ajustes de Nova" — preferencias y soporte.
+///
+/// Diseño Figma Septiembre 2026 (node 42:434): dos secciones de tarjetas
+/// (Preferencias / Soporte y Legal) con ícono, título y descripción por fila.
+/// "Cambiar contraseña" no aplica a cuentas de Google (sin contraseña local),
+/// igual que en el diseño anterior.
+library;
+
 import 'package:flutter/material.dart';
-import '../core/design/app_back_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_spacing.dart';
-import '../core/design/app_radius.dart';
-import '../core/design/app_text_styles.dart';
 import '../services/google_auth_service.dart';
-import 'profile_page.dart';
-import 'change_password_page.dart';
 import 'about_page.dart';
+import 'change_password_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  void _proximamente(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('$feature: próximamente'),
+      backgroundColor: AppColors.bienvenidaAzul,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        title: const Text('Configuración'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        surfaceTintColor: AppColors.surface,
-        automaticallyImplyLeading: false,
-        leadingWidth: 52,
-        leading: const Padding(
-          padding: EdgeInsets.only(left: AppSpacing.sm),
-          child: Center(child: AppBackButton()),
+      backgroundColor: const Color(0xFFF7F9FB),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildEncabezado(context),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionLabel('PREFERENCIAS'),
+                    const SizedBox(height: 8),
+                    FutureBuilder<bool>(
+                      future: GoogleAuthService.isGoogleUser(),
+                      builder: (context, snapshot) {
+                        final isGoogleUser = snapshot.data == true;
+                        return _buildCard([
+                          _SettingsRow(
+                            iconAsset: 'assets/icons/ic-bell.svg',
+                            title: 'Notificaciones',
+                            subtitle: 'Alertas de eventos y beneficios',
+                            onTap: () => _proximamente(context, 'Notificaciones'),
+                          ),
+                          _SettingsRow(
+                            iconAsset: 'assets/icons/ic-lock.svg',
+                            title: 'Privacidad y Datos',
+                            subtitle: 'Gestionar permisos del dispositivo',
+                            onTap: () => _proximamente(context, 'Privacidad y Datos'),
+                          ),
+                          if (!isGoogleUser)
+                            _SettingsRow(
+                              iconAsset: 'assets/icons/ic-key.svg',
+                              title: 'Cambiar contraseña',
+                              subtitle: 'Actualizar credenciales de seguridad',
+                              onTap: () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => const ChangePasswordPage())),
+                            ),
+                        ]);
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildSectionLabel('SOPORTE Y LEGAL'),
+                    const SizedBox(height: 8),
+                    _buildCard([
+                      _SettingsRow(
+                        iconAsset: 'assets/icons/ic-file-text.svg',
+                        title: 'Términos y condiciones',
+                        subtitle: 'Políticas de uso de la plataforma',
+                        onTap: () => _proximamente(context, 'Términos y condiciones'),
+                      ),
+                      _SettingsRow(
+                        iconAsset: 'assets/icons/ic-help-circle.svg',
+                        title: 'Ayuda y Soporte',
+                        subtitle: 'Preguntas frecuentes y contacto',
+                        onTap: () => _proximamente(context, 'Ayuda y Soporte'),
+                      ),
+                      _SettingsRow(
+                        iconAsset: 'assets/icons/ic-info.svg',
+                        title: 'Acerca de Nova',
+                        subtitle: 'Versión, créditos y más',
+                        onTap: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const AboutPage())),
+                      ),
+                    ]),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-        titleTextStyle: AppTextStyles.title,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
+    );
+  }
+
+  Widget _buildEncabezado(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.bienvenidaBorde))),
+      child: Row(
         children: [
-          _buildGroup(context, [
-            _SettingsTile(
-              icon: Icons.person_rounded,
-              label: 'Perfil',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage())),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(color: AppColors.bienvenidaAzulClaro, shape: BoxShape.circle),
+              child: Center(child: SvgPicture.asset('assets/icons/ic-flecha-atras.svg', width: 16)),
             ),
-          ]),
-          const SizedBox(height: AppSpacing.sm),
-          FutureBuilder<bool>(
-            future: GoogleAuthService.isGoogleUser(),
-            builder: (context, snapshot) {
-              if (snapshot.data == true) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: _buildGroup(context, [
-                  _SettingsTile(
-                    icon: Icons.lock_rounded,
-                    label: 'Cambiar contraseña',
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ChangePasswordPage())),
-                  ),
-                ]),
-              );
-            },
           ),
-          _buildGroup(context, [
-            _SettingsTile(
-              icon: Icons.info_rounded,
-              label: 'Acerca de',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const AboutPage())),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Ajustes de Nova',
+                    style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                Text('Configuraciones de la aplicación',
+                    style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+              ],
             ),
-          ]),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildGroup(BuildContext context, List<_SettingsTile> tiles) {
+  Widget _buildSectionLabel(String text) {
+    return Text(text,
+        style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary, letterSpacing: 0.5));
+  }
+
+  Widget _buildCard(List<_SettingsRow> rows) {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.lgAll,
-        border: Border.all(color: AppColors.border),
+        color: Colors.white,
+        border: Border.all(color: AppColors.bienvenidaBorde),
+        borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.hardEdge,
       child: Column(
-        children: List.generate(tiles.length, (i) {
+        children: List.generate(rows.length, (i) {
           return Column(
             children: [
-              InkWell(
-                onTap: tiles[i].onTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.md,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.xs + 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: AppRadius.smAll,
-                        ),
-                        child: Icon(tiles[i].icon,
-                            size: 20, color: AppColors.primary),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child:
-                            Text(tiles[i].label, style: AppTextStyles.bodyLg),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded,
-                          size: 14, color: AppColors.textHint),
-                    ],
-                  ),
-                ),
-              ),
-              if (i < tiles.length - 1)
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: AppColors.border,
-                  indent: AppSpacing.md,
-                ),
+              rows[i],
+              if (i < rows.length - 1)
+                const Divider(height: 1, thickness: 1, color: AppColors.bienvenidaBorde),
             ],
           );
         }),
@@ -131,13 +165,47 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class _SettingsTile {
-  const _SettingsTile({
-    required this.icon,
-    required this.label,
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.iconAsset,
+    required this.title,
+    required this.subtitle,
     required this.onTap,
   });
-  final IconData icon;
-  final String label;
+
+  final String iconAsset;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(color: AppColors.bienvenidaAzulClaro, borderRadius: BorderRadius.circular(10)),
+              child: Center(child: SvgPicture.asset(iconAsset, width: 18, height: 18)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
+                  Text(subtitle, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                ],
+              ),
+            ),
+            SvgPicture.asset('assets/icons/ic-chevron-right.svg', width: 16, height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }

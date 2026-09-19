@@ -63,7 +63,7 @@ class PlaceHeader extends StatelessWidget {
                   borderRadius: AppRadius.pillAll,
                 ),
                 child: Text(
-                  type.singular,
+                  place.tipoLabel,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -73,6 +73,23 @@ class PlaceHeader extends StatelessWidget {
               ),
             ],
           ),
+          if (place.tipo == 'escenario_deportivo') ...[
+            const SizedBox(height: AppSpacing.xs),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                decoration: BoxDecoration(
+                  color: AppColors.bienvenidaRojo.withValues(alpha: 0.10),
+                  borderRadius: AppRadius.pillAll,
+                ),
+                child: const Text(
+                  'Sede oficial · Juegos 2027',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [

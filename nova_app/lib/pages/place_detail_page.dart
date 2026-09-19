@@ -6,6 +6,7 @@ import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../widgets/place_header.dart';
 import '../widgets/place_info.dart';
+import '../widgets/place_more_info.dart';
 import '../widgets/place_action_buttons.dart';
 
 class PlaceDetailPage extends StatelessWidget {
@@ -120,8 +121,9 @@ class PlaceDetailPage extends StatelessWidget {
       children: [
         PlaceHeader(place: place, type: type),
         PlaceInfo(place: place, type: type),
+        PlaceMoreInfo(place: place),
         const SizedBox(height: AppSpacing.lg),
-        PlaceActionButtons(type: type),
+        PlaceActionButtons(place: place, type: type),
         const SizedBox(height: AppSpacing.xl),
       ],
     );
