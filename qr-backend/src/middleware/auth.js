@@ -15,6 +15,7 @@
 
 require('dotenv').config();
 const jwt    = require('jsonwebtoken');
+const crypto = require('crypto');
 const prisma = require('../config/prisma');
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -47,6 +48,7 @@ const generateToken = (user) => {
       username: user.username,
       role:     user.role     || null,
       place_id: user.place_id || null,
+      jti:      crypto.randomUUID(),
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
@@ -63,6 +65,19 @@ const generateToken = (user) => {
  */
 const verifyToken = (token) => {
   try { return jwt.verify(token, JWT_SECRET); }
+  catch { return null; }
+};
+
+/**
+ * Decodifica un JWT sin verificar su firma (uso: leer jti/exp en logout,
+ * donde el token ya pasó por authenticateToken en la misma petición).
+ *
+ * @function decodeToken
+ * @param {string} token - Token JWT a decodificar
+ * @returns {Object|null} Payload decodificado, o null si el formato es inválido
+ */
+const decodeToken = (token) => {
+  try { return jwt.decode(token); }
   catch { return null; }
 };
 
@@ -103,6 +118,21 @@ const authenticateToken = (req, res, next) => {
         return res.status(403).json({ success: false, error: 'Token inválido o expirado' });
       }
       try {
+        if (decoded.jti) {
+          try {
+            const revoked = await prisma.$queryRaw`
+              SELECT jti FROM revoked_tokens WHERE jti = ${decoded.jti} LIMIT 1
+            `;
+            if (revoked.length > 0) {
+              return res.status(401).json({ success: false, error: 'Sesión cerrada. Inicia sesión de nuevo.' });
+            }
+          } catch (revokedErr) {
+            // No bloquear la autenticación si revoked_tokens aún no existe
+            // en este entorno — la firma/expiración del JWT sigue verificada.
+            console.warn('⚠️ No se pudo verificar revoked_tokens:', revokedErr.message);
+          }
+        }
+
         const user = await prisma.user.findUnique({
           where:  { id: decoded.id },
           select: { isActive: true, role: true, placeId: true },
@@ -125,4 +155,4 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, generateToken, verifyToken, JWT_SECRET, JWT_EXPIRES_IN };
+module.exports = { authenticateToken, generateToken, verifyToken, decodeToken, JWT_SECRET, JWT_EXPIRES_IN };

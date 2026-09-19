@@ -19,7 +19,7 @@ const express  = require('express');
 const bcrypt   = require('bcryptjs');
 const router   = express.Router();
 const prisma   = require('../config/prisma');
-const { authenticateToken, generateToken } = require('../middleware/auth');
+const { authenticateToken, generateToken, decodeToken } = require('../middleware/auth');
 const { validate, schemas } = require('../middleware/validate');
 
 /**
@@ -220,6 +220,44 @@ router.post('/users/register', validate(schemas.register), async (req, res) => {
   } catch (error) {
     console.error('❌ Error en /users/register:', error);
     return res.status(500).json({ success: false, error: 'Error al registrar usuario' });
+  }
+});
+
+/**
+ * @route POST /logout
+ * @description Revoca el token JWT actual (agrega su jti a revoked_tokens)
+ * para que no pueda volver a usarse aunque no haya expirado todavía.
+ * De paso limpia (lazy) los tokens revocados ya expirados.
+ *
+ * Si la tabla revoked_tokens todavía no existe en este entorno, el logout
+ * igual responde 200 — la revocación es defensa en profundidad, no la
+ * única barrera (el cliente siempre debe borrar el token localmente).
+ *
+ * @access Privado — requiere JWT válido
+ * @returns {200} { success: true, message: 'Sesión cerrada correctamente' }
+ */
+router.post('/logout', authenticateToken, async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = token ? decodeToken(token) : null;
+
+    if (decoded?.jti && decoded?.exp) {
+      try {
+        await prisma.$executeRaw`
+          INSERT INTO revoked_tokens (jti, user_id, expires_at)
+          VALUES (${decoded.jti}, ${req.user.id}, ${new Date(decoded.exp * 1000)})
+          ON CONFLICT (jti) DO NOTHING
+        `;
+        await prisma.$executeRaw`DELETE FROM revoked_tokens WHERE expires_at < NOW()`;
+      } catch (revokedErr) {
+        console.warn('⚠️ No se pudo registrar la revocación (¿falta la tabla revoked_tokens?):', revokedErr.message);
+      }
+    }
+
+    return res.json({ success: true, message: 'Sesión cerrada correctamente' });
+  } catch (error) {
+    console.error('❌ Error en /logout:', error);
+    return res.status(500).json({ success: false, error: 'Error al cerrar sesión' });
   }
 });
 
