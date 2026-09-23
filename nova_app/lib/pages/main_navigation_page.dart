@@ -34,7 +34,6 @@ import 'home_page.dart';
 import 'places_page.dart';
 import 'history_page.dart';
 import 'profile_page.dart';
-import '../core/design/app_colors.dart';
 import '../widgets/bottom_navigation_bar.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -92,9 +91,8 @@ class _MainNavigationPageState extends State<MainNavigationPage>
           ],
         ),
       ),
-      floatingActionButton: (_currentIndex == 0 || _currentIndex == 1)
-          ? _buildFab()
-          : null,
+      floatingActionButton:
+          (_currentIndex == 0 || _currentIndex == 1) ? _buildFab() : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: MainBottomNavBar(
         currentIndex: _currentIndex,
@@ -103,17 +101,32 @@ class _MainNavigationPageState extends State<MainNavigationPage>
     );
   }
 
+  // FAB central con gradiente azul→verde de marca (Figma node 4:2,
+  // "Pestaña · Escanear") — antes era teal (AppColors.primary), branding
+  // desactualizado frente al resto del flujo bienvenida/home.
   Widget _buildFab() {
-    return FloatingActionButton(
-      onPressed: () {
-        HapticFeedback.mediumImpact();
-        Navigator.pushNamed(context, '/scan');
-      },
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.onPrimary,
-      elevation: 6,
-      tooltip: 'Escanear QR',
-      child: const Icon(Icons.qr_code_scanner_rounded, size: 26),
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF0071BD), Color(0xFF078930)],
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            Navigator.pushNamed(context, '/scan');
+          },
+          child: const Icon(Icons.qr_code_scanner_rounded,
+              color: Colors.white, size: 24),
+        ),
+      ),
     );
   }
 }
