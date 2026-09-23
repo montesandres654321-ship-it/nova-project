@@ -53,36 +53,56 @@ class _CarruselItem {
 }
 
 const _kJuegosItems = [
-  _CarruselItem('assets/images/home/foto-deportes.png', 'Deportes', 'Agenda y resultados'),
-  _CarruselItem('assets/images/home/foto-escenarios.png', 'Escenarios', 'Sedes de competencia'),
-  _CarruselItem('assets/images/home/foto-cultura.png', 'Cultura', 'Eventos y tradición'),
+  _CarruselItem('assets/images/home/foto-deportes.png', 'Deportes',
+      'Agenda y resultados'),
+  _CarruselItem('assets/images/home/foto-escenarios.png', 'Escenarios',
+      'Sedes de competencia'),
+  _CarruselItem(
+      'assets/images/home/foto-cultura.png', 'Cultura', 'Eventos y tradición'),
 ];
 
 const _kMunicipioItems = [
-  _CarruselItem('assets/images/municipios/foto-covenas.png', 'Coveñas', 'Playas y naturaleza'),
-  _CarruselItem('assets/images/municipios/foto-tolu.png', 'Santiago de Tolú', 'Costa y patrimonio'),
-  _CarruselItem('assets/images/municipios/foto-sincelejo.png', 'Sincelejo', 'Capital de Sucre'),
+  _CarruselItem('assets/images/municipios/foto-covenas.png', 'Coveñas',
+      'Playas y naturaleza'),
+  _CarruselItem('assets/images/municipios/foto-tolu.png', 'Santiago de Tolú',
+      'Costa y patrimonio'),
+  _CarruselItem('assets/images/municipios/foto-sincelejo.png', 'Sincelejo',
+      'Capital de Sucre'),
 ];
 const _kMunicipioSlugs = ['covenas', 'santiago_de_tolu', 'sincelejo'];
 
 const _kRutaItems = [
-  _CarruselItem('assets/images/rutas/foto-ruta-costera.png', 'Ruta Costera', 'Playas y manglares'),
-  _CarruselItem('assets/images/rutas/foto-ruta-patrimonio.png', 'Ruta Patrimonio', 'Historia y cultura'),
-  _CarruselItem('assets/images/rutas/foto-ruta-cienagas.png', 'Ruta Ciénagas', 'Naturaleza viva'),
+  _CarruselItem('assets/images/rutas/foto-ruta-costera.png', 'Ruta Costera',
+      'Playas y manglares'),
+  _CarruselItem('assets/images/rutas/foto-ruta-patrimonio.png',
+      'Ruta Patrimonio', 'Historia y cultura'),
+  _CarruselItem('assets/images/rutas/foto-ruta-cienagas.png', 'Ruta Ciénagas',
+      'Naturaleza viva'),
 ];
 
 const _kNaturalezaItems = [
-  _CarruselItem('assets/images/naturaleza/foto-manglares.png', 'Manglares', 'Ecosistema protegido'),
-  _CarruselItem('assets/images/naturaleza/foto-cienagas.png', 'Ciénagas', 'Fauna y recorridos'),
+  _CarruselItem('assets/images/naturaleza/foto-manglares.png', 'Manglares',
+      'Ecosistema protegido'),
+  _CarruselItem('assets/images/naturaleza/foto-cienagas.png', 'Ciénagas',
+      'Fauna y recorridos'),
 ];
 
 const _kSaboresItems = [
-  _CarruselItem('assets/images/gastronomia/foto-restaurantes.png', 'Restaurantes', 'Sabor local'),
-  _CarruselItem('assets/images/gastronomia/foto-platos-tipicos.png', 'Platos típicos', 'Cocina de Sucre'),
-  _CarruselItem('assets/images/gastronomia/foto-compras.png', 'Compras', 'Artesanías y más'),
+  _CarruselItem('assets/images/gastronomia/foto-restaurantes.png',
+      'Restaurantes', 'Sabor local'),
+  _CarruselItem('assets/images/gastronomia/foto-platos-tipicos.png',
+      'Platos típicos', 'Cocina de Sucre'),
+  _CarruselItem('assets/images/gastronomia/foto-compras.png', 'Compras',
+      'Artesanías y más'),
 ];
 
-const _kChips = ['Escenarios', 'Restaurantes', 'Parques', 'Artesanías', 'Playas'];
+const _kChips = [
+  'Escenarios',
+  'Restaurantes',
+  'Parques',
+  'Artesanías',
+  'Playas'
+];
 
 class _HomePageState extends State<HomePage> {
   ScanRecord? _lastScan;
@@ -117,10 +137,8 @@ class _HomePageState extends State<HomePage> {
           _userName = user['first_name'] ?? user['username'] ?? 'Usuario';
         });
       } else {
-        final userName =
-            prefs.getString(AppConstants.keyUsername) ?? 'Usuario';
-        final firstName =
-            prefs.getString(AppConstants.keyFirstName) ?? '';
+        final userName = prefs.getString(AppConstants.keyUsername) ?? 'Usuario';
+        final firstName = prefs.getString(AppConstants.keyFirstName) ?? '';
         setState(() {
           _userName = firstName.isNotEmpty ? firstName : userName;
         });
@@ -205,7 +223,8 @@ class _HomePageState extends State<HomePage> {
                 onTapItem: (i) => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MunicipioPage(municipio: _kMunicipioSlugs[i]),
+                    builder: (_) =>
+                        MunicipioPage(municipio: _kMunicipioSlugs[i]),
                   ),
                 ),
               ),
@@ -213,9 +232,11 @@ class _HomePageState extends State<HomePage> {
               _buildSeccionCarrusel(
                 titulo: 'Rutas y recorridos',
                 verMasLabel: 'Ver rutas',
-                onVerMasTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RutasPage())),
+                onVerMasTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const RutasPage())),
                 items: _kRutaItems,
-                onTapItem: (_) => Navigator.push(context, MaterialPageRoute(builder: (_) => const RutasPage())),
+                onTapItem: (_) => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const RutasPage())),
               ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
@@ -240,37 +261,48 @@ class _HomePageState extends State<HomePage> {
   }
 
   // [1] ENCABEZADO — foto + gradiente + saludo + buscador
+  //
+  // Estructura en capas (Stack a nivel del Container completo, SIN padding
+  // envolviéndolo): la foto y el gradiente deben cubrir el header entero,
+  // no solo el área interior al padding — de lo contrario el gradiente
+  // queda inset y deja una franja de foto sin overlay cerca de los bordes.
   Widget _buildEncabezado() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        image: DecorationImage(
-          image: AssetImage('assets/images/home/foto-hero-home.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xCC0A578B), // rgba(10,87,139,0.8)
-                      Color(0xCC0071BD), // rgba(0,113,189,0.8)
-                      Color(0x7AFFFFFF), // rgba(255,255,255,0.48)
-                    ],
-                    stops: [0.02, 0.50, 0.98],
-                  ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+      child: Stack(
+        children: [
+          // CAPA 1: Foto (cubre TODO el header)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/home/foto-hero-home.png',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  Container(color: AppColors.bienvenidaAzul),
+            ),
+          ),
+          // CAPA 2: Gradiente EXACTO del Figma (node 4:2) — también a
+          // pantalla completa, no inset por el padding del contenido.
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xCC0A578B), // rgba(10,87,139,0.8)
+                    Color(0xCC0071BD), // rgba(0,113,189,0.8)
+                    Color(0x7AFFFFFF), // rgba(255,255,255,0.48)
+                  ],
+                  stops: [0.02, 0.50, 0.98],
                 ),
               ),
             ),
-            Column(
+          ),
+          // CAPA 3: Contenido, con su propio padding (no afecta a las
+          // capas de fondo, que ya están a pantalla completa arriba).
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -296,12 +328,14 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SvgPicture.asset('assets/icons/ic-map-pin.svg', width: 16, height: 16),
+                              SvgPicture.asset('assets/icons/ic-map-pin.svg',
+                                  width: 16, height: 16),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   'Estás en $_userLocation',
-                                  style: GoogleFonts.openSans(fontSize: 13, color: Colors.white),
+                                  style: GoogleFonts.openSans(
+                                      fontSize: 13, color: Colors.white),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -327,18 +361,21 @@ class _HomePageState extends State<HomePage> {
                 GestureDetector(
                   onTap: () {}, // Búsqueda: pendiente de implementar
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(
                       children: [
-                        SvgPicture.asset('assets/icons/ic-buscar.svg', width: 18, height: 18),
+                        SvgPicture.asset('assets/icons/ic-buscar.svg',
+                            width: 18, height: 18),
                         const SizedBox(width: 10),
                         Text(
                           '¿Tienes un lugar en mente?',
-                          style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textHint),
+                          style: GoogleFonts.openSans(
+                              fontSize: 14, color: AppColors.textHint),
                         ),
                       ],
                     ),
@@ -346,8 +383,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -356,53 +393,63 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCtaEscanear() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: GestureDetector(
-        onTap: () => Navigator.pushNamed(context, '/scan'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0071BD), Color(0xFF078930)],
-            ),
-            borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0071BD), Color(0xFF078930)],
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: SvgPicture.asset(
-                  'assets/icons/ic-qr-code.svg',
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Escanear QR',
-                      style: GoogleFonts.openSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, '/scan'),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    Text(
-                      'Toca para escanear un lugar',
-                      style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
+                    child: SvgPicture.asset(
+                      'assets/icons/ic-qr-code.svg',
+                      width: 18,
+                      height: 18,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Escanear QR',
+                          style: GoogleFonts.openSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'Toca para escanear un lugar',
+                          style: GoogleFonts.openSans(
+                              fontSize: 12,
+                              color: AppColors.bienvenidaAzulClaro),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -448,7 +495,8 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 2),
                   Text(
                     _lastScan!.place,
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                    style: GoogleFonts.openSans(
+                        fontSize: 12, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -533,9 +581,11 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Expanded(child: _buildBotonBanner('Deportes', solido: true)),
+                    Expanded(
+                        child: _buildBotonBanner('Deportes', solido: true)),
                     const SizedBox(width: 10),
-                    Expanded(child: _buildBotonBanner('Escenarios', solido: false)),
+                    Expanded(
+                        child: _buildBotonBanner('Escenarios', solido: false)),
                   ],
                 ),
               ],
@@ -555,7 +605,8 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Text(
         texto,
-        style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+        style: GoogleFonts.openSans(
+            fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
       ),
     );
   }
@@ -567,7 +618,9 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: solido ? Colors.white : Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(999),
-        border: solido ? null : Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        border: solido
+            ? null
+            : Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: Text(
         texto,
@@ -620,7 +673,9 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.openSans(
                   fontSize: tituloEspecial ? 15 : 18,
                   fontWeight: FontWeight.w700,
-                  color: tituloEspecial ? AppColors.bienvenidaCoral : AppColors.bienvenidaTextoFuerte,
+                  color: tituloEspecial
+                      ? AppColors.bienvenidaCoral
+                      : AppColors.bienvenidaTextoFuerte,
                 ),
               ),
               if (verMasLabel != null)
@@ -690,7 +745,8 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Aún no hay lugares para mostrar.',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+              style: GoogleFonts.openSans(
+                  fontSize: 13, color: AppColors.textSecondary),
             ),
           )
         else
@@ -709,7 +765,8 @@ class _HomePageState extends State<HomePage> {
                     photoSize: 72,
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => PlaceDetailPage(place: place)),
+                      MaterialPageRoute(
+                          builder: (_) => PlaceDetailPage(place: place)),
                     ),
                   ),
                   const SizedBox(height: 10),
