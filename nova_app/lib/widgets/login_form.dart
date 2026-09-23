@@ -113,7 +113,9 @@ class LoginForm extends StatelessWidget {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: rememberMe ? AppColors.bienvenidaVerde : Colors.white,
+                        color: rememberMe
+                            ? AppColors.bienvenidaVerde
+                            : Colors.white,
                         border: Border.all(color: AppColors.bienvenidaBorde),
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -196,7 +198,8 @@ class LoginForm extends StatelessWidget {
             child: Row(
               children: [
                 const Expanded(
-                    child: Divider(color: AppColors.bienvenidaBorde, thickness: 1)),
+                    child: Divider(
+                        color: AppColors.bienvenidaBorde, thickness: 1)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
@@ -210,7 +213,8 @@ class LoginForm extends StatelessWidget {
                   ),
                 ),
                 const Expanded(
-                    child: Divider(color: AppColors.bienvenidaBorde, thickness: 1)),
+                    child: Divider(
+                        color: AppColors.bienvenidaBorde, thickness: 1)),
               ],
             ),
           ),
@@ -220,6 +224,7 @@ class LoginForm extends StatelessWidget {
             logo: 'assets/images/logos/logo-google.png',
             logoW: 21,
             logoH: 21,
+            logoLeft: 20,
             texto: 'Continuar con Google',
             onTap: onGooglePressed,
           ),
@@ -228,6 +233,7 @@ class LoginForm extends StatelessWidget {
             logo: 'assets/images/logos/logo-facebook.png',
             logoW: 23,
             logoH: 23,
+            logoLeft: 19,
             texto: 'Continuar con Facebook',
             onTap: null, // deshabilitado por ahora
           ),
@@ -236,11 +242,12 @@ class LoginForm extends StatelessWidget {
             logo: 'assets/images/logos/logo-apple.png',
             logoW: 25,
             logoH: 25,
+            logoLeft: 17,
             texto: 'Continuar con Apple',
             onTap: null, // deshabilitado por ahora
           ),
 
-          const SizedBox(height: 35),
+          const SizedBox(height: 16),
 
           // ── MÓDULO JUEGOS NACIONALES 2027 ─────────────────────
           Container(
@@ -310,42 +317,45 @@ class LoginForm extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
             child: Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  Text(
-                    '¿Aún no tienes cuenta? ',
+              alignment: WrapAlignment.center,
+              children: [
+                Text(
+                  '¿Aún no tienes cuenta? ',
+                  style: GoogleFonts.openSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RegisterPage()),
+                  ),
+                  child: Text(
+                    'Regístrate',
                     style: GoogleFonts.openSans(
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.bienvenidaVerde,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const RegisterPage()),
-                    ),
-                    child: Text(
-                      'Regístrate',
-                      style: GoogleFonts.openSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.bienvenidaVerde,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );
   }
 
-  // Botón social reutilizable (logo + texto superpuestos, estilo Figma)
+  // Botón social reutilizable (logo anclado a la izquierda, texto centrado
+  // en el ancho total del botón — spec Figma node 2:2, icono left=17-20px
+  // según el logo para que nunca se superponga con el texto)
   Widget _buildBotonSocial({
     required String logo,
     required double logoW,
     required double logoH,
+    required double logoLeft,
     required String texto,
     VoidCallback? onTap,
   }) {
@@ -354,14 +364,14 @@ class LoginForm extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         side: const BorderSide(color: AppColors.bienvenidaBorde),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        minimumSize: const Size(double.infinity, 0),
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(double.infinity, 49),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
           Positioned(
-            left: 0,
+            left: logoLeft,
             child: Image.asset(logo, width: logoW, height: logoH),
           ),
           Text(

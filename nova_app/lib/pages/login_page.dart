@@ -89,7 +89,8 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(AppConstants.keyAuthProvider, 'email');
         if (_rememberMe) {
-          await prefs.setString(AppConstants.keySavedEmail, _emailCtrl.text.trim());
+          await prefs.setString(
+              AppConstants.keySavedEmail, _emailCtrl.text.trim());
           await prefs.setBool(AppConstants.keyRememberMe, true);
         } else {
           await prefs.remove(AppConstants.keySavedEmail);
@@ -98,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Bienvenido ${user?['first_name'] ?? user?['username'] ?? ''}'),
+          content: Text(
+              'Bienvenido ${user?['first_name'] ?? user?['username'] ?? ''}'),
           backgroundColor: AppColors.success,
         ));
         Navigator.of(context).pushReplacement(
@@ -141,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
+          padding: const EdgeInsets.fromLTRB(24, 64, 24, 32),
           child: LoginForm(
             formKey: _formKey,
             emailController: _emailCtrl,
