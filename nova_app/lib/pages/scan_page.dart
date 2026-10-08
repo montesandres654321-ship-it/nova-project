@@ -215,7 +215,7 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'En escenarios, parques, museos, restaurantes y comercios aliados encontrarás códigos QR que te permiten descubrir historias, información del evento y recompensas exclusivas de los Juegos Nacionales y Paranacionales 2027.',
+                      'En escenarios, parques, museos, restaurantes y comercios aliados encontrarás códigos QR que te permiten descubrir historias, información y recompensas exclusivas del Golfo de Morrosquillo.',
                       style: GoogleFonts.openSans(fontSize: 14, color: _kTextoSuave, height: 22 / 14),
                     ),
                   ],

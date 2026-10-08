@@ -70,7 +70,7 @@ const Map<String, _MunicipioData> _kMunicipios = {
   'sincelejo': _MunicipioData(
     heroAsset: 'assets/images/municipios/hero-sincelejo.png',
     nombre: 'Sincelejo',
-    subtitulo: 'Capital de Sucre · Sede de los Juegos Nacionales 2027',
+    subtitulo: 'Capital del departamento de Sucre',
     valoracion: 4.7,
     nLugares: 12,
     nRutas: 3,
@@ -80,7 +80,7 @@ const Map<String, _MunicipioData> _kMunicipios = {
     timeline: [
       _TimelineEntry('1776', 'Fundación del poblado de Sincelejo.'),
       _TimelineEntry('1966', 'Se erige como capital del nuevo departamento de Sucre.'),
-      _TimelineEntry('2027', 'Sede principal de los Juegos Nacionales y Paranacionales.'),
+      _TimelineEntry('2024', 'Modernización del terminal de transportes y espacios públicos.'),
     ],
     textoFinalBold: 'Las Fiestas del 20 de Enero',
     textoFinalResto: ' reúnen cada año a miles de visitantes en torno a la corraleja y la música sabanera.',
@@ -104,7 +104,7 @@ const Map<String, _MunicipioData> _kMunicipios = {
         'Uno de los puertos más antiguos del Caribe colombiano, con playas, malecón y tradición pesquera.',
     timeline: [
       _TimelineEntry('1535', 'Fundación española del puerto de Tolú.'),
-      _TimelineEntry('2027', 'Sede de eventos náuticos de los Juegos Nacionales.'),
+      _TimelineEntry('2010s', 'Consolidación del malecón como polo turístico náutico.'),
     ],
     textoFinalBold: 'El malecón turístico',
     textoFinalResto: ' es el punto de encuentro para disfrutar el atardecer sobre el mar Caribe.',
@@ -126,7 +126,7 @@ const Map<String, _MunicipioData> _kMunicipios = {
         'Balneario por excelencia de la región Caribe, con playas de aguas cálidas y manglares cercanos.',
     timeline: [
       _TimelineEntry('1960s', 'Auge turístico como destino de playa del Caribe.'),
-      _TimelineEntry('2027', 'Sede de actividades acuáticas de los Juegos Nacionales.'),
+      _TimelineEntry('2010s', 'Crecimiento de la oferta hotelera y de deportes acuáticos.'),
     ],
     textoFinalBold: 'Punta Bolívar',
     textoFinalResto: ' es la playa más visitada, con deportes acuáticos y comida típica frente al mar.',
@@ -241,7 +241,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: SvgPicture.asset(
-                  'assets/images/logos/logo-juegos-nacionales-2027.svg',
+                  'assets/images/logos/logo-nova-verde-m.svg',
                   width: 40,
                   height: 40,
                 ),

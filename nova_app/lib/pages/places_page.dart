@@ -4,8 +4,8 @@
 // ============================================================
 // Rediseño Figma Septiembre 2026 (NOVA_HOME_EXPLORAR_PLAN.md, node 5:2).
 // Antes era un TabBarView por tipo de establecimiento (hoteles/
-// restaurantes/bares); ahora es una lista de los tres municipios sede
-// de los Juegos Nacionales 2027, con filtros de categoría. La API de
+// restaurantes/bares); ahora es una lista de los tres municipios del
+// Golfo de Morrosquillo, con filtros de categoría. La API de
 // lugares (ApiService.getPlacesByMunicipio) se mantiene — solo cambia
 // la presentación.
 // ============================================================
@@ -138,7 +138,7 @@ class _PlacesPageState extends State<PlacesPage> {
     );
   }
 
-  // HEADER — logo Juegos + título + subtítulo + buscador
+  // HEADER — logo NOVA + título + subtítulo + buscador
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -149,8 +149,8 @@ class _PlacesPageState extends State<PlacesPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SvgPicture.asset(
-                'assets/images/logos/logo-juegos-nacionales-2027.svg',
-                width: 122,
+                'assets/images/logos/logo-nova-verde.svg',
+                width: 92,
                 height: 55,
               ),
               GestureDetector(

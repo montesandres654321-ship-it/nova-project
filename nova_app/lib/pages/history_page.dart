@@ -164,7 +164,7 @@ class _HistoryPageState extends State<HistoryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Mis beneficios · Juegos 2027',
+            'Mis beneficios',
             style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
           ),
           const SizedBox(height: 20),

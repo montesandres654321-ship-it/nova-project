@@ -84,7 +84,7 @@ class PlaceHeader extends StatelessWidget {
                   borderRadius: AppRadius.pillAll,
                 ),
                 child: const Text(
-                  'Sede oficial · Juegos 2027',
+                  'Escenario deportivo',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
                 ),
               ),

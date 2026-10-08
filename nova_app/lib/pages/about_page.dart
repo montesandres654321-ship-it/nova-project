@@ -123,7 +123,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'Conéctate directamente con el patrimonio local, la gastronomía '
-            'tradicional y vive los Juegos Nacionales y Paranacionales 2027.',
+            'tradicional y disfruta el Golfo de Morrosquillo.',
             style: GoogleFonts.openSans(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
           ),
         ],

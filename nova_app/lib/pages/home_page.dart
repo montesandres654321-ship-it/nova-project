@@ -8,10 +8,9 @@
 /// [ApiService.getAllPlaces] (backend).
 ///
 /// Diseño Figma Septiembre 2026 (NOVA_HOME_EXPLORAR_PLAN.md, node 4:2):
-/// encabezado con foto+gradiente, CTA de escaneo, banner Juegos
-/// Nacionales 2027, chips de categoría y carruseles curados (Juegos,
-/// municipios, rutas, naturaleza, sabores) + lista "Lo mejor valorado"
-/// con datos reales de [ApiService.getAllPlaces].
+/// encabezado con foto+gradiente, CTA de escaneo, chips de categoría y
+/// carruseles curados (municipios, rutas, naturaleza, sabores) + lista
+/// "Lo mejor valorado" con datos reales de [ApiService.getAllPlaces].
 ///
 /// [onNavigateToTab] — callback para navegar a otras tabs del [MainNavigationPage]
 library;
@@ -51,15 +50,6 @@ class _CarruselItem {
   final String subtitulo;
   const _CarruselItem(this.imagePath, this.titulo, this.subtitulo);
 }
-
-const _kJuegosItems = [
-  _CarruselItem('assets/images/home/foto-deportes.png', 'Deportes',
-      'Agenda y resultados'),
-  _CarruselItem('assets/images/home/foto-escenarios.png', 'Escenarios',
-      'Sedes de competencia'),
-  _CarruselItem(
-      'assets/images/home/foto-cultura.png', 'Cultura', 'Eventos y tradición'),
-];
 
 const _kMunicipioItems = [
   _CarruselItem('assets/images/municipios/foto-covenas.png', 'Coveñas',
@@ -207,15 +197,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               _buildUltimoEscaneo(),
               const SizedBox(height: 20),
-              _buildBannerJuegos(),
-              const SizedBox(height: 20),
               _buildChipsCategorias(),
-              const SizedBox(height: 24),
-              _buildSeccionCarrusel(
-                titulo: 'Juegos 2027',
-                tituloEspecial: true,
-                items: _kJuegosItems,
-              ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
                 titulo: 'Explora por municipio',
@@ -522,117 +504,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // [3] BANNER JUEGOS NACIONALES 2027
-  Widget _buildBannerJuegos() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: AppColors.bienvenidaCoral,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -40,
-              bottom: -20,
-              child: Opacity(
-                opacity: 0.14,
-                child: SvgPicture.asset(
-                  'assets/icons/ic-marca-agua-juegos.svg',
-                  width: 200,
-                  height: 90,
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildChipBanner('Evento especial'),
-                    _buildChipBanner('2027'),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  'Juegos Nacionales y Paranacionales 2027',
-                  style: GoogleFonts.openSans(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Agenda, escenarios, cultura, gastronomía y naturaleza de los tres municipios sede.',
-                  style: GoogleFonts.openSans(
-                    fontSize: 13,
-                    color: AppColors.bienvenidaAzulClaro,
-                    height: 19 / 13,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                        child: _buildBotonBanner('Deportes', solido: true)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                        child: _buildBotonBanner('Escenarios', solido: false)),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChipBanner(String texto) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        texto,
-        style: GoogleFonts.openSans(
-            fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildBotonBanner(String texto, {required bool solido}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: solido ? Colors.white : Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(999),
-        border: solido
-            ? null
-            : Border.all(color: Colors.white.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        texto,
-        style: GoogleFonts.openSans(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: solido ? AppColors.bienvenidaCoral : Colors.white,
-        ),
-      ),
-    );
-  }
-
   // [4] CHIPS CATEGORÍAS (scroll horizontal)
   Widget _buildChipsCategorias() {
     return SizedBox(
@@ -651,7 +522,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Secciones de carrusel genéricas (Juegos 2027, municipios, rutas, ...)
+  // Secciones de carrusel genéricas (municipios, rutas, naturaleza, ...)
   Widget _buildSeccionCarrusel({
     required String titulo,
     required List<_CarruselItem> items,

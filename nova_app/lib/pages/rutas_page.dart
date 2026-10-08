@@ -5,8 +5,7 @@
 // Lista de rutas curadas (datos mock — la BD no tiene tabla de rutas
 // aún, per NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md PASO 4). El botón
 // "Consultar" de cada tarjeta no tiene acción todavía (pantalla de
-// detalle futura); la ruta destacada "Ruta oficial Juegos 2027" sí
-// navega a una pantalla real (ruta_juegos_page.dart).
+// detalle futura).
 //
 // Diseño Figma Septiembre 2026, node 7:39.
 // ============================================================
@@ -15,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../core/design/app_colors.dart';
-import 'ruta_juegos_page.dart';
 
 class _Ruta {
   final String imagePath;
@@ -69,10 +67,6 @@ class RutasPage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: _buildBannerJuegos(context),
-              ),
-              Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                 child: Column(
                   children: [
@@ -85,42 +79,6 @@ class RutasPage extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  // Banner destacado hacia la ruta oficial de los Juegos 2027
-  Widget _buildBannerJuegos(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RutaJuegosPage())),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.bienvenidaAzul,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Ruta oficial Juegos Nacionales 2027',
-                    style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '3 días · Coveñas, Santiago de Tolú y Sincelejo',
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
-          ],
         ),
       ),
     );
