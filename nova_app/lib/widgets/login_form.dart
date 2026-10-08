@@ -56,7 +56,7 @@ class LoginForm extends StatelessWidget {
             width: 88,
             height: 52.585,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             'Bienvenido a Sucre.',
             style: GoogleFonts.openSans(
@@ -66,7 +66,7 @@ class LoginForm extends StatelessWidget {
               height: 33 / 26,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           Text(
             'Entra y sigue descubriendo el departamento.',
             style: GoogleFonts.openSans(
@@ -76,7 +76,7 @@ class LoginForm extends StatelessWidget {
               height: 22 / 15,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // ── FORMULARIO ──────────────────────────────────────
           EmailInput(
@@ -85,7 +85,7 @@ class LoginForm extends StatelessWidget {
             figmaLabel: 'Correo electrónico',
             hintText: 'tucorreo@ejemplo.com',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           PasswordInput(
             controller: passwordController,
@@ -95,7 +95,7 @@ class LoginForm extends StatelessWidget {
             figmaStyle: true,
             verticalPadding: 15,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Fila: Recordarme + ¿Olvidaste?
           Wrap(
@@ -156,7 +156,7 @@ class LoginForm extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Botón Iniciar sesión
           SizedBox(
@@ -194,7 +194,7 @@ class LoginForm extends StatelessWidget {
 
           // ── SEPARADOR "o continúa con" ───────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Row(
               children: [
                 const Expanded(
@@ -220,38 +220,48 @@ class LoginForm extends StatelessWidget {
           ),
 
           // ── BOTONES SOCIALES ─────────────────────────────────
-          _buildBotonSocial(
-            logo: 'assets/images/logos/logo-google.png',
-            logoW: 21,
-            logoH: 21,
-            logoLeft: 20,
-            texto: 'Continuar con Google',
-            onTap: onGooglePressed,
-          ),
-          const SizedBox(height: 12),
-          _buildBotonSocial(
-            logo: 'assets/images/logos/logo-facebook.png',
-            logoW: 23,
-            logoH: 23,
-            logoLeft: 19,
-            texto: 'Continuar con Facebook',
-            onTap: null, // deshabilitado por ahora
-          ),
-          const SizedBox(height: 12),
-          _buildBotonSocial(
-            logo: 'assets/images/logos/logo-apple.png',
-            logoW: 25,
-            logoH: 25,
-            logoLeft: 17,
-            texto: 'Continuar con Apple',
-            onTap: null, // deshabilitado por ahora
+          // 3 botones cuadrados lado a lado (icono arriba, label abajo)
+          // en vez de fila vertical — evita cualquier superposición
+          // icono/texto y ahorra espacio vertical en pantallas chicas.
+          Row(
+            children: [
+              Expanded(
+                child: _buildBotonSocialIcono(
+                  logo: 'assets/images/logos/logo-google.png',
+                  fallbackIcon: Icons.g_mobiledata,
+                  fallbackColor: const Color(0xFF4285F4),
+                  label: 'Google',
+                  onTap: onGooglePressed,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBotonSocialIcono(
+                  logo: 'assets/images/logos/logo-facebook.png',
+                  fallbackIcon: Icons.facebook,
+                  fallbackColor: const Color(0xFF1877F2),
+                  label: 'Facebook',
+                  onTap: null, // deshabilitado por ahora
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBotonSocialIcono(
+                  logo: 'assets/images/logos/logo-apple.png',
+                  fallbackIcon: Icons.apple,
+                  fallbackColor: Colors.black,
+                  label: 'Apple',
+                  onTap: null, // deshabilitado por ahora
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
 
           // ── MÓDULO JUEGOS NACIONALES 2027 ─────────────────────
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppColors.bienvenidaFondoInput,
               border: Border.all(color: AppColors.bienvenidaBorde),
@@ -315,7 +325,7 @@ class LoginForm extends StatelessWidget {
 
           // ── PIE DE PÁGINA ────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [
@@ -348,39 +358,41 @@ class LoginForm extends StatelessWidget {
     );
   }
 
-  // Botón social reutilizable (logo anclado a la izquierda, texto centrado
-  // en el ancho total del botón — spec Figma node 2:2, icono left=17-20px
-  // según el logo para que nunca se superponga con el texto)
-  Widget _buildBotonSocial({
+  // Botón social cuadrado (icono arriba, label abajo) — usado en fila de 3
+  // (Google / Facebook / Apple) para que quepan lado a lado sin overflow.
+  Widget _buildBotonSocialIcono({
     required String logo,
-    required double logoW,
-    required double logoH,
-    required double logoLeft,
-    required String texto,
-    VoidCallback? onTap,
+    required IconData fallbackIcon,
+    required Color fallbackColor,
+    required String label,
+    required VoidCallback? onTap,
   }) {
     return OutlinedButton(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         side: const BorderSide(color: AppColors.bienvenidaBorde),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        padding: EdgeInsets.zero,
-        minimumSize: const Size(double.infinity, 49),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        minimumSize: const Size(0, 52),
+        backgroundColor: Colors.white,
       ),
-      child: Stack(
-        alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Positioned(
-            left: logoLeft,
-            child: Image.asset(logo, width: logoW, height: logoH),
+          Image.asset(
+            logo,
+            width: 24,
+            height: 24,
+            errorBuilder: (_, __, ___) =>
+                Icon(fallbackIcon, size: 26, color: fallbackColor),
           ),
+          const SizedBox(height: 6),
           Text(
-            texto,
+            label,
             style: GoogleFonts.openSans(
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w600,
               color: AppColors.bienvenidaTextoMedio,
-              height: 19 / 10,
             ),
           ),
         ],

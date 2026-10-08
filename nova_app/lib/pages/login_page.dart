@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 64, 24, 32),
+          padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
           child: LoginForm(
             formKey: _formKey,
             emailController: _emailCtrl,
