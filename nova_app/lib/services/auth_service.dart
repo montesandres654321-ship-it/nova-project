@@ -253,8 +253,9 @@ class AuthService {
       }
     }
 
-    // Borrar solo los datos de sesión — mantener onboarding_complete
-    // (no repetir el flujo de bienvenida) y las prefs de "recordarme".
+    // Borrar solo los datos de sesión — las prefs de "recordarme" se
+    // mantienen. Sin token, el splash siempre vuelve a mostrar el
+    // flujo de bienvenida (permisos → onboarding → login).
     await prefs.remove(AppConstants.keyToken);
     await prefs.remove(AppConstants.keyUserId);
     await prefs.remove(AppConstants.keyUser);

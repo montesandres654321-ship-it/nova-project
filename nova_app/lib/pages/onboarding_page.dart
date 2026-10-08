@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/design/app_colors.dart';
-import '../utils/constants.dart';
 import 'login_page.dart';
-import 'main_navigation_page.dart';
 
 // Slide 1 · Juegos Nacionales 2027
 const _kResplandorAmarilloAsset = 'assets/images/onboarding/resplandor-amarillo.svg';
@@ -50,16 +47,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Future<void> _finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', true);
-    final hasToken = (prefs.getString(AppConstants.keyToken) ?? '').isNotEmpty;
-    if (!mounted) return;
+  // El onboarding solo se muestra cuando splash ya determinó que no hay
+  // sesión activa (ver splash_page.dart), así que siempre termina en login.
+  void _finishOnboarding() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) =>
-            hasToken ? const MainNavigationPage() : const LoginPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
     );
   }
 

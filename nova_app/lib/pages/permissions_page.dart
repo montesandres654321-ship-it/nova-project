@@ -21,7 +21,7 @@ class PermissionsPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+          padding: const EdgeInsets.fromLTRB(24, 72, 24, 40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,42 +71,57 @@ class PermissionsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  Text(
-                    'Con el respaldo de',
-                    style: GoogleFonts.openSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.bienvenidaTextoFuerte,
+              // SizedBox(width: infinity) fuerza a que este bloque llene el
+              // ancho disponible dentro del Column externo (que usa
+              // crossAxisAlignment.start) — sin esto, tanto el texto como
+              // la card de logos quedaban pegados al borde izquierdo en vez
+              // de centrados en la pantalla.
+              SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Con el respaldo de',
+                      style: GoogleFonts.openSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.bienvenidaTextoFuerte,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 180,
-                    height: 67,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.bienvenidaBorde),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(width: 12),
-                        Image.asset(_kLogoMincitAsset, width: 69, height: 40),
-                        const SizedBox(width: 15),
-                        Image.asset(
-                          _kLogoGobernacionAsset,
-                          width: 44,
-                          height: 44,
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Container(
+                        width: 180,
+                        height: 67,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: AppColors.bienvenidaBorde),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const SizedBox(width: 12),
-                      ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(width: 12),
+                            Image.asset(
+                              _kLogoMincitAsset,
+                              width: 69,
+                              height: 40,
+                            ),
+                            const SizedBox(width: 15),
+                            Image.asset(
+                              _kLogoGobernacionAsset,
+                              width: 44,
+                              height: 44,
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(
                 width: double.infinity,
@@ -122,10 +137,10 @@ class PermissionsPage extends StatelessWidget {
                   child: Text(
                     'Continuar',
                     style: GoogleFonts.openSans(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
-                      height: 26 / 12,
+                      height: 26 / 13,
                     ),
                   ),
                 ),
