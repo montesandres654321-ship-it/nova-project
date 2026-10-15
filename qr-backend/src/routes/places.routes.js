@@ -23,7 +23,7 @@ const VALID_TIPOS = [
   'cultura', 'artesania', 'playa', 'ruta',
   'gastronomia', 'compras', 'servicio',
 ];
-const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas'];
+const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues'];
 
 router.get('/', async (req, res) => {
   try {

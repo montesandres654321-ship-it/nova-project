@@ -114,6 +114,9 @@ const analyticsRouter = require('./src/routes/analytics.routes');
 const uploadRouter    = require('./src/routes/upload.routes');
 const dashboardRouter = require('./src/routes/dashboard.routes');
 const ownerRouter     = require('./src/routes/owner.routes');
+const devicesRouter   = require('./src/routes/devices.routes');
+const locationRouter  = require('./src/routes/location.routes');
+const { startScheduler } = require('./src/cron/scheduler');
 
 // ══════════════════════════════════════════════════════════
 // MONTAJE DE RUTAS
@@ -146,6 +149,12 @@ app.use('/', dashboardRouter);
 
 // Owner stats: /owner/stats
 app.use('/', ownerRouter);
+
+// Devices: montado en /devices → rutas internas son /register
+app.use('/devices', devicesRouter);
+
+// Location: montado en /location → rutas internas son /ping
+app.use('/location', locationRouter);
 
 // auth-v2 desactivado — pendiente migración a PG antes de reactivar
 // app.use('/', authV2Router);
@@ -183,6 +192,8 @@ app.use((req, res) => {
 // Solo escuchar si este archivo se ejecuta directamente (node index.js),
 // no cuando lo importa un test con require('../index').
 if (require.main === module) {
+  startScheduler();
+
   app.listen(PORT, '0.0.0.0', () => {
     console.log('\n🚀 NOVA APP BACKEND listo');
     console.log(`📡  http://localhost:${PORT}`);
