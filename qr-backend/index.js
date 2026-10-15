@@ -116,6 +116,8 @@ const dashboardRouter = require('./src/routes/dashboard.routes');
 const ownerRouter     = require('./src/routes/owner.routes');
 const devicesRouter   = require('./src/routes/devices.routes');
 const locationRouter  = require('./src/routes/location.routes');
+const recommendationsRouter = require('./src/routes/recommendations.routes');
+const { authenticateToken } = require('./src/middleware/auth');
 const { startScheduler } = require('./src/cron/scheduler');
 
 // ══════════════════════════════════════════════════════════
@@ -155,6 +157,9 @@ app.use('/devices', devicesRouter);
 
 // Location: montado en /location → rutas internas son /ping
 app.use('/location', locationRouter);
+
+// Recommendations: /recommendations/:municipio (requiere JWT)
+app.use('/recommendations', authenticateToken, recommendationsRouter);
 
 // auth-v2 desactivado — pendiente migración a PG antes de reactivar
 // app.use('/', authV2Router);
