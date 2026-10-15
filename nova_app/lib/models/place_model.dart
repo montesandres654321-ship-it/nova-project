@@ -122,10 +122,14 @@ class Place {
       isActive: json['is_active'] == true || json['is_active'] == 1,
       latitud: (json['latitud'] as num?)?.toDouble(),
       longitud: (json['longitud'] as num?)?.toDouble(),
-      // Campos de recompensa
-      hasReward: json['has_reward'] == true || json['has_reward'] == 1,
-      rewardName: json['reward_name'],
-      rewardIcon: json['reward_icon'],
+      // Campos de recompensa — algunos endpoints (ej. /recommendations)
+      // devuelven camelCase directo de Prisma en vez de snake_case
+      hasReward: json['has_reward'] == true ||
+          json['has_reward'] == 1 ||
+          json['hasReward'] == true ||
+          json['hasReward'] == 1,
+      rewardName: json['reward_name'] ?? json['rewardName'],
+      rewardIcon: json['reward_icon'] ?? json['rewardIcon'],
       rewardDescription: json['reward_description'],
       rewardStock: json['reward_stock'],
       categoria: (json['categoria'] as String?)?.trim().isNotEmpty == true ? json['categoria'] : null,

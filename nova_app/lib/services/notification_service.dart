@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../utils/constants.dart';
+import '../core/navigator_key.dart';
 
 class NotificationService {
+  /// Guarda la última notificación recibida en SharedPreferences, para
+  /// que NotificacionesPage la muestre. Pública (no `_saveNotification`)
+  /// porque el background handler de main.dart también la llama, y ese
+  /// handler vive en otro archivo.
+  static Future<void> saveNotification(RemoteMessage message) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'last_notif_title', message.notification?.title ?? '');
+    await prefs.setString(
+        'last_notif_body', message.notification?.body ?? '');
+    await prefs.setString(
+        'last_notif_municipio', message.data['municipio'] ?? '');
+    await prefs.setString(
+        'last_notif_time', DateTime.now().toIso8601String());
+    await prefs.setBool('has_new_notification', true);
+  }
   /// Registra el token FCM del dispositivo en el backend. Si el usuario
   /// todavía no tiene el permiso de notificaciones concedido, primero
   /// muestra un diálogo explicativo — solo pide el permiso del sistema
@@ -74,12 +92,16 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       final municipio = message.data['municipio'];
       print('[FCM] Notificación abierta, municipio: $municipio');
-      // TODO Sprint siguiente: navegar a explorar/$municipio
+      if (municipio != null) {
+        navigatorKey.currentState
+            ?.pushNamed('/recomendaciones', arguments: municipio);
+      }
     });
 
     // App en foreground → mostrar notificación en pantalla
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('[FCM Foreground] ${message.notification?.title}');
+      saveNotification(message);
     });
   }
 }

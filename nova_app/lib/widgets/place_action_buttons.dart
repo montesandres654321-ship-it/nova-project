@@ -9,6 +9,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../pages/scan_page.dart';
@@ -32,30 +33,62 @@ class PlaceActionButtons extends StatelessWidget {
     return 'Escanear QR de este lugar';
   }
 
+  Future<void> _abrirComoLlegar() async {
+    final url = 'https://www.google.com/maps/dir/?api=1'
+        '&destination=${place.latitud},${place.longitud}';
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final tieneUbicacion = place.latitud != null && place.longitud != null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ScanPage()),
-          ),
-          icon: const Icon(Icons.qr_code_scanner_rounded),
-          label: Text(_scanLabel),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+      child: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ScanPage()),
+              ),
+              icon: const Icon(Icons.qr_code_scanner_rounded),
+              label: Text(_scanLabel),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
-        ),
+          if (tieneUbicacion) ...[
+            const SizedBox(height: AppSpacing.sm),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _abrirComoLlegar,
+                icon: const Icon(Icons.directions_rounded),
+                label: const Text('Cómo llegar'),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.bienvenidaAzul),
+                  foregroundColor: AppColors.bienvenidaAzul,
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

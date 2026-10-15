@@ -19,14 +19,19 @@ import 'pages/profile_page.dart';
 import 'pages/change_password_page.dart';
 import 'pages/about_page.dart';
 import 'pages/splash_page.dart';
+import 'pages/recomendaciones_page.dart';
+import 'pages/notificaciones_page.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
+import 'core/navigator_key.dart';
+import 'services/notification_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.saveNotification(message);
   print('[FCM Background] ${message.notification?.title}');
 }
 
@@ -34,6 +39,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  NotificationService.setupNotificationHandlers();
 
   runApp(const MyApp());
 }
@@ -44,6 +50,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Nova App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
@@ -60,6 +67,8 @@ class MyApp extends StatelessWidget {
         '/change-password': (context) => const ChangePasswordPage(),
         '/about':           (context) => const AboutPage(),
         '/history':         (context) => const HistoryPage(),
+        '/recomendaciones': (context) => const RecomendacionesPage(),
+        '/notificaciones':  (context) => const NotificacionesPage(),
         // FIX: /success ELIMINADA — solo se navega con MaterialPageRoute
         // desde ScanPage con datos reales del backend
       },

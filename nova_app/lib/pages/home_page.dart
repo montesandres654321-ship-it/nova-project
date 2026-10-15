@@ -122,15 +122,29 @@ class _HomePageState extends State<HomePage> {
   bool _showLocationBanner = false;
   bool _didReadLocationArg = false;
 
+  // Badge de la campana de notificaciones.
+  int _unreadCount = 0;
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadUnreadCount();
     _loadLastScan();
     _loadTopPlaces();
     _checkLocation();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastSeen = prefs.getString('notifications_last_seen');
+    // Por ahora: si hay una notificación guardada y no fue vista, count = 1
+    final hasNew = prefs.getBool('has_new_notification') ?? false;
+    if (!mounted) return;
+    setState(() => _unreadCount = hasNew ? 1 : 0);
+    debugPrint('notifications_last_seen: $lastSeen');
   }
 
   // Lee el argumento `showLocationBanner` que login_page.dart pasa como
@@ -329,6 +343,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Campana de notificaciones — a la izquierda del avatar de perfil.
+  Widget _buildNotifBell() {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.pushNamed(context, '/notificaciones');
+        if (mounted) _loadUnreadCount();
+      },
+      child: Badge(
+        isLabelVisible: _unreadCount > 0,
+        label: Text('$_unreadCount'),
+        child: Container(
+          width: 42,
+          height: 42,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.9),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.notifications_rounded,
+              color: AppColors.bienvenidaAzul),
+        ),
+      ),
+    );
+  }
+
   // [1] ENCABEZADO — foto + gradiente + saludo + buscador
   //
   // Estructura en capas (Stack a nivel del Container completo, SIN padding
@@ -414,6 +453,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
+                    _buildNotifBell(),
                     const SizedBox(width: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(999),
