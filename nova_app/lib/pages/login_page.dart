@@ -4,6 +4,8 @@ import '../services/api_service.dart';
 import '../utils/constants.dart';
 import '../core/design/app_colors.dart';
 import '../widgets/login_form.dart';
+import '../services/notification_service.dart';
+import '../services/location_service.dart';
 import 'main_navigation_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -103,8 +105,26 @@ class _LoginPageState extends State<LoginPage> {
               'Bienvenido ${user?['first_name'] ?? user?['username'] ?? ''}'),
           backgroundColor: AppColors.success,
         ));
+
+        // Ubicación + notificaciones push — ambos determinan si se debe
+        // mostrar el banner de "activa tu ubicación" en HomePage.
+        final token = data['token']?.toString() ?? '';
+        bool showLocationBanner = false;
+        if (token.isNotEmpty) {
+          final locationOk = await LocationService.pingLocation(token);
+          if (!mounted) return;
+          await NotificationService.registerToken(token, context);
+          if (!mounted) return;
+          showLocationBanner = !locationOk;
+        }
+
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+          MaterialPageRoute(
+            builder: (_) => const MainNavigationPage(),
+            settings: RouteSettings(
+              arguments: {'showLocationBanner': showLocationBanner},
+            ),
+          ),
         );
       } else {
         if (!mounted) return;

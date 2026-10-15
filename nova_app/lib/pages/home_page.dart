@@ -19,10 +19,12 @@ library;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/scan_record.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
+import '../services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 import '../core/design/app_colors.dart';
@@ -114,6 +116,12 @@ class _HomePageState extends State<HomePage> {
   String? _topPlacesError;
   String _chipActivo = 'Escenarios';
 
+  // Banner "activa tu ubicación" — se reevalúa cada vez que se entra a
+  // HomePage, NO se recuerda en SharedPreferences que fue cerrado: debe
+  // seguir apareciendo mientras la ubicación siga sin estar activa.
+  bool _showLocationBanner = false;
+  bool _didReadLocationArg = false;
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
@@ -122,6 +130,67 @@ class _HomePageState extends State<HomePage> {
     _loadUserData();
     _loadLastScan();
     _loadTopPlaces();
+    _checkLocation();
+  }
+
+  // Lee el argumento `showLocationBanner` que login_page.dart pasa como
+  // settings.arguments de la ruta — solo como hint inicial para evitar el
+  // parpadeo mientras _checkLocation() (la fuente de verdad) resuelve.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didReadLocationArg) {
+      _didReadLocationArg = true;
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map && args['showLocationBanner'] == true) {
+        _updateLocationBanner(true);
+      }
+    }
+  }
+
+  Future<void> _checkLocation() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(AppConstants.keyToken);
+      if (token == null || token.isEmpty) return;
+      final ok = await LocationService.checkAndPing(token);
+      if (!mounted) return;
+      _updateLocationBanner(!ok);
+    } catch (e) {
+      debugPrint('Error verificando ubicación: $e');
+    }
+  }
+
+  void _updateLocationBanner(bool show) {
+    if (_showLocationBanner == show) return;
+    setState(() => _showLocationBanner = show);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.hideCurrentMaterialBanner();
+      if (_showLocationBanner) {
+        messenger.showMaterialBanner(MaterialBanner(
+          backgroundColor: Colors.white,
+          leading: const Icon(Icons.location_off,
+              color: AppColors.bienvenidaCoral),
+          content: const Text(
+            'Activa la ubicación para ver lugares cerca de ti',
+            style: TextStyle(fontSize: 13),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Geolocator.openAppSettings(),
+              child: const Text('Activar'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 18),
+              onPressed: () =>
+                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+            ),
+          ],
+        ));
+      }
+    });
   }
 
   // ── Data ───────────────────────────────────────────────────
