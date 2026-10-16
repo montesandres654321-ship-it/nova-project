@@ -39,37 +39,51 @@ Prisma:     src/generated/prisma  ← SIEMPRE ESTE
 
 ## LO QUE YA EXISTE — NO DUPLICAR
 
-### nova_app/ — estructura real auditada
+### nova_app/ — estructura real auditada (post-auditoría Oct 2026)
 ```
 lib/
 ├── core/
-│   └── design/
-│       ├── app_colors.dart       ← colores del sistema
-│       ├── app_theme.dart        ← tema global
-│       ├── app_spacing.dart      ← espaciados
-│       ├── app_radius.dart       ← bordes
-│       ├── app_text_styles.dart  ← tipografías
-│       └── app_back_button.dart  ← widget compartido
+│   ├── design/
+│   │   ├── app_colors.dart       ← colores del sistema
+│   │   ├── app_theme.dart        ← tema global
+│   │   ├── app_spacing.dart      ← espaciados
+│   │   ├── app_radius.dart       ← bordes
+│   │   ├── app_text_styles.dart  ← tipografías
+│   │   └── app_back_button.dart  ← widget compartido
+│   └── navigator_key.dart        ← GlobalKey<NavigatorState> (evita import circular
+│                                    entre main.dart y notification_service.dart)
 ├── models/
 │   ├── place_model.dart
 │   ├── place_type.dart
 │   └── scan_record.dart
-├── widgets/
-│   └── place_card.dart
-├── utils/
-│   └── constants.dart            ← AppConstants (URL backend)
 ├── services/
-│   ├── api_service.dart          ← monolítico (en transición)
-│   └── google_auth_service.dart  ← escrito, desactivado
-└── pages/                        ← 14 pantallas existentes
-    login, register, forgot_password, change_password,
-    home, main_navigation, places, place_detail,
-    history, scan, success, profile, settings, about
+│   ├── api_service.dart              ← monolítico (en transición, 11 páginas aún lo usan directo)
+│   ├── auth_service.dart             ← Oct 2026
+│   ├── google_auth_service.dart      ← escrito, desactivado
+│   ├── location_service.dart         ← Oct 2026 — pingLocation()
+│   ├── notification_service.dart     ← Oct 2026 — registerToken(), saveNotification()
+│   ├── places_service.dart           ← Oct 2026
+│   ├── profile_service.dart          ← Oct 2026
+│   ├── recommendations_service.dart  ← Oct 2026
+│   ├── rewards_service.dart          ← Oct 2026
+│   └── scan_service.dart             ← Oct 2026
+├── widgets/                      ← ~29 widgets (place_card, place_action_buttons,
+│                                    place_header, place_info, qr_scanner_widget,
+│                                    login_form, register_form, success_*, etc.)
+└── pages/                        ← 23 pantallas (lista completa, verificada Oct 2026)
+    about, change_password, forgot_password, history, home, login,
+    main_navigation, mapa, municipio, notificaciones, onboarding,
+    permissions, place_detail, places, profile, recomendaciones,
+    recompensa, register, ruta_juegos, rutas, scan, settings,
+    splash, success
 
 assets/
 ├── images/    ← hotel_01-03, restaurante_01-04+5+6, bares_01-06 (PNG/JPG)
 └── icon/      ← app_icon.svg/detailed/simple + app_icon_1024/512/192/48.png
 ```
+
+**Servicios nuevos Oct 2026:** `location_service.dart`, `notification_service.dart`, `recommendations_service.dart`
+**Páginas nuevas Oct 2026:** `notificaciones_page.dart`, `recomendaciones_page.dart`, `splash_page.dart`, `onboarding_page.dart`, `permissions_page.dart`, `mapa_page.dart`, `municipio_page.dart`, `rutas_page.dart`, `ruta_juegos_page.dart`, `recompensa_page.dart`
 
 Dependencias clave ya instaladas (pubspec.yaml, no volver a agregar):
 `mobile_scanner`, `image_picker`, `url_launcher`, `http`, `shared_preferences`,
@@ -129,13 +143,14 @@ user_place    → Coordinador de escenario — solo su dashboard
 
 ---
 
-## ESTADO BD (auditado)
+## ESTADO BD (auditado Oct 2026)
 ```
-places:       20 activos
-users:         6 (3 turistas, 1 admin_general,
-                  1 user_general, 1 user_place)
-scans:        34
-user_rewards: 18
+places:         56 activos (+ 20 legacy inactivos con municipio=null, is_active=false)
+users:           6 (3 turistas, 1 admin_general, 1 user_general, 1 user_place)
+scans:          34
+user_rewards:   18
+device_tokens:  tabla activa — FCM tokens reales en producción
+user_locations: tabla activa — GPS reales en producción
 ```
 
 ---
@@ -272,16 +287,33 @@ git push origin main
 
 ## PRÓXIMAS TAREAS EN ORDEN
 ```
-1. splash_page.dart       ← esperando diseño Figma
-2. onboarding_page.dart   ← esperando diseño Figma
-3. encuesta_page.dart     ← post-escaneo (nueva funcionalidad)
-4. Google Sign-In         ← reactivar google_auth_service.dart
-5. Explorar con 4 cats    ← ampliar places_page.dart
-6. Rutas turísticas       ← módulo nuevo features/routes/
-7. Dashboard económico    ← módulo nuevo nova_dashboard/
+1. splash_page.dart        ← esperando assets del diseñador (Figma listo)
+2. permissions_page.dart   ← esperando assets del diseñador (Figma listo)
+3. onboarding_page.dart    ← esperando assets del diseñador (Figma listo)
+4. encuesta_page.dart      ← post-escaneo, funcionalidad crítica MVP
+5. Google Sign-In          ← reactivar google_auth_service.dart (código existe)
+6. Forgot Password backend ← endpoint faltante en qr-backend
+7. Migrar 11 páginas       ← de api_service.dart a servicios especializados
+8. Colores dashboard       ← 404 hardcodeados pendientes (bloqueador Figma)
 ```
 
 ---
 
-*Última actualización: Septiembre 2026*
+## RUTAS REALES DEL BACKEND (verificadas Oct 2026)
+```
+POST /auth/login
+POST /auth/register
+GET  /places
+GET  /places/:id
+POST /scan
+GET  /scan/history
+GET  /rewards
+POST /devices/register        ← registrar FCM token (no /notifications/register-token)
+POST /location/ping            ← ping GPS (no /locations/ping)
+GET  /recommendations/:municipio
+```
+
+---
+
+*Última actualización: Octubre 16, 2026 — post-auditoría completa*
 *Repo: https://github.com/montesandres654321-ship-it/nova-project*
