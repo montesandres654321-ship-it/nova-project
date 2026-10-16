@@ -49,6 +49,8 @@ model User {
   placeId        Int?      @map("place_id")
   scans          Scan[]
   rewards        UserReward[]
+  deviceTokens   DeviceToken[]
+  location       UserLocation?
   @@map("users")
 }
 
@@ -156,4 +158,34 @@ model UserReward {
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   place             Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
   @@map("user_rewards")
+}
+
+/// Token FCM de un dispositivo, para envío de notificaciones push.
+/// Escrito/leído hoy vía $queryRaw/$executeRaw en devices.routes.js, location.routes.js
+/// y notification.service.js — este modelo documenta esa tabla (ya existente en Supabase,
+/// ver postgres/schema.sql) para que Prisma la conozca, no reemplaza esas queries crudas.
+model DeviceToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int?      @map("user_id")
+  token     String    @unique
+  platform  String    @default("android")
+  municipio String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("device_tokens")
+}
+
+/// Última ubicación GPS conocida de un turista (no historial — upsert por userId,
+/// ver ON CONFLICT (user_id) en location.routes.js). Mismo caso que DeviceToken:
+/// las rutas siguen escribiendo con $executeRaw, este modelo solo documenta la tabla.
+model UserLocation {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @unique @map("user_id")
+  lat       Float
+  lng       Float
+  municipio String?
+  updatedAt DateTime @default(now()) @map("updated_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("user_locations")
 }
