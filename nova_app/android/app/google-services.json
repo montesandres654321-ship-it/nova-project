@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "918283043344-d3ehhg0d63so4ee47p3u68nu5q7dl63j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nova_app",
+            "certificate_hash": "a2de69ed159c7756ae592dcdb692f355372a3bb1"
+          }
+        },
+        {
           "client_id": "918283043344-sm9gd5hpho64j39v9fr6hs22ib8vgkbt.apps.googleusercontent.com",
           "client_type": 3
         }
