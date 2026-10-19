@@ -20,7 +20,7 @@ class GoogleAuthService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
     serverClientId:
-        '918283043344-sm9gd5hpho64j39v9fr6hs22ib8vgkbt.apps.googleusercontent.com',
+        '544862155746-1u1qsb9fbhnkfi11cu5et47mfrq6r74o.apps.googleusercontent.com',
   );
 
   /// Login completo con Google: autenticar + sincronizar con backend
