@@ -24,7 +24,9 @@ class AppConstants {
   static const String loginEndpoint       = '/login';
   static const String registerEndpoint    = '/users/register';
   // Temporalmente desactivado en app móvil hasta habilitar backend
-  static const String googleAuthEndpoint  = '/users/google-auth';
+  static const String googleAuthEndpoint      = '/users/google-auth';
+  static const String forgotPasswordEndpoint  = '/auth/forgot-password';
+  static const String resetPasswordEndpoint   = '/auth/reset-password';
 
   // ─── Endpoints PLACES ───────────────────────────────────
   static const String placesEndpoint      = '/places';
