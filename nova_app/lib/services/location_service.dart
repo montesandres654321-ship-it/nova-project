@@ -23,7 +23,8 @@ class LocationService {
 
       // Obtener posición
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low,
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
       );
 
       // Enviar al backend y capturar el municipio resuelto

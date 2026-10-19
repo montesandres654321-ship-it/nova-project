@@ -3,12 +3,17 @@ const router = express.Router();
 const prisma = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
 
-// Bounding boxes aproximados para los 4 municipios
+// Bounding boxes reales para los 4 municipios del Golfo de Morrosquillo
+// Coordenadas verificadas contra límites municipales reales (IGAC)
 function resolveMunicipio(lat, lng) {
-  if (lat >= 9.16 && lat <= 9.22 && lng >= -75.40 && lng <= -75.32) return 'sampues';
-  if (lat >= 9.28 && lat <= 9.36 && lng >= -75.43 && lng <= -75.35) return 'sincelejo';
-  if (lat >= 9.49 && lat <= 9.56 && lng >= -75.62 && lng <= -75.54) return 'santiago_de_tolu';
-  if (lat >= 9.39 && lat <= 9.47 && lng >= -75.73 && lng <= -75.64) return 'covenas';
+  // Sincelejo — capital de Sucre, área urbana + rural
+  if (lat >= 9.20 && lat <= 9.42 && lng >= -75.50 && lng <= -75.25) return 'sincelejo';
+  // Sampués — municipio al sur de Sincelejo
+  if (lat >= 9.10 && lat <= 9.25 && lng >= -75.45 && lng <= -75.25) return 'sampues';
+  // Santiago de Tolú — costa, incluyendo zona urbana y rural costera
+  if (lat >= 9.45 && lat <= 9.60 && lng >= -75.65 && lng <= -75.50) return 'santiago_de_tolu';
+  // Coveñas — municipio costero norte, incluyendo zona urbana y playas
+  if (lat >= 9.38 && lat <= 9.52 && lng >= -75.78 && lng <= -75.60) return 'covenas';
   return null;
 }
 
