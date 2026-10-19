@@ -53,10 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB_DaV4zGYXxXjBxOAyFdMICMATl-XuirM',
-    appId: '1:918283043344:android:41b4a2dcd653dbd037c095',
-    messagingSenderId: '918283043344',
-    projectId: 'nova-app-b3b79',
-    storageBucket: 'nova-app-b3b79.firebasestorage.app',
+    apiKey: 'AIzaSyDu_8i906SOLzUzvFTQXbxReBfb7sSTC8I',
+    appId: '1:544862155746:android:1a65f6ff0412f5e8b6bfbb',
+    messagingSenderId: '544862155746',
+    projectId: 'nova-app-38bd9',
+    storageBucket: 'nova-app-38bd9.firebasestorage.app',
   );
 }
