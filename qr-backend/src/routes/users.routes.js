@@ -2,7 +2,7 @@ const express   = require('express');
 const bcrypt    = require('bcryptjs');
 const router    = express.Router();
 const prisma    = require('../config/prisma');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, generateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 
 function serializeRaw(rows) {
@@ -510,6 +510,135 @@ router.get('/stats/dashboard', authenticateToken, authorize(['admin_general', 'u
   } catch (error) {
     console.error('❌ Error en /stats/dashboard:', error);
     return res.status(500).json({ success: false, error: 'Error al obtener estadísticas' });
+  }
+});
+
+// ─── POST /users/google-auth ──────────────────────────────
+// Upsert de usuario autenticado con Google.
+// Casos:
+//   A) Usuario ya existe por google_id           → login directo
+//   B) Usuario ya existe por email (registro normal) → vincula google_id + login
+//   C) Usuario nuevo                             → crea cuenta y hace login
+//
+// Nunca devuelve 404 ni error por "usuario no encontrado" —
+// siempre crea o encuentra al usuario.
+//
+// @body { google_uid, email, name, photoUrl }
+// @returns { success, token, user }
+router.post('/users/google-auth', async (req, res) => {
+  try {
+    const { google_uid, uid, email, name, photoUrl } = req.body;
+    const googleId = google_uid || uid;
+
+    if (!googleId || !email) {
+      return res.status(400).json({ success: false, error: 'google_uid y email son requeridos' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // ── Caso A: ya existe por google_id ───────────────────
+    let rows = serializeRaw(await prisma.$queryRaw`
+      SELECT * FROM users WHERE google_id = ${googleId} AND is_active = TRUE LIMIT 1
+    `);
+    let user = rows[0];
+
+    if (!user) {
+      // ── Caso B: existe por email (cuenta de formulario) ─
+      rows = serializeRaw(await prisma.$queryRaw`
+        SELECT * FROM users WHERE email = ${normalizedEmail} AND is_active = TRUE LIMIT 1
+      `);
+      user = rows[0];
+
+      if (user) {
+        // Vincular google_id a la cuenta existente
+        await prisma.$executeRaw`
+          UPDATE users SET google_id = ${googleId}, last_login = NOW() WHERE id = ${user.id}
+        `;
+        user = serializeRaw(await prisma.$queryRaw`
+          SELECT * FROM users WHERE id = ${user.id} LIMIT 1
+        `)[0];
+      }
+    }
+
+    if (!user) {
+      // ── Caso C: usuario nuevo — crear cuenta ──────────────
+      // Generar username único a partir del nombre o email
+      const baseName  = (name || normalizedEmail.split('@')[0])
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+        .slice(0, 18) || 'user';
+      const suffix    = Math.floor(1000 + Math.random() * 9000);
+      const username  = `${baseName}${suffix}`;
+
+      // Dividir nombre en first/last
+      const parts     = (name || '').trim().split(' ');
+      const firstName = parts[0] || '';
+      const lastName  = parts.slice(1).join(' ') || '';
+      const photoVal  = photoUrl || null;
+
+      const inserted = serializeRaw(await prisma.$queryRaw`
+        INSERT INTO users (
+          first_name, last_name, username, email,
+          google_id, role, is_active, accepted_terms, photo_url
+        )
+        VALUES (
+          ${firstName}, ${lastName}, ${username}, ${normalizedEmail},
+          ${googleId}, ${null}, TRUE, TRUE, ${photoVal}
+        )
+        RETURNING id
+      `);
+
+      user = serializeRaw(await prisma.$queryRaw`
+        SELECT * FROM users WHERE id = ${inserted[0].id} LIMIT 1
+      `)[0];
+    } else {
+      // Actualizar last_login para casos A y B (ya vinculado)
+      await prisma.$executeRaw`
+        UPDATE users SET last_login = NOW() WHERE id = ${user.id}
+      `;
+    }
+
+    // Bloquear admins — la app móvil es solo para turistas
+    if (user.role && ['admin_general', 'user_general', 'user_place'].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Esta aplicación es exclusiva para turistas. Accede desde el dashboard web.',
+      });
+    }
+
+    const token = generateToken(user);
+
+    return res.json({
+      success: true,
+      token,
+      user: {
+        id:         user.id,
+        email:      user.email,
+        username:   user.username,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        role:       user.role       || null,
+        place_id:   user.place_id   || null,
+        is_active:  user.is_active,
+      },
+      data: {
+        token,
+        user: {
+          id:         user.id,
+          email:      user.email,
+          username:   user.username,
+          first_name: user.first_name,
+          last_name:  user.last_name,
+          role:       user.role       || null,
+          place_id:   user.place_id   || null,
+          is_active:  user.is_active,
+        },
+      },
+    });
+
+  } catch (error) {
+    console.error('❌ Error en /users/google-auth:', error);
+    return res.status(500).json({ success: false, error: 'Error al autenticar con Google' });
   }
 });
 

@@ -6,6 +6,7 @@ import '../core/design/app_colors.dart';
 import '../widgets/login_form.dart';
 import '../services/notification_service.dart';
 import '../services/location_service.dart';
+import '../services/google_auth_service.dart';
 import 'main_navigation_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -147,12 +148,74 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginWithGoogle() async {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Inicio con Google: próximamente'),
-        backgroundColor: AppColors.warning,
-      ),
-    );
+    setState(() => _isLoading = true);
+
+    try {
+      final data = await GoogleAuthService.signInWithGoogle();
+
+      if (!mounted) return;
+
+      if (data['success'] == true) {
+        final user = data['user'];
+        final token = data['token']?.toString() ?? '';
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Bienvenido ${user?['first_name'] ?? user?['username'] ?? ''}'),
+          backgroundColor: AppColors.success,
+        ));
+
+        // Ubicación + notificaciones push
+        bool showLocationBanner = false;
+        if (token.isNotEmpty) {
+          final municipio = await LocationService.pingLocation(token);
+          if (!mounted) return;
+          await NotificationService.registerToken(token, context);
+          if (!mounted) return;
+          showLocationBanner = municipio == null;
+        }
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const MainNavigationPage(),
+            settings: RouteSettings(
+              arguments: {'showLocationBanner': showLocationBanner},
+            ),
+          ),
+        );
+      } else {
+        final error = data['error']?.toString() ?? 'Error al iniciar con Google';
+        // Si el error es por cuenta de admin, mostrar diálogo en vez de snackbar
+        if (error.contains('dashboard') || error.contains('exclusiva')) {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Acceso restringido'),
+              content: Text(error),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Entendido'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+          ));
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+        backgroundColor: AppColors.error,
+      ));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   // ── Build ──────────────────────────────────────────────────

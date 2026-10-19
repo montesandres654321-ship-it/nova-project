@@ -2,8 +2,9 @@
 // ============================================================
 // SERVICIO DE AUTENTICACIÓN GOOGLE — Nova App Móvil
 // ============================================================
-// Usa AppConstants para IP y keys
-// Guarda token JWT tras login exitoso
+// Web Client ID (OAuth 2.0) obtenido de Google Cloud Console:
+//   918283043344-sm9gd5hpho64j39v9fr6hs22ib8vgkbt.apps.googleusercontent.com
+// Necesario en Android para que el token de Google sea válido.
 // ============================================================
 
 import 'package:flutter/foundation.dart';
@@ -14,98 +15,105 @@ import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
 class GoogleAuthService {
+  // serverClientId = Web Client ID de Google Cloud Console
+  // Es obligatorio en Android para obtener el idToken válido
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
+    serverClientId:
+        '918283043344-sm9gd5hpho64j39v9fr6hs22ib8vgkbt.apps.googleusercontent.com',
   );
 
   /// Login completo con Google: autenticar + sincronizar con backend
-  static Future<Map<String, dynamic>?> signInWithGoogle() async {
-    return {
-      'success': false,
-      'error': 'Inicio de sesión con Google temporalmente desactivado',
-    };
-
-    /*
+  static Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
       debugPrint('🔵 Iniciando autenticación con Google...');
 
+      // Forzar selector de cuenta cada vez (evita auto-login silencioso)
+      await _googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
       if (googleUser == null) {
         return {'success': false, 'error': 'Inicio de sesión cancelado'};
       }
 
-      debugPrint('🟢 Google autenticado: ID:${googleUser.id}');
+      debugPrint('🟢 Google autenticado: ${googleUser.email}');
 
-      // Sincronizar con backend
+      // Sincronizar con backend Nova
       final backendResult = await _syncWithBackend(googleUser);
 
-      if (backendResult != null && backendResult['success'] == true) {
-        // Backend devuelve token y user en raíz Y en data.data
-        final inner = backendResult['data'];
-        final userData = backendResult['user'] ?? inner?['user'];
-        final token = backendResult['token'] ?? inner?['token'];
+      if (backendResult['success'] == true) {
+        final userData = backendResult['user'];
+        final token    = backendResult['token'];
 
-        // Guardar datos en SharedPreferences
+        // Guardar sesión en SharedPreferences
         final prefs = await SharedPreferences.getInstance();
-        if (token != null) await prefs.setString(AppConstants.keyToken, token);
+        if (token != null) {
+          await prefs.setString(AppConstants.keyToken, token);
+        }
         if (userData != null) {
-          await prefs.setString(AppConstants.keyUser, jsonEncode(userData));
-          await prefs.setString(AppConstants.keyEmail, userData['email'] ?? '');
-          await prefs.setString(AppConstants.keyUsername, userData['username'] ?? '');
+          await prefs.setString(AppConstants.keyUser,      jsonEncode(userData));
+          await prefs.setString(AppConstants.keyEmail,     userData['email']      ?? '');
+          await prefs.setString(AppConstants.keyUsername,  userData['username']   ?? '');
           await prefs.setString(AppConstants.keyFirstName, userData['first_name'] ?? '');
           await prefs.setString(AppConstants.keyAuthProvider, 'google');
-          if (userData['id'] != null) await prefs.setInt(AppConstants.keyUserId, userData['id']);
+          if (userData['id'] != null) {
+            await prefs.setInt(AppConstants.keyUserId, userData['id']);
+          }
         }
 
-        debugPrint('✅ Login Google exitoso');
+        debugPrint('✅ Login Google exitoso — ${userData?['first_name']}');
         return {
           'success': true,
-          'user': userData,
+          'user':    userData,
+          'token':   token,
           'message': 'Bienvenido ${userData?['first_name'] ?? userData?['username'] ?? ''}',
         };
       } else {
         await _googleSignIn.signOut();
         return {
           'success': false,
-          'error': backendResult?['error'] ?? 'Error al sincronizar con el servidor',
+          'error': backendResult['error'] ?? 'Error al sincronizar con el servidor',
         };
       }
     } catch (error) {
       debugPrint('🔴 Error en Google SignIn: $error');
       await _googleSignIn.signOut();
-      return {'success': false, 'error': 'Error: $error'};
+      return {'success': false, 'error': 'Error inesperado: $error'};
     }
-    */
   }
 
-  /// Sincronizar usuario Google con el backend
-  static Future<Map<String, dynamic>?> _syncWithBackend(GoogleSignInAccount googleUser) async {
+  /// Sincronizar usuario Google con el backend Nova
+  static Future<Map<String, dynamic>> _syncWithBackend(
+      GoogleSignInAccount googleUser) async {
     try {
       final response = await http.post(
         Uri.parse(AppConstants.buildUrl(AppConstants.googleAuthEndpoint)),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'google_uid': googleUser.id,
-          'uid': googleUser.id,
-          'email': googleUser.email,
-          'name': googleUser.displayName,
-          'photoUrl': googleUser.photoUrl,
+          'email':      googleUser.email,
+          'name':       googleUser.displayName,
+          'photoUrl':   googleUser.photoUrl,
         }),
       ).timeout(AppConstants.timeoutNormal);
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && body['success'] == true) {
+        return body;
       } else {
-        final errorData = jsonDecode(response.body);
-        return {'success': false, 'error': errorData['error'] ?? 'Error del servidor'};
+        return {
+          'success': false,
+          'error': body['error'] ?? 'Error del servidor (${response.statusCode})',
+        };
       }
     } catch (e) {
-      debugPrint('🔴 Error de conexión: $e');
+      debugPrint('🔴 Error de conexión con backend: $e');
       return {'success': false, 'error': 'Error de conexión: $e'};
     }
   }
 
-  /// Cerrar sesión
+  /// Cerrar sesión Google y limpiar SharedPreferences
   static Future<void> signOut() async {
     try {
       await _googleSignIn.signOut();
@@ -114,15 +122,15 @@ class GoogleAuthService {
     await prefs.clear();
   }
 
-  /// Verificar si el usuario actual es de Google
+  /// Verificar si la sesión actual es de Google
   static Future<bool> isGoogleUser() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(AppConstants.keyAuthProvider) == 'google';
   }
 
-  /// Obtener usuario actual desde SharedPreferences
+  /// Obtener usuario guardado en SharedPreferences
   static Future<Map<String, dynamic>?> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs    = await SharedPreferences.getInstance();
     final userData = prefs.getString(AppConstants.keyUser);
     if (userData != null) return jsonDecode(userData);
     return null;
