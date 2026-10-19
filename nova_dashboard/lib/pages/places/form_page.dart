@@ -37,6 +37,9 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   late TextEditingController _rewardNameController;
   late TextEditingController _rewardDescriptionController;
   late TextEditingController _rewardStockController;
+  late TextEditingController _latitudController;
+  late TextEditingController _longitudController;
+  String? _selectedMunicipio;
 
   List<AdminModel> _availableOwners = [];
   int?    _selectedOwnerId;
@@ -79,6 +82,9 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         text: p?.rewardDescription ?? '');
     _rewardStockController = TextEditingController(
         text: p?.rewardStock?.toString() ?? '');
+    _latitudController  = TextEditingController(text: p?.latitud?.toString() ?? '');
+    _longitudController = TextEditingController(text: p?.longitud?.toString() ?? '');
+    _selectedMunicipio  = p?.municipio;
     if (p != null) {
       _selectedType       = p.tipo;
       _isActive           = p.isActive;
@@ -96,6 +102,7 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
     _amenitiesController.dispose();
     _rewardNameController.dispose();  _rewardDescriptionController.dispose();
     _rewardStockController.dispose();
+    _latitudController.dispose(); _longitudController.dispose();
     super.dispose();
   }
 
@@ -160,6 +167,9 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         rewardIcon:  _hasReward ? _selectedRewardIcon : null,
         rewardStock: _hasReward ? _parseStock(_rewardStockController.text.trim()) : null,
         ownerAdminId: _selectedOwnerId,
+        municipio: _selectedMunicipio,
+        latitud:   double.tryParse(_latitudController.text.trim()),
+        longitud:  double.tryParse(_longitudController.text.trim()),
       );
 
       final result = widget.place == null
@@ -281,7 +291,11 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
       phoneController: _phoneController,
       amenitiesController: _amenitiesController,
       isActive: _isActive,
-      onActiveChanged: (v) => setState(() => _isActive = v));
+      onActiveChanged: (v) => setState(() => _isActive = v),
+      selectedMunicipio: _selectedMunicipio,
+      onMunicipioChanged: (v) => setState(() => _selectedMunicipio = v),
+      latitudController: _latitudController,
+      longitudController: _longitudController);
 
   List<Widget> _recompensaSection() => buildRecompensaSection(
       hasReward: _hasReward,

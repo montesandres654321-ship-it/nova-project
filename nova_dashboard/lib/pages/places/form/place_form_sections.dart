@@ -7,6 +7,7 @@ import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../../models/admin_model.dart';
+import '../../../models/place.dart';
 import 'place_form_fields.dart';
 import 'place_form_tokens.dart';
 
@@ -102,6 +103,10 @@ List<Widget> buildDetallesSection({
   required TextEditingController amenitiesController,
   required bool isActive,
   required void Function(bool) onActiveChanged,
+  required String? selectedMunicipio,
+  required void Function(String?) onMunicipioChanged,
+  required TextEditingController latitudController,
+  required TextEditingController longitudController,
 }) => [
   placeFormResponsiveFieldRow(
     placeFormField(controller: addressController, label: 'Dirección', icon: Icons.home),
@@ -113,6 +118,33 @@ List<Widget> buildDetallesSection({
       label: 'Servicios (separados por coma)',
       icon: Icons.list,
       hint: 'Wifi, Piscina, A/C'),
+  const SizedBox(height: 12),
+  DropdownButtonFormField<String>(
+    value: selectedMunicipio,
+    decoration: placeFormInputDecoration('Municipio', Icons.map_outlined,
+        hint: 'Sin municipio asignado'),
+    style: const TextStyle(fontSize: 13, color: Colors.black87),
+    items: Place.municipiosValidos
+        .map((m) => DropdownMenuItem(
+            value: m, child: Text(Place.municipiosLabels[m] ?? m)))
+        .toList(),
+    onChanged: onMunicipioChanged,
+  ),
+  const SizedBox(height: 12),
+  placeFormResponsiveFieldRow(
+    TextFormField(
+      controller: latitudController,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+      style: const TextStyle(fontSize: 13),
+      decoration: placeFormInputDecoration('Latitud', Icons.my_location, hint: 'ej: 9.3047'),
+    ),
+    TextFormField(
+      controller: longitudController,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+      style: const TextStyle(fontSize: 13),
+      decoration: placeFormInputDecoration('Longitud', Icons.my_location, hint: 'ej: -75.3978'),
+    ),
+  ),
   const SizedBox(height: 12),
   SwitchListTile(
     title: const Text('Lugar activo', style: TextStyle(fontSize: 13)),

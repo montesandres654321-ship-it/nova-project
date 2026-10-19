@@ -14,6 +14,9 @@ class Place {
   final String? address;
   final String? phone;
   final String? priceRange;
+  final String? municipio;
+  final double? latitud;
+  final double? longitud;
   final List<String> amenities;
   final bool isActive;
 
@@ -46,6 +49,9 @@ class Place {
     this.address,
     this.phone,
     this.priceRange,
+    this.municipio,
+    this.latitud,
+    this.longitud,
     required this.amenities,
     required this.isActive,
     this.hasReward = false,
@@ -94,6 +100,9 @@ class Place {
       address:     json['address'],
       phone:       json['phone'],
       priceRange:  json['price_range'],
+      municipio:   json['municipio'],
+      latitud:     (json['latitud'] as num?)?.toDouble(),
+      longitud:    (json['longitud'] as num?)?.toDouble(),
       amenities:   amenitiesList,
       isActive:    json['is_active'] is bool
           ? json['is_active'] as bool
@@ -130,6 +139,9 @@ class Place {
       'address':     address,
       'phone':       phone,
       'price_range': priceRange,
+      'municipio':   municipio,
+      'latitud':     latitud,
+      'longitud':    longitud,
       'amenities':   jsonEncode(amenities),
       'is_active':   isActive  ? 1 : 0,
       'has_reward':  hasReward ? 1 : 0,
@@ -191,6 +203,18 @@ class Place {
     'servicio':            '🛎️',
   };
 
+  static const List<String> municipiosValidos = [
+    'sincelejo',
+    'santiago_de_tolu',
+    'covenas',
+  ];
+
+  static const Map<String, String> municipiosLabels = {
+    'sincelejo':         'Sincelejo',
+    'santiago_de_tolu':  'Santiago de Tolú',
+    'covenas':           'Coveñas',
+  };
+
   // ── Getters ──────────────────────────────────────────
   String get tipoEmoji => tiposEmoji[tipo.toLowerCase()] ?? '📍';
 
@@ -228,7 +252,8 @@ class Place {
     int? id, String? name, String? tipo, String? lugar,
     String? description, String? imageUrl, String? qrImageUrl,
     double? rating, String? address, String? phone,
-    String? priceRange, List<String>? amenities, bool? isActive,
+    String? priceRange, String? municipio, double? latitud, double? longitud,
+    List<String>? amenities, bool? isActive,
     bool? hasReward, String? rewardName, String? rewardDescription,
     String? rewardIcon,
     int?    rewardStock,       // ← NUEVO
@@ -248,6 +273,9 @@ class Place {
       address:     address     ?? this.address,
       phone:       phone       ?? this.phone,
       priceRange:  priceRange  ?? this.priceRange,
+      municipio:   municipio   ?? this.municipio,
+      latitud:     latitud     ?? this.latitud,
+      longitud:    longitud    ?? this.longitud,
       amenities:   amenities   ?? this.amenities,
       isActive:    isActive    ?? this.isActive,
       hasReward:   hasReward   ?? this.hasReward,
