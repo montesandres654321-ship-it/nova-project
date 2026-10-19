@@ -4,7 +4,7 @@
 // ============================================================
 // Rediseño Figma Septiembre 2026 (NOVA_HOME_EXPLORAR_PLAN.md, node 5:2).
 // Antes era un TabBarView por tipo de establecimiento (hoteles/
-// restaurantes/bares); ahora es una lista de los tres municipios sede
+// restaurantes/bares); ahora es una lista de los cuatro municipios sede
 // de los Juegos Nacionales 2027, con filtros de categoría. La API de
 // lugares (ApiService.getPlacesByMunicipio) se mantiene — solo cambia
 // la presentación.
@@ -36,6 +36,8 @@ const _kMunicipiosExplorar = [
       'assets/images/municipios/foto-tolu.png'),
   _MunicipioInfo('covenas', 'Coveñas', 'Playas y naturaleza del Golfo de Morrosquillo.',
       'assets/images/municipios/foto-covenas.png'),
+  _MunicipioInfo('sampues', 'Sampués', 'Capital artesanal con talleres de tejido y palma.',
+      'assets/images/municipios/foto-sampues.png'),
 ];
 
 const _kCategorias = ['Lugares', 'Hoteles', 'Restaurantes', 'Bares', 'Reservas nat.'];
@@ -169,7 +171,7 @@ class _PlacesPageState extends State<PlacesPage> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Explora los tres municipios sede',
+            'Explora los municipios sede',
             style: GoogleFonts.openSans(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -178,7 +180,7 @@ class _PlacesPageState extends State<PlacesPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Descubre hoteles, restaurantes y experiencias en Sincelejo, Santiago de Tolú y Coveñas.',
+            'Descubre hoteles, restaurantes y experiencias en Sincelejo, Santiago de Tolú, Coveñas y Sampués.',
             style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary, height: 1.4),
           ),
           const SizedBox(height: 16),
@@ -288,7 +290,7 @@ class _PlacesPageState extends State<PlacesPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Hospedaje, gastronomía, cultura, naturaleza y deporte en un solo recorrido por los tres municipios sede.',
+              'Hospedaje, gastronomía, cultura, naturaleza y deporte en los cuatro municipios sede.',
               style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
             ),
             const SizedBox(height: 12),

@@ -111,11 +111,12 @@ class _LoginPageState extends State<LoginPage> {
         final token = data['token']?.toString() ?? '';
         bool showLocationBanner = false;
         if (token.isNotEmpty) {
-          final locationOk = await LocationService.pingLocation(token);
+          final municipio = await LocationService.pingLocation(token);
           if (!mounted) return;
           await NotificationService.registerToken(token, context);
           if (!mounted) return;
-          showLocationBanner = !locationOk;
+          // municipio == null significa que no hay GPS o no cayó en ningún bbox
+          showLocationBanner = municipio == null;
         }
 
         Navigator.of(context).pushReplacement(

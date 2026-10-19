@@ -5,9 +5,9 @@ import '../utils/constants.dart';
 
 class LocationService {
   /// Pide permiso si hace falta, obtiene la posición y la envía al backend.
-  /// Retorna `false` si el permiso quedó denegado (para que el caller pueda
-  /// mostrar un banner) — NO se silencia el resultado del permiso.
-  static Future<bool> pingLocation(String authToken) async {
+  /// Retorna el slug del municipio resuelto (p.ej. 'sampues') si todo va
+  /// bien, o `null` si el permiso fue denegado o hubo un error.
+  static Future<String?> pingLocation(String authToken) async {
     try {
       // Verificar permisos
       LocationPermission permission = await Geolocator.checkPermission();
@@ -18,7 +18,7 @@ class LocationService {
       // (ya no sirve pedirlo de nuevo) — solo reportamos el estado.
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        return false;
+        return null;
       }
 
       // Obtener posición
@@ -26,8 +26,8 @@ class LocationService {
         desiredAccuracy: LocationAccuracy.low,
       );
 
-      // Enviar al backend
-      await http.post(
+      // Enviar al backend y capturar el municipio resuelto
+      final response = await http.post(
         Uri.parse('${AppConstants.backendUrl}/location/ping'),
         headers: {
           'Content-Type': 'application/json',
@@ -38,22 +38,28 @@ class LocationService {
           'lng': position.longitude,
         }),
       );
-      return true;
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        // El backend devuelve { success: true, municipio: 'sampues' }
+        final municipio = body['municipio'] as String?;
+        return municipio; // puede ser null si las coords no caen en ningún bbox
+      }
+      return null;
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
   /// Verifica el permiso actual SIN solicitarlo (no interrumpe al usuario).
-  /// Si ya está concedido, hace el ping y retorna true; si no, retorna
-  /// false para que el caller mantenga visible el banner de ubicación.
-  static Future<bool> checkAndPing(String authToken) async {
+  /// Si ya está concedido, hace el ping y retorna el municipio resuelto;
+  /// si no, retorna null para que el caller mantenga visible el banner.
+  static Future<String?> checkAndPing(String authToken) async {
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
-      await pingLocation(authToken); // hace el POST
-      return true;
+      return pingLocation(authToken); // hace el POST y devuelve municipio
     }
-    return false; // banner sigue visible
+    return null; // banner sigue visible
   }
 }

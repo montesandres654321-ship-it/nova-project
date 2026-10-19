@@ -51,6 +51,7 @@ class AppConstants {
   static const String keyUserId      = 'userId';
   static const String keyUser        = 'user';
   static const String keyUsername     = 'username';
+  static const String keyMunicipio   = 'user_municipio';
   static const String keyEmail       = 'email';
   static const String keyFirstName   = 'first_name';
   static const String keyAuthProvider = 'auth_provider';

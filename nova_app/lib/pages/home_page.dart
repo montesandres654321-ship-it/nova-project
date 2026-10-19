@@ -64,6 +64,8 @@ const _kJuegosItems = [
 ];
 
 const _kMunicipioItems = [
+  _CarruselItem('assets/images/municipios/foto-sampues.png', 'Sampués',
+      'Capital artesanal del departamento'),
   _CarruselItem('assets/images/municipios/foto-covenas.png', 'Coveñas',
       'Playas y naturaleza'),
   _CarruselItem('assets/images/municipios/foto-tolu.png', 'Santiago de Tolú',
@@ -71,7 +73,7 @@ const _kMunicipioItems = [
   _CarruselItem('assets/images/municipios/foto-sincelejo.png', 'Sincelejo',
       'Capital de Sucre'),
 ];
-const _kMunicipioSlugs = ['covenas', 'santiago_de_tolu', 'sincelejo'];
+const _kMunicipioSlugs = ['sampues', 'covenas', 'santiago_de_tolu', 'sincelejo'];
 
 const _kRutaItems = [
   _CarruselItem('assets/images/rutas/foto-ruta-costera.png', 'Ruta Costera',
@@ -125,6 +127,9 @@ class _HomePageState extends State<HomePage> {
   // Badge de la campana de notificaciones.
   int _unreadCount = 0;
 
+  // Municipio resuelto por GPS (slug: 'sampues', 'sincelejo', etc.)
+  String? _userMunicipio;
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
@@ -135,6 +140,7 @@ class _HomePageState extends State<HomePage> {
     _loadLastScan();
     _loadTopPlaces();
     _checkLocation();
+    _loadMunicipioAndPing();
   }
 
   Future<void> _loadUnreadCount() async {
@@ -167,11 +173,32 @@ class _HomePageState extends State<HomePage> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(AppConstants.keyToken);
       if (token == null || token.isEmpty) return;
-      final ok = await LocationService.checkAndPing(token);
+      final municipio = await LocationService.checkAndPing(token);
       if (!mounted) return;
-      _updateLocationBanner(!ok);
+      _updateLocationBanner(municipio == null);
     } catch (e) {
       debugPrint('Error verificando ubicación: $e');
+    }
+  }
+
+  // Carga el municipio guardado en SharedPrefs (respuesta inmediata) y
+  // luego hace el ping GPS para actualizarlo desde el backend.
+  Future<void> _loadMunicipioAndPing() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString(AppConstants.keyMunicipio);
+      if (saved != null && mounted) {
+        setState(() => _userMunicipio = saved);
+      }
+      final token = prefs.getString(AppConstants.keyToken);
+      if (token == null) return;
+      final municipio = await LocationService.checkAndPing(token);
+      if (municipio != null && mounted) {
+        setState(() => _userMunicipio = municipio);
+        await prefs.setString(AppConstants.keyMunicipio, municipio);
+      }
+    } catch (e) {
+      debugPrint('Error resolviendo municipio GPS: $e');
     }
   }
 
@@ -270,7 +297,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  String get _userLocation => _lastScan?.place ?? 'Sucre, Colombia';
+  // Mapa slug → nombre legible para el header
+  static const _kNombreMunicipio = {
+    'sincelejo':        'Sincelejo',
+    'santiago_de_tolu': 'Santiago de Tolú',
+    'covenas':          'Coveñas',
+    'sampues':          'Sampués',
+  };
+
+  // Prioridad: GPS resuelto > último QR escaneado > fallback
+  String get _userLocation {
+    if (_userMunicipio != null) {
+      return _kNombreMunicipio[_userMunicipio] ?? _userMunicipio!;
+    }
+    return _lastScan?.place ?? 'Sucre, Colombia';
+  }
 
   // ── Build ──────────────────────────────────────────────────
 

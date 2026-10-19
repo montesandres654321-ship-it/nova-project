@@ -136,12 +136,37 @@ const Map<String, _MunicipioData> _kMunicipios = {
       _ChipQueHacer(Icons.restaurant_outlined, 'Gastronomía'),
     ],
   ),
+  'sampues': _MunicipioData(
+    heroAsset: 'assets/images/municipios/foto-sampues.png',
+    nombre: 'Sampués',
+    subtitulo: 'Capital artesanal del departamento de Sucre',
+    valoracion: 4.5,
+    nLugares: 5,
+    nRutas: 1,
+    historiaTitulo: 'Sampués en su historia',
+    historiaDescripcion:
+        'Municipio reconocido por su tradición artesanal en tejidos, sombreros vueltiaos y objetos de palma de iraca.',
+    timeline: [
+      _TimelineEntry('1776', 'Fundación del municipio de Sampués.'),
+      _TimelineEntry('1995', 'Declarado municipio artesanal de Colombia.'),
+      _TimelineEntry('2027', 'Sede de eventos culturales de los Juegos Nacionales.'),
+    ],
+    textoFinalBold: 'El Festival de la Artesanía',
+    textoFinalResto:
+        ' convoca cada año a artesanos de toda la región Caribe en torno al tejido y la palma.',
+    chips: [
+      _ChipQueHacer(Icons.shopping_bag_outlined, 'Artesanías'),
+      _ChipQueHacer(Icons.theater_comedy_outlined, 'Cultura'),
+      _ChipQueHacer(Icons.restaurant_outlined, 'Gastronomía'),
+      _ChipQueHacer(Icons.event_outlined, 'Festivales'),
+    ],
+  ),
 };
 
 class MunicipioPage extends StatefulWidget {
   const MunicipioPage({super.key, required this.municipio});
 
-  /// Slug del municipio: 'sincelejo' | 'santiago_de_tolu' | 'covenas'
+  /// Slug del municipio: 'sincelejo' | 'santiago_de_tolu' | 'covenas' | 'sampues'
   final String municipio;
 
   @override
