@@ -18,22 +18,14 @@
 const express      = require('express');
 const bcrypt       = require('bcryptjs');
 const crypto       = require('crypto');
-const nodemailer   = require('nodemailer');
+const { Resend }   = require('resend');
 const router       = express.Router();
 const prisma       = require('../config/prisma');
 const { authenticateToken, generateToken, decodeToken } = require('../middleware/auth');
 const { validate, schemas } = require('../middleware/validate');
 
-// ── Mailer — Gmail SMTP (app password en .env) ──────────────────────────────
-function createTransport() {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,   // App Password de Google (no la contraseña normal)
-    },
-  });
-}
+// ── Mailer — Resend API (reemplaza nodemailer+SMTP que Render free bloquea) ──
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function serializeRaw(rows) {
   return rows.map(row => {
@@ -328,11 +320,10 @@ router.post('/auth/forgot-password', async (req, res) => {
       // URL de la app móvil — deep link para abrir la pantalla de reset
       const resetUrl = `novaapp://reset-password?token=${token}`;
 
-      // Enviar email
-      if (process.env.MAIL_USER && process.env.MAIL_PASS) {
-        const transport = createTransport();
-        await transport.sendMail({
-          from: `"Nova App" <${process.env.MAIL_USER}>`,
+      // Enviar email vía Resend (API HTTP — funciona en Render free tier)
+      if (process.env.RESEND_API_KEY) {
+        const { error: mailError } = await resend.emails.send({
+          from: 'Nova App <onboarding@resend.dev>',
           to:   user.email,
           subject: 'Recupera tu contraseña en Nova',
           html: `
@@ -353,8 +344,11 @@ router.post('/auth/forgot-password', async (req, res) => {
             </div>
           `,
         });
+        if (mailError) {
+          console.error('⚠️  Error enviando email Resend:', mailError);
+        }
       } else {
-        console.warn('⚠️  MAIL_USER / MAIL_PASS no configurados — email no enviado. Token:', token);
+        console.warn('⚠️  RESEND_API_KEY no configurada — email no enviado. Token:', token);
       }
     }
 
