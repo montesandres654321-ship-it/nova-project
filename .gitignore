@@ -27,3 +27,4 @@ dist/
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
 **/pubspec.lock
+qr-backend/scripts/seed-test-user.js
