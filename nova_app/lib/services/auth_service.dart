@@ -27,6 +27,14 @@ class AuthService {
     if (raw is String && raw.isNotEmpty) return raw;
     if (raw is Map) {
       final msg = raw['message'];
+      // Errores de validación del backend: { campo: [mensajes] } — mostrar cuál campo falló
+      final details = raw['details'];
+      if (details is Map && details.isNotEmpty) {
+        final lines = details.entries
+            .map((e) => '${e.key}: ${(e.value is List ? (e.value as List).join(', ') : e.value)}')
+            .join('\n');
+        return '${msg is String && msg.isNotEmpty ? msg : fallback}\n$lines';
+      }
       if (msg is String && msg.isNotEmpty) return msg;
     }
     return fallback;

@@ -135,10 +135,11 @@ class RegisterForm extends StatelessWidget {
               if (v == null || v.trim().isEmpty) {
                 return 'Elige un nombre de usuario';
               }
-              if (v.contains(' ')) return 'Sin espacios (usa _ o .)';
+              if (v.contains(' ')) return 'Sin espacios (usa _)';
               if (v.length < 3) return 'Mínimo 3 caracteres';
-              if (!RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(v)) {
-                return 'Solo letras, números, _ y .';
+              // Mismo patrón que el backend (validate.js): sin punto
+              if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v)) {
+                return 'Solo letras, números y _';
               }
               return null;
             },
@@ -165,7 +166,10 @@ class RegisterForm extends StatelessWidget {
                 onTogglePasswordObscure(!obscurePassword),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Requerido';
-              if (v.length < 6) return 'Mínimo 6 caracteres';
+              // Mismas reglas que el backend (validate.js)
+              if (v.length < 8) return 'Mínimo 8 caracteres';
+              if (!v.contains(RegExp(r'[A-Z]'))) return 'Incluye una mayúscula';
+              if (!v.contains(RegExp(r'[0-9]'))) return 'Incluye un número';
               return null;
             },
           ),
