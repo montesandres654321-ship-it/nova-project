@@ -4,6 +4,7 @@ const router    = express.Router();
 const prisma    = require('../config/prisma');
 const { authenticateToken, generateToken } = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
+const { verifyGoogleIdToken } = require('../config/googleAuth');
 
 function serializeRaw(rows) {
   return rows.map(row => {
@@ -527,14 +528,30 @@ router.get('/stats/dashboard', authenticateToken, authorize(['admin_general', 'u
 // @returns { success, token, user }
 router.post('/users/google-auth', async (req, res) => {
   try {
-    const { google_uid, uid, email, name, photoUrl } = req.body;
-    const googleId = google_uid || uid;
+    // Solo se confía en lo que Google firma dentro del idToken — NUNCA en
+    // google_uid / email del body (cualquiera podría suplantar una cuenta).
+    const { idToken } = req.body;
 
-    if (!googleId || !email) {
-      return res.status(400).json({ success: false, error: 'google_uid y email son requeridos' });
+    if (!idToken || typeof idToken !== 'string') {
+      return res.status(400).json({ success: false, error: 'idToken es requerido' });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    let verified;
+    try {
+      verified = await verifyGoogleIdToken(idToken);
+    } catch (err) {
+      console.warn('⚠️  /users/google-auth: idToken rechazado —', err.message);
+      return res.status(401).json({ success: false, error: 'Token de Google inválido' });
+    }
+
+    if (!verified.emailVerified) {
+      return res.status(401).json({ success: false, error: 'El correo de Google no está verificado' });
+    }
+
+    const googleId = verified.sub;
+    const normalizedEmail = verified.email.toLowerCase().trim();
+    const name = verified.name || req.body.name;
+    const photoUrl = verified.picture || req.body.photoUrl;
 
     // ── Caso A: ya existe por google_id ───────────────────
     let rows = serializeRaw(await prisma.$queryRaw`

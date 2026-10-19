@@ -86,14 +86,23 @@ class GoogleAuthService {
   static Future<Map<String, dynamic>> _syncWithBackend(
       GoogleSignInAccount googleUser) async {
     try {
+      // El backend solo confía en el idToken firmado por Google (no en el email/uid del body)
+      final googleAuth = await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+      if (idToken == null || idToken.isEmpty) {
+        return {
+          'success': false,
+          'error': 'Google no devolvió idToken (revisa serverClientId / SHA-1)',
+        };
+      }
+
       final response = await http.post(
         Uri.parse(AppConstants.buildUrl(AppConstants.googleAuthEndpoint)),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'google_uid': googleUser.id,
-          'email':      googleUser.email,
-          'name':       googleUser.displayName,
-          'photoUrl':   googleUser.photoUrl,
+          'idToken':  idToken,
+          'name':     googleUser.displayName,
+          'photoUrl': googleUser.photoUrl,
         }),
       ).timeout(AppConstants.timeoutNormal);
 
