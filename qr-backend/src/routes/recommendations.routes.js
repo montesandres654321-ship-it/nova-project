@@ -30,6 +30,8 @@ router.get('/:municipio', async (req, res) => {
         hasReward: true,
         rewardName: true,
         rewardIcon: true,
+        latitud: true,
+        longitud: true,
       },
     });
 
