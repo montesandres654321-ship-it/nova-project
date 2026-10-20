@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../utils/constants.dart';
 import '../core/navigator_key.dart';
+import 'auth_service.dart';
 
 /// Canal de notificaciones — debe coincidir con el channelId que envía el backend
 const String _kChannelId   = 'nova_recomendaciones';
@@ -30,13 +31,22 @@ class NotificationService {
         final municipio = response.payload ?? '';
         if (municipio.isEmpty) return;
 
-        final prefs       = await SharedPreferences.getInstance();
-        final token       = prefs.getString(AppConstants.keyToken);
+        final prefs        = await SharedPreferences.getInstance();
+        final token        = prefs.getString(AppConstants.keyToken);
         final tieneSession = token != null && token.isNotEmpty;
 
         if (tieneSession) {
-          navigatorKey.currentState
-              ?.pushNamed('/recomendaciones', arguments: municipio);
+          final valid = await AuthService.validateToken(token!);
+          if (valid) {
+            navigatorKey.currentState
+                ?.pushNamed('/recomendaciones', arguments: municipio);
+          } else {
+            await AuthService.logout();
+            navigatorKey.currentState?.pushNamed(
+              '/notificacion-preview',
+              arguments: {'municipio': municipio},
+            );
+          }
         } else {
           navigatorKey.currentState?.pushNamed(
             '/notificacion-preview',
@@ -157,9 +167,22 @@ class NotificationService {
     final tieneSession = token != null && token.isNotEmpty;
 
     if (tieneSession) {
-      // Usuario autenticado → directo a recomendaciones
-      navigatorKey.currentState
-          ?.pushNamed('/recomendaciones', arguments: municipio);
+      // Validar token contra el backend — puede haber expirado
+      final valid = await AuthService.validateToken(token!);
+      if (valid) {
+        navigatorKey.currentState
+            ?.pushNamed('/recomendaciones', arguments: municipio);
+      } else {
+        await AuthService.logout();
+        navigatorKey.currentState?.pushNamed(
+          '/notificacion-preview',
+          arguments: {
+            'municipio': municipio,
+            'title':     title,
+            'body':      body,
+          },
+        );
+      }
     } else {
       // Sin sesión → preview público con nombre, foto y tipo de lugares
       navigatorKey.currentState?.pushNamed(
