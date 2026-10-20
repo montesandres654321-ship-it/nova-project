@@ -18,6 +18,12 @@ class AppTheme {
       foregroundColor: AppColors.onPrimary,
       elevation: 0,
       centerTitle: true,
+      // Material 3 aplica un tint azul derivado del ColorScheme.primary
+      // encima del backgroundColor — lo neutralizamos aquí para que
+      // TODOS los AppBar de la app muestren exactamente AppColors.primary
+      // (teal #06B6A4) sin mezcla de color, sin importar el contexto de
+      // navegación (push, pushReplacement, dentro o fuera de sesión).
+      surfaceTintColor: Colors.transparent,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
