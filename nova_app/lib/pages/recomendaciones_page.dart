@@ -98,12 +98,34 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(AppConstants.keyToken) ?? '';
+
+      // Sin token válido no podemos llamar /recommendations (requiere JWT).
+      // Redirigimos al preview público para que el usuario pueda ver los
+      // lugares e iniciar sesión desde ahí.
+      if (token.isEmpty) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacementNamed(
+          '/notificacion-preview',
+          arguments: {'municipio': _municipio},
+        );
+        return;
+      }
+
       final data =
           await RecommendationsService.getByMunicipio(_municipio, token);
       if (!mounted) return;
       setState(() => _lugares = data.map(Place.fromJson).toList());
     } catch (e) {
       if (!mounted) return;
+      // Si el backend devuelve 401 (token expirado), redirigir al preview
+      final errorStr = e.toString();
+      if (errorStr.contains('401') || errorStr.contains('403')) {
+        Navigator.of(context).pushReplacementNamed(
+          '/notificacion-preview',
+          arguments: {'municipio': _municipio},
+        );
+        return;
+      }
       setState(() => _error = 'No pudimos cargar las recomendaciones');
     } finally {
       if (mounted) setState(() => _loading = false);

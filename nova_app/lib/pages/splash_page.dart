@@ -52,11 +52,30 @@ class _SplashPageState extends State<SplashPage> {
       if (!mounted) return;
 
       if (tieneSession) {
-        // Usuario logueado → directo a recomendaciones
-        Navigator.of(context).pushReplacementNamed(
-          '/recomendaciones',
-          arguments: municipio,
-        );
+        // Token guardado → validar contra el backend antes de entrar.
+        // Si expiró o fue revocado, tratar igual que sin sesión.
+        final valid = await AuthService.validateToken(token!);
+        if (!mounted) return;
+
+        if (valid) {
+          // Token válido → recomendaciones completas (requiere JWT)
+          Navigator.of(context).pushReplacementNamed(
+            '/recomendaciones',
+            arguments: municipio,
+          );
+        } else {
+          // Token expirado → limpiar y mostrar preview público
+          await AuthService.logout();
+          if (!mounted) return;
+          Navigator.of(context).pushReplacementNamed(
+            '/notificacion-preview',
+            arguments: {
+              'municipio': municipio,
+              'title':     title,
+              'body':      body,
+            },
+          );
+        }
       } else {
         // Sin sesión → preview público con info de los lugares
         Navigator.of(context).pushReplacementNamed(
