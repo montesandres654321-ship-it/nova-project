@@ -27,6 +27,7 @@ class AppConstants {
   static const String googleAuthEndpoint      = '/users/google-auth';
   static const String forgotPasswordEndpoint  = '/auth/forgot-password';
   static const String resetPasswordEndpoint   = '/auth/reset-password';
+  static const String verifyResetCodeEndpoint = '/auth/verify-reset-code';
 
   // ─── Endpoints PLACES ───────────────────────────────────
   static const String placesEndpoint      = '/places';

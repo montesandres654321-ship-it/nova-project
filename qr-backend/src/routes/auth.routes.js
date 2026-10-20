@@ -295,6 +295,11 @@ router.post('/logout', authenticateToken, async (req, res) => {
   }
 });
 
+// ── Recuperación de contraseña por código de 6 dígitos ──────────────
+const hashResetCode = (code) => crypto.createHash('sha256').update(String(code)).digest('hex');
+const MAX_RESET_ATTEMPTS = 5;            // intentos fallidos antes de invalidar el código
+const resetAttempts = new Map();         // user_id -> fallos (en memoria; se reinicia al redesplegar)
+
 /**
  * @route POST /auth/forgot-password
  * @description Genera un token de recuperación y envía email al usuario.
@@ -326,17 +331,16 @@ router.post('/auth/forgot-password', async (req, res) => {
         DELETE FROM password_reset_tokens WHERE user_id = ${user.id}
       `;
 
-      // Generar token seguro (32 bytes = 64 hex chars)
-      const token     = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+      // Código de 6 dígitos (CSPRNG). En BD solo se guarda su hash SHA256.
+      const code      = String(crypto.randomInt(100000, 1000000));
+      const codeHash  = hashResetCode(code);
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
       await prisma.$executeRaw`
         INSERT INTO password_reset_tokens (user_id, token, expires_at)
-        VALUES (${user.id}, ${token}, ${expiresAt})
+        VALUES (${user.id}, ${codeHash}, ${expiresAt})
       `;
-
-      // URL de la app móvil — deep link para abrir la pantalla de reset
-      const resetUrl = `novaapp://reset-password?token=${token}`;
+      resetAttempts.delete(user.id);
 
       // Enviar email vía Brevo (API HTTP — funciona en Render free tier)
       if (process.env.BREVO_API_KEY) {
@@ -349,14 +353,11 @@ router.post('/auth/forgot-password', async (req, res) => {
               <img src="https://nova-project-wk67.vercel.app/logo-nova.png" alt="Nova" width="80" style="margin-bottom:16px"/>
               <h2 style="color:#0071BD;margin:0 0 8px">Recupera tu contraseña</h2>
               <p style="color:#4B5563;font-size:14px">Hola ${user.first_name || 'viajero'},</p>
-              <p style="color:#4B5563;font-size:14px">Recibimos una solicitud para restablecer tu contraseña en <strong>Nova App</strong>. Si no la hiciste tú, puedes ignorar este correo.</p>
+              <p style="color:#4B5563;font-size:14px">Tu código de verificación es:</p>
               <div style="text-align:center;margin:28px 0">
-                <a href="${resetUrl}"
-                   style="background:#0071BD;color:#fff;padding:14px 32px;border-radius:999px;text-decoration:none;font-size:15px;font-weight:600;display:inline-block">
-                  Restablecer contraseña
-                </a>
+                <span style="font-size:48px;font-weight:800;letter-spacing:12px;color:#0071BD">${code}</span>
               </div>
-              <p style="color:#9CA3AF;font-size:12px">Este enlace expira en <strong>1 hora</strong>. Si el botón no funciona, copia este token en la app:<br/><code style="background:#F3F4F6;padding:4px 8px;border-radius:4px;font-size:11px">${token}</code></p>
+              <p style="color:#9CA3AF;font-size:12px;text-align:center">Expira en <strong>15 minutos</strong>. No lo compartas con nadie.</p>
               <hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0"/>
               <p style="color:#9CA3AF;font-size:11px;text-align:center">© 2027 Nova · Turismo Sucre · Colombia</p>
             </div>
@@ -366,7 +367,7 @@ router.post('/auth/forgot-password', async (req, res) => {
           console.error('⚠️  Error enviando email Brevo:', mailErr.message);
         }
       } else {
-        console.warn('⚠️  BREVO_API_KEY no configurada — email no enviado. Token:', token);
+        console.warn('⚠️  BREVO_API_KEY no configurada — email no enviado.');
       }
     }
 
@@ -379,6 +380,65 @@ router.post('/auth/forgot-password', async (req, res) => {
   } catch (error) {
     console.error('❌ Error en /auth/forgot-password:', error);
     return res.status(500).json({ success: false, error: 'Error al procesar la solicitud' });
+  }
+});
+
+/**
+ * @route POST /auth/verify-reset-code
+ * @description Valida el código de 6 dígitos enviado por email y cambia la contraseña.
+ * Tras ${MAX_RESET_ATTEMPTS} códigos incorrectos el código vigente se invalida (anti fuerza bruta).
+ * @access Público
+ * @param {string} req.body.email
+ * @param {string} req.body.code
+ * @param {string} req.body.new_password
+ */
+router.post('/auth/verify-reset-code', async (req, res) => {
+  try {
+    const { email, code, new_password } = req.body;
+    if (!email || !code || !new_password ||
+        typeof email !== 'string' || typeof new_password !== 'string') {
+      return res.status(400).json({ success: false, error: 'email, code y new_password requeridos' });
+    }
+    if (new_password.length < 6) {
+      return res.status(400).json({ success: false, error: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const invalid = () =>
+      res.status(400).json({ success: false, error: 'Código inválido o expirado' });
+
+    const users = serializeRaw(await prisma.$queryRaw`
+      SELECT id FROM users WHERE email = ${email.toLowerCase().trim()} AND is_active = TRUE LIMIT 1
+    `);
+    if (!users.length) return invalid();
+    const userId = users[0].id;
+
+    const codeHash = hashResetCode(String(code).trim());
+    const tokens = serializeRaw(await prisma.$queryRaw`
+      SELECT id FROM password_reset_tokens
+      WHERE user_id = ${userId} AND token = ${codeHash} AND expires_at > NOW()
+      LIMIT 1
+    `);
+
+    if (!tokens.length) {
+      const fails = (resetAttempts.get(userId) || 0) + 1;
+      if (fails >= MAX_RESET_ATTEMPTS) {
+        await prisma.$executeRaw`DELETE FROM password_reset_tokens WHERE user_id = ${userId}`;
+        resetAttempts.delete(userId);
+      } else {
+        resetAttempts.set(userId, fails);
+      }
+      return invalid();
+    }
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+    await prisma.$executeRaw`UPDATE users SET password = ${hashedPassword} WHERE id = ${userId}`;
+    await prisma.$executeRaw`DELETE FROM password_reset_tokens WHERE user_id = ${userId}`;
+    resetAttempts.delete(userId);
+
+    return res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+  } catch (err) {
+    console.error('[verify-reset-code]', err.message);
+    return res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 });
 

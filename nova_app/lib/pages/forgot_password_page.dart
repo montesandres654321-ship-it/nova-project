@@ -4,11 +4,12 @@
 // ============================================================
 // Rediseño Oct 2026 — paleta Figma (azul #0071BD / verde #078930),
 // fondo blanco igual que login_page. Llama al backend real:
-//   POST /auth/forgot-password → envía email con token
-//   POST /auth/reset-password  → valida token + nueva contraseña
+//   POST /auth/forgot-password    → envía email con código de 6 dígitos
+//   POST /auth/verify-reset-code  → valida código + nueva contraseña
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -29,7 +30,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   // ── Controladores ─────────────────────────────────────────
   final _emailCtrl    = TextEditingController();
-  final _tokenCtrl    = TextEditingController();
+  final _codeCtrl    = TextEditingController();
   final _passCtrl     = TextEditingController();
   final _confirmCtrl  = TextEditingController();
   final _emailFormKey = GlobalKey<FormState>();
@@ -45,7 +46,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   void dispose() {
     _emailCtrl.dispose();
-    _tokenCtrl.dispose();
+    _codeCtrl.dispose();
     _passCtrl.dispose();
     _confirmCtrl.dispose();
     super.dispose();
@@ -86,11 +87,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     setState(() => _loading = true);
     try {
       final res = await http.post(
-        Uri.parse('${AppConstants.backendUrl}${AppConstants.resetPasswordEndpoint}'),
+        Uri.parse('${AppConstants.backendUrl}${AppConstants.verifyResetCodeEndpoint}'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'token':    _tokenCtrl.text.trim(),
-          'password': _passCtrl.text,
+          'email':        _emailCtrl.text.trim().toLowerCase(),
+          'code':         _codeCtrl.text.trim(),
+          'new_password': _passCtrl.text,
         }),
       ).timeout(AppConstants.timeoutNormal);
 
@@ -99,7 +101,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (res.statusCode == 200 && body['success'] == true) {
         setState(() => _step = 3);
       } else {
-        _showError(body['error'] ?? 'Token inválido o expirado');
+        _showError(body['error'] ?? 'Código inválido o expirado');
       }
     } catch (e) {
       if (mounted) _showError('Error de conexión. Verifica tu internet.');
@@ -232,7 +234,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 8),
           Text(
-            'Ingresa tu correo y te enviaremos un código para restablecer tu acceso.',
+            'Te enviaremos un código de 6 dígitos a tu email',
             style: GoogleFonts.openSans(
                 fontSize: 14, color: AppColors.textSecondary, height: 1.5),
           ),
@@ -246,7 +248,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           const SizedBox(height: 20),
           _buildPrimaryButton(
-            label: 'Enviar instrucciones',
+            label: 'Enviar código',
             loading: _loading,
             onPressed: _sendEmail,
           ),
@@ -280,7 +282,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 8),
           Text(
-            'Si el correo está registrado recibirás un código de 64 caracteres. Pégalo aquí junto con tu nueva contraseña.',
+            'Si el correo está registrado recibirás un código de 6 dígitos (vence en 15 minutos). Ingrésalo aquí junto con tu nueva contraseña.',
             style: GoogleFonts.openSans(
                 fontSize: 14, color: AppColors.textSecondary, height: 1.5),
           ),
@@ -315,13 +317,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           _buildLabel('Código del correo'),
           const SizedBox(height: 6),
           TextFormField(
-            controller: _tokenCtrl,
+            controller: _codeCtrl,
             enabled: !_loading,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: GoogleFonts.openSans(
-                fontSize: 13, color: AppColors.bienvenidaTextoFuerte),
-            decoration: _inputDecoration('Pega aquí el código recibido'),
-            validator: (v) => (v == null || v.trim().length < 10)
-                ? 'Ingresa el código completo del correo'
+                fontSize: 18,
+                letterSpacing: 6,
+                fontWeight: FontWeight.w700,
+                color: AppColors.bienvenidaTextoFuerte),
+            decoration: _inputDecoration('000000').copyWith(counterText: ''),
+            validator: (v) => (v == null || v.trim().length != 6)
+                ? 'Ingresa el código de 6 dígitos'
                 : null,
           ),
           const SizedBox(height: 16),
