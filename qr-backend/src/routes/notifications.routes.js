@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { sendDailyNotifications } = require('../services/notification.service');
-const auth = require('../middleware/auth');
+const { authenticateToken: auth } = require('../middleware/auth');
 
 function serializeRaw(rows) {
   return rows.map(row => {
