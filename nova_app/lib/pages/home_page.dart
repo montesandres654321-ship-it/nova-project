@@ -523,13 +523,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ),
                     _buildNotifBell(),
                     const SizedBox(width: 12),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        color: const Color(0xFFBFE0F2),
-                        child: const Icon(Icons.person, color: Colors.white),
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, '/profile'),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          color: const Color(0xFFBFE0F2),
+                          child: const Icon(Icons.person, color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
