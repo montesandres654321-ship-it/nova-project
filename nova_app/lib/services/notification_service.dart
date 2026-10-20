@@ -32,6 +32,14 @@ class NotificationService {
         if (municipio.isEmpty) return;
 
         final prefs        = await SharedPreferences.getInstance();
+        // Recuperar title/body guardados por _showLocalNotification
+        final title = prefs.getString('pending_notif_title') ?? '';
+        final body  = prefs.getString('pending_notif_body')  ?? '';
+        // Limpiar para que no queden datos stale
+        await prefs.remove('pending_notif_title');
+        await prefs.remove('pending_notif_body');
+        await prefs.remove('pending_notif_municipio');
+
         final token        = prefs.getString(AppConstants.keyToken);
         final tieneSession = token != null && token.isNotEmpty;
 
@@ -44,13 +52,21 @@ class NotificationService {
             await AuthService.logout();
             navigatorKey.currentState?.pushNamed(
               '/notificacion-preview',
-              arguments: {'municipio': municipio},
+              arguments: {
+                'municipio': municipio,
+                'title':     title,
+                'body':      body,
+              },
             );
           }
         } else {
           navigatorKey.currentState?.pushNamed(
             '/notificacion-preview',
-            arguments: {'municipio': municipio},
+            arguments: {
+              'municipio': municipio,
+              'title':     title,
+              'body':      body,
+            },
           );
         }
       },
@@ -213,11 +229,19 @@ class NotificationService {
   /// Muestra una notificación local en la bandeja del sistema.
   /// Se usa cuando la app está en foreground y FCM no la muestra
   /// automáticamente en Android.
+  /// También persiste title/body en SharedPreferences para que
+  /// onDidReceiveNotificationResponse pueda recuperarlos al hacer tap.
   static Future<void> _showLocalNotification(RemoteMessage message) async {
     final notif = message.notification;
     if (notif == null) return;
 
     final municipio = message.data['municipio'] ?? '';
+
+    // Persistir para recuperar en onDidReceiveNotificationResponse
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_notif_title',    notif.title ?? '');
+    await prefs.setString('pending_notif_body',     notif.body  ?? '');
+    await prefs.setString('pending_notif_municipio', municipio);
 
     const androidDetails = AndroidNotificationDetails(
       _kChannelId,
