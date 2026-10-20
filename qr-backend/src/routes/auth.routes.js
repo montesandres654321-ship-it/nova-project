@@ -230,7 +230,11 @@ router.post('/users/register', validate(schemas.register), async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
 
     const phoneVal     = phone     || null;
-    const dobVal       = dob       || null;
+    // users.dob es de tipo DATE en Postgres: solo se acepta 'YYYY-MM-DD' (si no, null)
+    const dobValid     = /^\d{4}-\d{2}-\d{2}$/.test(dob || '') &&
+                         !isNaN(new Date(dob).getTime()) &&
+                         new Date(dob).toISOString().slice(0, 10) === dob;
+    const dobVal       = dobValid ? dob : null;
     const genderVal    = gender    || null;
     const residenceVal = residence || null;
 
@@ -241,7 +245,7 @@ router.post('/users/register', validate(schemas.register), async (req, res) => {
         role, is_active, accepted_terms
       )
       VALUES (${fName || ''}, ${lName || ''}, ${username}, ${email}, ${hashed},
-              ${phoneVal}, ${dobVal}, ${genderVal}, ${residenceVal}, ${null}, TRUE, TRUE)
+              ${phoneVal}, ${dobVal}::date, ${genderVal}, ${residenceVal}, ${null}, TRUE, TRUE)
       RETURNING id
     `;
     const userId = inserted[0].id;
