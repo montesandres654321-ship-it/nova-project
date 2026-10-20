@@ -92,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final token = prefs.getString(AppConstants.keyToken);
         if (token != null) {
           final resp = await http.get(
-            Uri.parse('${AppConstants.baseUrl}/users/me'),
+            Uri.parse('${AppConstants.backendUrl}/users/me'),
             headers: {'Authorization': 'Bearer $token'},
           ).timeout(AppConstants.timeoutNormal);
 
