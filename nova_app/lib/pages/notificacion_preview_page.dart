@@ -177,7 +177,7 @@ class _NotificacionPreviewPageState
     await prefs.setString('return_route', '/recomendaciones');
     await prefs.setString('return_route_municipio', _municipio);
     if (!mounted) return;
-    Navigator.pushNamed(context, '/');
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
   // ─── UI ──────────────────────────────────────────────────────────────────

@@ -42,8 +42,9 @@ class _LoginPageState extends State<LoginPage> {
 
     if (returnRoute != null && returnRoute.isNotEmpty) {
       // Reemplaza login y navega a la pantalla pendiente
-      Navigator.of(context).pushReplacementNamed(
+      Navigator.of(context).pushNamedAndRemoveUntil(
         returnRoute,
+        (route) => false,
         arguments: municipio.isNotEmpty ? municipio : null,
       );
     } else {

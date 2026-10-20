@@ -155,6 +155,13 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
         foregroundColor: Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        leading: Navigator.of(context).canPop()
+            ? const BackButton()
+            : IconButton(
+                icon: const Icon(Icons.home_rounded),
+                onPressed: () => Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/home', (route) => false),
+              ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
