@@ -39,6 +39,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Crea el canal Android + inicializa flutter_local_notifications
+  await NotificationService.init();
   NotificationService.setupNotificationHandlers();
 
   runApp(const MyApp());

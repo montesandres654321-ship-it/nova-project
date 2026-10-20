@@ -1,12 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../utils/constants.dart';
 import '../core/navigator_key.dart';
 
+/// Canal de notificaciones — debe coincidir con el channelId que envía el backend
+const String _kChannelId   = 'nova_recomendaciones';
+const String _kChannelName = 'Recomendaciones NOVA';
+const String _kChannelDesc = 'Lugares y recompensas cerca de ti';
+
+final FlutterLocalNotificationsPlugin _localNotif =
+    FlutterLocalNotificationsPlugin();
+
 class NotificationService {
+  /// Inicializa flutter_local_notifications y crea el canal Android.
+  /// Llamar UNA vez desde main(), antes de runApp().
+  static Future<void> init() async {
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const initSettings = InitializationSettings(android: androidSettings);
+
+    await _localNotif.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Usuario tocó la notificación local → navegar si hay municipio
+        final municipio = response.payload;
+        if (municipio != null && municipio.isNotEmpty) {
+          navigatorKey.currentState
+              ?.pushNamed('/recomendaciones', arguments: municipio);
+        }
+      },
+    );
+
+    // Crear el canal en Android 8+ (obligatorio para que aparezca en bandeja)
+    const androidChannel = AndroidNotificationChannel(
+      _kChannelId,
+      _kChannelName,
+      description: _kChannelDesc,
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+
+    await _localNotif
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+  }
   /// Guarda la última notificación recibida en SharedPreferences, para
   /// que NotificacionesPage la muestre. Pública (no `_saveNotification`)
   /// porque el background handler de main.dart también la llama, y ese
@@ -98,10 +141,40 @@ class NotificationService {
       }
     });
 
-    // App en foreground → mostrar notificación en pantalla
+    // App en foreground → mostrar en bandeja del sistema como notificación real
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('[FCM Foreground] ${message.notification?.title}');
       saveNotification(message);
+      _showLocalNotification(message);
     });
+  }
+
+  /// Muestra una notificación local en la bandeja del sistema.
+  /// Se usa cuando la app está en foreground y FCM no la muestra
+  /// automáticamente en Android.
+  static Future<void> _showLocalNotification(RemoteMessage message) async {
+    final notif = message.notification;
+    if (notif == null) return;
+
+    final municipio = message.data['municipio'] ?? '';
+
+    const androidDetails = AndroidNotificationDetails(
+      _kChannelId,
+      _kChannelName,
+      channelDescription: _kChannelDesc,
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    await _localNotif.show(
+      message.hashCode,
+      notif.title,
+      notif.body,
+      const NotificationDetails(android: androidDetails),
+      payload: municipio,
+    );
   }
 }
