@@ -7,7 +7,8 @@
 //   1. Llega con arguments = { 'municipio': 'sampues', 'title': '...', 'body': '...' }
 //   2. Llama GET /places?municipio=sampues  (endpoint público, sin JWT)
 //   3. Muestra: nombre, foto y categoría de cada lugar
-//   4. Botón CTA → LoginPage con returnRoute guardado en SharedPreferences
+//   4. Tap en cualquier lugar → LoginPage (con returnRoute en SharedPreferences)
+//   5. Botón CTA al final → mismo efecto
 //
 // Cuando el usuario SÍ tiene sesión, notification_service.dart lo manda
 // directamente a /recomendaciones y esta página nunca se abre.
@@ -19,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../core/design/app_colors.dart';
 import '../utils/constants.dart';
 
 // ─── Etiquetas legibles por municipio ───────────────────────────────────────
@@ -32,14 +34,14 @@ const Map<String, String> _kMunicipioLabels = {
 // ─── Icono por categoría ─────────────────────────────────────────────────────
 IconData _iconoParaTipo(String tipo) {
   switch (tipo) {
-    case 'restaurant': return Icons.restaurant;
-    case 'hotel':      return Icons.hotel;
-    case 'bar':        return Icons.local_bar;
-    case 'playa':      return Icons.beach_access;
-    case 'naturaleza': return Icons.park;
-    case 'cultura':    return Icons.museum;
-    case 'artesania':  return Icons.brush;
-    default:           return Icons.place;
+    case 'restaurant': return Icons.restaurant_rounded;
+    case 'hotel':      return Icons.hotel_rounded;
+    case 'bar':        return Icons.local_bar_rounded;
+    case 'playa':      return Icons.beach_access_rounded;
+    case 'naturaleza': return Icons.park_rounded;
+    case 'cultura':    return Icons.museum_rounded;
+    case 'artesania':  return Icons.brush_rounded;
+    default:           return Icons.place_rounded;
   }
 }
 
@@ -106,10 +108,14 @@ class _NotificacionPreviewPageState
   List<_PreviewPlace> _lugares = [];
   bool _cargando = true;
   String? _error;
+  bool _didInit = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_didInit) return;
+    _didInit = true;
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
@@ -118,8 +124,10 @@ class _NotificacionPreviewPageState
     _body      = args?['body']      as String? ??
         'Descubre lo mejor de ${_kMunicipioLabels[_municipio] ?? _municipio}';
 
-    if (_municipio.isNotEmpty && _lugares.isEmpty && _cargando) {
+    if (_municipio.isNotEmpty) {
       _cargarLugares();
+    } else {
+      setState(() => _cargando = false);
     }
   }
 
@@ -142,7 +150,7 @@ class _NotificacionPreviewPageState
         final parsed = data
             .map((e) => _PreviewPlace.fromJson(e as Map<String, dynamic>))
             .where((p) => p.name.isNotEmpty)
-            .take(6) // máximo 6 cards en el preview
+            .take(6)
             .toList();
 
         setState(() {
@@ -166,15 +174,8 @@ class _NotificacionPreviewPageState
   // Guarda la ruta de retorno y navega al login
   Future<void> _irALogin() async {
     final prefs = await SharedPreferences.getInstance();
-    // Después del login, SplashPage o LoginPage redirige aquí
-    await prefs.setString(
-      'return_route',
-      '/recomendaciones',
-    );
-    await prefs.setString(
-      'return_route_municipio',
-      _municipio,
-    );
+    await prefs.setString('return_route', '/recomendaciones');
+    await prefs.setString('return_route_municipio', _municipio);
     if (!mounted) return;
     Navigator.pushNamed(context, '/');
   }
@@ -183,83 +184,87 @@ class _NotificacionPreviewPageState
 
   @override
   Widget build(BuildContext context) {
-    final colorTeal  = const Color(0xFF06B6A4);
-    final municipioLabel =
-        _kMunicipioLabels[_municipio] ?? _municipio;
+    final municipioLabel = _kMunicipioLabels[_municipio] ?? _municipio;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF7F9FB),
       body: CustomScrollView(
         slivers: [
-          // ── AppBar con gradiente ──────────────────────────────────────
+          // ── AppBar con gradiente del sistema de diseño ────────────────
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 210,
             pinned: true,
             automaticallyImplyLeading: false,
-            backgroundColor: colorTeal,
+            backgroundColor: AppColors.primary,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF0D9488),
-                      colorTeal,
-                      const Color(0xFF22D3EE),
+                      AppColors.primary,
+                      AppColors.primaryLight,
                     ],
                   ),
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // Chip "Vista previa"
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
+                            color: Colors.white.withOpacity(0.22),
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.35),
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.visibility,
-                                  color: Colors.white, size: 14),
+                              Icon(Icons.visibility_rounded,
+                                  color: Colors.white, size: 13),
                               SizedBox(width: 4),
                               Text(
-                                'Vista previa',
+                                'Vista previa · Sin sesión',
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         // Título de la notificación
                         Text(
                           _title,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 21,
                             fontWeight: FontWeight.bold,
-                            height: 1.25,
+                            height: 1.2,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 5),
                         // Subtítulo
                         Text(
                           _body,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.88),
-                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 13,
+                            height: 1.3,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -274,82 +279,102 @@ class _NotificacionPreviewPageState
 
           // ── Contenido ──────────────────────────────────────────────────
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                // Encabezado de sección
+
+                // ── Encabezado de sección ─────────────────────────────
                 if (_municipio.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 14),
                     child: Row(
                       children: [
-                        Icon(Icons.location_on,
-                            color: colorTeal, size: 18),
-                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.10),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.location_on_rounded,
+                            color: AppColors.primary,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Text(
-                          'Lugares en $municipioLabel',
+                          municipioLabel.isNotEmpty
+                              ? 'Lugares en $municipioLabel'
+                              : 'Lugares recomendados',
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                // Estado de carga / error / lista
+                // ── Estado de carga / error / lista ───────────────────
                 if (_cargando) ...[
-                  const SizedBox(height: 32),
-                  Center(
+                  const SizedBox(height: 40),
+                  const Center(
                     child: Column(
                       children: [
-                        CircularProgressIndicator(color: colorTeal),
-                        const SizedBox(height: 12),
+                        CircularProgressIndicator(color: AppColors.primary),
+                        SizedBox(height: 12),
                         Text(
                           'Cargando lugares…',
                           style: TextStyle(
-                              color: Colors.grey[500], fontSize: 14),
+                              color: AppColors.textHint, fontSize: 14),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 40),
                 ] else if (_error != null) ...[
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
                   Center(
                     child: Column(
                       children: [
-                        Icon(Icons.wifi_off,
-                            color: Colors.grey[400], size: 48),
+                        const Icon(Icons.wifi_off_rounded,
+                            color: AppColors.textHint, size: 48),
                         const SizedBox(height: 12),
                         Text(_error!,
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 14),
+                            style: const TextStyle(
+                                color: AppColors.textSecondary, fontSize: 14),
                             textAlign: TextAlign.center),
                         const SizedBox(height: 16),
                         OutlinedButton.icon(
                           onPressed: _cargarLugares,
-                          icon: const Icon(Icons.refresh),
+                          icon: const Icon(Icons.refresh_rounded),
                           label: const Text('Reintentar'),
                           style: OutlinedButton.styleFrom(
-                              foregroundColor: colorTeal,
-                              side: BorderSide(color: colorTeal)),
+                            foregroundColor: AppColors.primary,
+                            side: const BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 40),
                 ] else if (_lugares.isEmpty) ...[
-                  const SizedBox(height: 32),
-                  Center(
+                  const SizedBox(height: 40),
+                  const Center(
                     child: Text(
                       'No hay lugares disponibles en este momento.',
                       style: TextStyle(
-                          color: Colors.grey[500], fontSize: 14),
+                          color: AppColors.textSecondary, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  const SizedBox(height: 40),
                 ] else ...[
-                  // Grid de tarjetas
+                  // ── Grid de tarjetas (2 columnas) ─────────────────
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -358,73 +383,21 @@ class _NotificacionPreviewPageState
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.78,
+                      childAspectRatio: 0.75,
                     ),
                     itemCount: _lugares.length,
-                    itemBuilder: (context, index) =>
-                        _LugarCard(lugar: _lugares[index]),
+                    itemBuilder: (context, index) => _LugarCard(
+                      lugar: _lugares[index],
+                      onTap: _irALogin,
+                    ),
                   ),
+                  const SizedBox(height: 24),
                 ],
 
-                const SizedBox(height: 24),
+                // ── Banner CTA "inicia sesión" ────────────────────────
+                _LoginCTABanner(onTap: _irALogin),
 
-                // ── Banner "inicia sesión" ─────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        colorTeal.withOpacity(0.08),
-                        const Color(0xFF22D3EE).withOpacity(0.06),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: colorTeal.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(Icons.lock_outline,
-                          color: colorTeal, size: 32),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Inicia sesión para ver recompensas, escanear QR y mucho más',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E293B),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _irALogin,
-                          icon: const Icon(Icons.explore, size: 20),
-                          label: const Text(
-                            'Explorar y ganar recompensas',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorTeal,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
               ]),
             ),
           ),
@@ -435,138 +408,175 @@ class _NotificacionPreviewPageState
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TARJETA DE LUGAR
+// TARJETA DE LUGAR — con tap que lleva al login
 // ═══════════════════════════════════════════════════════════════════════════
 class _LugarCard extends StatelessWidget {
   final _PreviewPlace lugar;
-  const _LugarCard({required this.lugar});
+  final VoidCallback onTap;
+
+  const _LugarCard({required this.lugar, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final colorTeal = const Color(0xFF06B6A4);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Imagen con overlays ───────────────────────────────────
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildImage(lugar.imageUrl),
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Imagen ──────────────────────────────────────────────────
-          Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _buildImage(lugar.imageUrl),
+                  // Gradiente inferior sutil
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 48,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.30),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
-                // Gradiente inferior para el badge
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 40,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.35),
-                          Colors.transparent,
+                  // Badge de recompensa (esquina superior derecha)
+                  if (lugar.hasReward)
+                    Positioned(
+                      top: 7,
+                      right: 7,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '🎁',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
+
+                  // Ícono de candado / login (esquina inferior derecha)
+                  Positioned(
+                    bottom: 7,
+                    right: 7,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.92),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.12),
+                            blurRadius: 4,
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-
-                // Badge de recompensa
-                if (lugar.hasReward)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF59E0B),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        '🎁 Premio',
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700),
+                      child: const Icon(
+                        Icons.lock_rounded,
+                        size: 12,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // ── Info ─────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Categoría
-                Row(
-                  children: [
-                    Icon(_iconoParaTipo(lugar.tipo),
-                        color: colorTeal, size: 12),
-                    const SizedBox(width: 3),
-                    Text(
-                      _labelParaTipo(lugar.tipo),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: colorTeal,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                // Nombre
-                Text(
-                  lugar.name,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E293B),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // Rating
-                if (lugar.rating != null && lugar.rating! > 0) ...[
-                  const SizedBox(height: 4),
+            // ── Info ─────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(9, 7, 9, 9),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Tipo con ícono
                   Row(
                     children: [
-                      const Icon(Icons.star,
-                          color: Color(0xFFFBBF24), size: 12),
-                      const SizedBox(width: 2),
-                      Text(
-                        lugar.rating!.toStringAsFixed(1),
-                        style: const TextStyle(
-                            fontSize: 11, color: Color(0xFF64748B)),
+                      Icon(
+                        _iconoParaTipo(lugar.tipo),
+                        color: AppColors.primary,
+                        size: 11,
+                      ),
+                      const SizedBox(width: 3),
+                      Flexible(
+                        child: Text(
+                          _labelParaTipo(lugar.tipo),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.1,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 3),
+                  // Nombre
+                  Text(
+                    lugar.name,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // Rating
+                  if (lugar.rating != null && lugar.rating! > 0) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.star_rounded,
+                            color: AppColors.warning, size: 12),
+                        const SizedBox(width: 2),
+                        Text(
+                          lugar.rating!.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -574,10 +584,10 @@ class _LugarCard extends StatelessWidget {
   Widget _buildImage(String? url) {
     if (url == null || url.isEmpty) {
       return Container(
-        color: const Color(0xFFE2E8F0),
+        color: AppColors.surfaceVariant,
         child: const Center(
-          child: Icon(Icons.image_not_supported,
-              color: Color(0xFF94A3B8), size: 36),
+          child: Icon(Icons.image_not_supported_rounded,
+              color: AppColors.textHint, size: 32),
         ),
       );
     }
@@ -585,18 +595,103 @@ class _LugarCard extends StatelessWidget {
       imageUrl: url,
       fit: BoxFit.cover,
       placeholder: (_, __) => Container(
-        color: const Color(0xFFE2E8F0),
+        color: AppColors.surfaceVariant,
         child: const Center(
           child: CircularProgressIndicator(
-              strokeWidth: 2, color: Color(0xFF06B6A4)),
+              strokeWidth: 2, color: AppColors.primary),
         ),
       ),
       errorWidget: (_, __, ___) => Container(
-        color: const Color(0xFFE2E8F0),
+        color: AppColors.surfaceVariant,
         child: const Center(
-          child: Icon(Icons.broken_image,
-              color: Color(0xFF94A3B8), size: 36),
+          child: Icon(Icons.broken_image_rounded,
+              color: AppColors.textHint, size: 32),
         ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BANNER CTA — "Inicia sesión para ver todo"
+// ═══════════════════════════════════════════════════════════════════════════
+class _LoginCTABanner extends StatelessWidget {
+  final VoidCallback onTap;
+  const _LoginCTABanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Ícono con fondo
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.10),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.lock_open_rounded,
+              color: AppColors.primary,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Inicia sesión para ver todo',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Accede a recompensas, escanea QR y descubre lo mejor del Golfo de Morrosquillo',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: onTap,
+              icon: const Icon(Icons.explore_rounded, size: 18),
+              label: const Text(
+                'Explorar y ganar recompensas',
+                style: TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

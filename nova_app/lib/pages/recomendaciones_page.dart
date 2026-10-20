@@ -151,8 +151,9 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.bienvenidaAzul,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        elevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -160,11 +161,15 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
             Text(
               _tituloMunicipio,
               style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
             ),
             const Text(
               'Lugares recomendados para ti',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: Colors.white70,
+              ),
             ),
           ],
         ),
@@ -176,7 +181,7 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
   Widget _buildBody() {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.bienvenidaAzul),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
 
@@ -199,7 +204,7 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
               ElevatedButton(
                 onPressed: _loadRecommendations,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.bienvenidaAzul,
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Reintentar'),
@@ -229,8 +234,8 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
             color: Colors.white,
             child: TabBar(
               isScrollable: true,
-              indicatorColor: AppColors.bienvenidaAzul,
-              labelColor: AppColors.bienvenidaAzul,
+              indicatorColor: AppColors.primary,
+              labelColor: AppColors.primary,
               unselectedLabelColor: AppColors.textSecondary,
               tabs: [for (final c in categorias) Tab(text: c.label)],
             ),
@@ -282,70 +287,127 @@ class _PlaceCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        clipBehavior: Clip.antiAlias,
+        margin: const EdgeInsets.only(bottom: 14),
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildImage(),
+            // ── Imagen hero ───────────────────────────────────────────
+            Stack(
+              children: [
+                _buildImage(),
+                // Badge de recompensa sobre la imagen
+                if (place.hasReward && (place.rewardName?.isNotEmpty ?? false))
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 9, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('🎁', style: TextStyle(fontSize: 11)),
+                          const SizedBox(width: 4),
+                          Text(
+                            place.rewardName!,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            // ── Info del lugar ────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    place.name,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
+                  // Tipo (chip pequeño)
                   Row(
                     children: [
-                      Icon(_iconoParaTipo(place.tipo),
-                          size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 6),
+                      Icon(
+                        _iconoParaTipo(place.tipo),
+                        size: 12,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
                       Text(
                         place.tipoLabel,
                         style: const TextStyle(
-                            fontSize: 13, color: AppColors.textSecondary),
-                      ),
-                      const SizedBox(width: 12),
-                      const Text('⭐', style: TextStyle(fontSize: 13)),
-                      const SizedBox(width: 2),
-                      Text(
-                        place.rating.toStringAsFixed(1),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w600),
+                          fontSize: 11,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                        ),
                       ),
                     ],
                   ),
-                  if (place.hasReward &&
-                      (place.rewardName?.isNotEmpty ?? false)) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: AppColors.sistemaVerdeClaro,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        '🎁 ${place.rewardName}',
+                  const SizedBox(height: 4),
+                  // Nombre
+                  Text(
+                    place.name,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  // Rating + flecha
+                  Row(
+                    children: [
+                      const Icon(Icons.star_rounded,
+                          color: AppColors.warning, size: 14),
+                      const SizedBox(width: 3),
+                      Text(
+                        place.rating.toStringAsFixed(1),
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.success,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                    ),
-                  ],
+                      const Spacer(),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 12,
+                        color: AppColors.textHint,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -358,21 +420,40 @@ class _PlaceCard extends StatelessWidget {
   Widget _buildImage() {
     if (place.imageUrl == null || place.imageUrl!.isEmpty) {
       return Container(
-        height: 160,
+        height: 155,
         width: double.infinity,
         color: AppColors.surfaceVariant,
-        child: const Icon(Icons.place, size: 48, color: AppColors.textHint),
+        child: const Center(
+          child: Icon(Icons.image_not_supported_rounded,
+              size: 42, color: AppColors.textHint),
+        ),
       );
     }
     return Image.network(
       place.imageUrl!,
-      height: 160,
+      height: 155,
       width: double.infinity,
       fit: BoxFit.cover,
+      loadingBuilder: (_, child, prog) {
+        if (prog == null) return child;
+        return Container(
+          height: 155,
+          color: AppColors.surfaceVariant,
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 2,
+            ),
+          ),
+        );
+      },
       errorBuilder: (_, __, ___) => Container(
-        height: 160,
+        height: 155,
         color: AppColors.surfaceVariant,
-        child: const Icon(Icons.place, size: 48, color: AppColors.textHint),
+        child: const Center(
+          child: Icon(Icons.broken_image_rounded,
+              size: 42, color: AppColors.textHint),
+        ),
       ),
     );
   }
