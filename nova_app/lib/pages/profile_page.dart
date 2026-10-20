@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../services/google_auth_service.dart';
@@ -68,11 +69,12 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userStr = prefs.getString(AppConstants.keyUser);
       final isGoogle = await GoogleAuthService.isGoogleUser();
       if (!mounted) return;
       setState(() => _isGoogleUser = isGoogle);
 
+      // Cargar desde caché primero (respuesta inmediata)
+      final userStr = prefs.getString(AppConstants.keyUser);
       if (userStr != null) {
         final user = jsonDecode(userStr);
         if (!mounted) return;
@@ -83,6 +85,36 @@ class _ProfilePageState extends State<ProfilePage> {
           _emailCtrl.text = user['email'] ?? '';
           _phoneCtrl.text = user['phone'] ?? '';
         });
+      }
+
+      // Luego actualizar desde el API para obtener datos frescos (incluye phone)
+      try {
+        final token = prefs.getString(AppConstants.keyToken);
+        if (token != null) {
+          final resp = await http.get(
+            Uri.parse('${AppConstants.baseUrl}/users/me'),
+            headers: {'Authorization': 'Bearer $token'},
+          ).timeout(AppConstants.timeoutNormal);
+
+          if (resp.statusCode == 200) {
+            final body = jsonDecode(resp.body);
+            if (body['success'] == true && body['data'] != null) {
+              final user = body['data'] as Map<String, dynamic>;
+              // Actualizar caché con datos frescos del servidor
+              await prefs.setString(AppConstants.keyUser, jsonEncode(user));
+              if (!mounted) return;
+              setState(() {
+                _firstNameCtrl.text = user['first_name'] ?? '';
+                _lastNameCtrl.text = user['last_name'] ?? '';
+                _usernameCtrl.text = user['username'] ?? '';
+                _emailCtrl.text = user['email'] ?? '';
+                _phoneCtrl.text = user['phone'] ?? '';
+              });
+            }
+          }
+        }
+      } catch (_) {
+        // Fallo silencioso — ya mostramos datos del caché
       }
     } catch (e) {
       _showError('Error cargando perfil: $e');
