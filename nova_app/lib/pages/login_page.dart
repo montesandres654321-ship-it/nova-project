@@ -26,6 +26,38 @@ class _LoginPageState extends State<LoginPage> {
   // _loadSaved() lo corrige según la preferencia real guardada.
   bool _rememberMe = true;
 
+  // ── Navegación post-login ──────────────────────────────────
+  /// Si existe un return_route pendiente (guardado por NotificacionPreviewPage),
+  /// navega allí. En caso contrario va al home normal.
+  Future<void> _navigateAfterLogin({required bool showLocationBanner}) async {
+    final prefs       = await SharedPreferences.getInstance();
+    final returnRoute = prefs.getString('return_route');
+    final municipio   = prefs.getString('return_route_municipio') ?? '';
+
+    // Limpiar pendiente
+    await prefs.remove('return_route');
+    await prefs.remove('return_route_municipio');
+
+    if (!mounted) return;
+
+    if (returnRoute != null && returnRoute.isNotEmpty) {
+      // Reemplaza login y navega a la pantalla pendiente
+      Navigator.of(context).pushReplacementNamed(
+        returnRoute,
+        arguments: municipio.isNotEmpty ? municipio : null,
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const MainNavigationPage(),
+          settings: RouteSettings(
+            arguments: {'showLocationBanner': showLocationBanner},
+          ),
+        ),
+      );
+    }
+  }
+
   // ── Lifecycle ──────────────────────────────────────────────
 
   @override
@@ -120,14 +152,7 @@ class _LoginPageState extends State<LoginPage> {
           showLocationBanner = municipio == null;
         }
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const MainNavigationPage(),
-            settings: RouteSettings(
-              arguments: {'showLocationBanner': showLocationBanner},
-            ),
-          ),
-        );
+        await _navigateAfterLogin(showLocationBanner: showLocationBanner);
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -175,14 +200,7 @@ class _LoginPageState extends State<LoginPage> {
           showLocationBanner = municipio == null;
         }
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const MainNavigationPage(),
-            settings: RouteSettings(
-              arguments: {'showLocationBanner': showLocationBanner},
-            ),
-          ),
-        );
+        await _navigateAfterLogin(showLocationBanner: showLocationBanner);
       } else {
         final error = data['error']?.toString() ?? 'Error al iniciar con Google';
         // Si el error es por cuenta de admin, mostrar diálogo en vez de snackbar

@@ -21,6 +21,7 @@ import 'pages/about_page.dart';
 import 'pages/splash_page.dart';
 import 'pages/recomendaciones_page.dart';
 import 'pages/notificaciones_page.dart';
+import 'pages/notificacion_preview_page.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -70,8 +71,9 @@ class MyApp extends StatelessWidget {
         '/change-password': (context) => const ChangePasswordPage(),
         '/about':           (context) => const AboutPage(),
         '/history':         (context) => const HistoryPage(),
-        '/recomendaciones': (context) => const RecomendacionesPage(),
-        '/notificaciones':  (context) => const NotificacionesPage(),
+        '/recomendaciones':      (context) => const RecomendacionesPage(),
+        '/notificaciones':       (context) => const NotificacionesPage(),
+        '/notificacion-preview': (context) => const NotificacionPreviewPage(),
         // FIX: /success ELIMINADA — solo se navega con MaterialPageRoute
         // desde ScanPage con datos reales del backend
       },

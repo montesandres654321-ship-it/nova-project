@@ -25,12 +25,23 @@ class NotificationService {
 
     await _localNotif.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Usuario tocó la notificación local → navegar si hay municipio
-        final municipio = response.payload;
-        if (municipio != null && municipio.isNotEmpty) {
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        // Usuario tocó la notificación local (foreground) → chequear JWT
+        final municipio = response.payload ?? '';
+        if (municipio.isEmpty) return;
+
+        final prefs       = await SharedPreferences.getInstance();
+        final token       = prefs.getString(AppConstants.keyToken);
+        final tieneSession = token != null && token.isNotEmpty;
+
+        if (tieneSession) {
           navigatorKey.currentState
               ?.pushNamed('/recomendaciones', arguments: municipio);
+        } else {
+          navigatorKey.currentState?.pushNamed(
+            '/notificacion-preview',
+            arguments: {'municipio': municipio},
+          );
         }
       },
     );
@@ -130,15 +141,42 @@ class NotificationService {
     }
   }
 
+  /// Navega al destino correcto según si el usuario tiene sesión activa.
+  ///
+  /// • Con JWT  → /recomendaciones  (pantalla autenticada, muestra lugares completos)
+  /// • Sin JWT  → /notificacion-preview  (pantalla pública con preview + CTA de login)
+  static Future<void> _routeAfterTap(RemoteMessage message) async {
+    final municipio = message.data['municipio'] ?? '';
+    final title     = message.notification?.title ?? '';
+    final body      = message.notification?.body  ?? '';
+
+    print('[FCM] Tap en notificación — municipio: $municipio');
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AppConstants.keyToken);
+    final tieneSession = token != null && token.isNotEmpty;
+
+    if (tieneSession) {
+      // Usuario autenticado → directo a recomendaciones
+      navigatorKey.currentState
+          ?.pushNamed('/recomendaciones', arguments: municipio);
+    } else {
+      // Sin sesión → preview público con nombre, foto y tipo de lugares
+      navigatorKey.currentState?.pushNamed(
+        '/notificacion-preview',
+        arguments: {
+          'municipio': municipio,
+          'title':     title,
+          'body':      body,
+        },
+      );
+    }
+  }
+
   static void setupNotificationHandlers() {
     // App en background → usuario toca la notificación
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      final municipio = message.data['municipio'];
-      print('[FCM] Notificación abierta, municipio: $municipio');
-      if (municipio != null) {
-        navigatorKey.currentState
-            ?.pushNamed('/recomendaciones', arguments: municipio);
-      }
+      _routeAfterTap(message);
     });
 
     // App en foreground → mostrar en bandeja del sistema como notificación real
