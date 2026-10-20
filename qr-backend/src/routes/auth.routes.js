@@ -23,13 +23,26 @@ const prisma       = require('../config/prisma');
 const { authenticateToken, generateToken, decodeToken } = require('../middleware/auth');
 const { validate, schemas } = require('../middleware/validate');
 
-// ── Mailer — Resend API (reemplaza nodemailer+SMTP que Render free bloquea) ──
-// Inicialización lazy para que el servidor no crashee si falta la env var al arrancar
-const { Resend: ResendClass } = require('resend');
-let _resend = null;
-function getResend() {
-  if (!_resend) _resend = new ResendClass(process.env.RESEND_API_KEY);
-  return _resend;
+// ── Mailer — Brevo API HTTP (SMTP está bloqueado en Render free; envía a cualquier destinatario) ──
+function sendEmail({ to, subject, html }) {
+  return fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': process.env.BREVO_API_KEY,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: { name: 'Nova App', email: process.env.BREVO_SENDER_EMAIL || 'noreply@nova-app.com' },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  }).then(async r => {
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(JSON.stringify(body));
+    return body;
+  });
 }
 
 function serializeRaw(rows) {
@@ -325,13 +338,13 @@ router.post('/auth/forgot-password', async (req, res) => {
       // URL de la app móvil — deep link para abrir la pantalla de reset
       const resetUrl = `novaapp://reset-password?token=${token}`;
 
-      // Enviar email vía Resend (API HTTP — funciona en Render free tier)
-      if (process.env.RESEND_API_KEY) {
-        const { error: mailError } = await getResend().emails.send({
-          from: 'Nova App <onboarding@resend.dev>',
-          to:   user.email,
-          subject: 'Recupera tu contraseña en Nova',
-          html: `
+      // Enviar email vía Brevo (API HTTP — funciona en Render free tier)
+      if (process.env.BREVO_API_KEY) {
+        try {
+          await sendEmail({
+            to: user.email,
+            subject: 'Recupera tu contraseña en Nova',
+            html: `
             <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;background:#fff">
               <img src="https://nova-project-wk67.vercel.app/logo-nova.png" alt="Nova" width="80" style="margin-bottom:16px"/>
               <h2 style="color:#0071BD;margin:0 0 8px">Recupera tu contraseña</h2>
@@ -348,12 +361,12 @@ router.post('/auth/forgot-password', async (req, res) => {
               <p style="color:#9CA3AF;font-size:11px;text-align:center">© 2027 Nova · Turismo Sucre · Colombia</p>
             </div>
           `,
-        });
-        if (mailError) {
-          console.error('⚠️  Error enviando email Resend:', mailError);
+          });
+        } catch (mailErr) {
+          console.error('⚠️  Error enviando email Brevo:', mailErr.message);
         }
       } else {
-        console.warn('⚠️  RESEND_API_KEY no configurada — email no enviado. Token:', token);
+        console.warn('⚠️  BREVO_API_KEY no configurada — email no enviado. Token:', token);
       }
     }
 
