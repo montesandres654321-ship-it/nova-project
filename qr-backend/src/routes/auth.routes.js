@@ -18,14 +18,19 @@
 const express      = require('express');
 const bcrypt       = require('bcryptjs');
 const crypto       = require('crypto');
-const { Resend }   = require('resend');
 const router       = express.Router();
 const prisma       = require('../config/prisma');
 const { authenticateToken, generateToken, decodeToken } = require('../middleware/auth');
 const { validate, schemas } = require('../middleware/validate');
 
 // ── Mailer — Resend API (reemplaza nodemailer+SMTP que Render free bloquea) ──
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Inicialización lazy para que el servidor no crashee si falta la env var al arrancar
+const { Resend: ResendClass } = require('resend');
+let _resend = null;
+function getResend() {
+  if (!_resend) _resend = new ResendClass(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 function serializeRaw(rows) {
   return rows.map(row => {
@@ -322,7 +327,7 @@ router.post('/auth/forgot-password', async (req, res) => {
 
       // Enviar email vía Resend (API HTTP — funciona en Render free tier)
       if (process.env.RESEND_API_KEY) {
-        const { error: mailError } = await resend.emails.send({
+        const { error: mailError } = await getResend().emails.send({
           from: 'Nova App <onboarding@resend.dev>',
           to:   user.email,
           subject: 'Recupera tu contraseña en Nova',
