@@ -117,6 +117,7 @@ const ownerRouter     = require('./src/routes/owner.routes');
 const devicesRouter   = require('./src/routes/devices.routes');
 const locationRouter  = require('./src/routes/location.routes');
 const recommendationsRouter = require('./src/routes/recommendations.routes');
+const notificationsRouter   = require('./src/routes/notifications.routes');
 const { authenticateToken } = require('./src/middleware/auth');
 const { startScheduler } = require('./src/cron/scheduler');
 
@@ -160,6 +161,9 @@ app.use('/location', locationRouter);
 
 // Recommendations: /recommendations/:municipio (requiere JWT)
 app.use('/recommendations', authenticateToken, recommendationsRouter);
+
+// Notifications: /notifications/send-test, /notifications/log (requiere JWT + admin)
+app.use('/notifications', notificationsRouter);
 
 // auth-v2 desactivado — pendiente migración a PG antes de reactivar
 // app.use('/', authV2Router);

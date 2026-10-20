@@ -65,20 +65,31 @@ async function sendDailyNotifications(turno) {
     WHERE token IS NOT NULL AND municipio IS NOT NULL
   `;
 
+  if (rows.length === 0) {
+    console.log(`[Notificaciones turno ${turno}] Sin dispositivos registrados`);
+    return;
+  }
+
+  // Pre-cargar 3 lugares por cada municipio único — evita N+1 queries
+  const municipiosUnicos = [...new Set(rows.map(r => r.municipio).filter(Boolean))];
+  const lugaresPorMunicipio = {};
+
+  for (const mun of municipiosUnicos) {
+    const lugares = await prisma.$queryRaw`
+      SELECT name FROM places
+      WHERE municipio = ${mun} AND is_active = true
+      ORDER BY RANDOM() LIMIT 3
+    `;
+    lugaresPorMunicipio[mun] = lugares;
+  }
+
   let enviadas = 0, errores = 0;
 
   for (const row of rows) {
-    // Mensaje personalizado según municipio del usuario
     const mensajes = MENSAJES_POR_MUNICIPIO[row.municipio] ?? MENSAJES_POR_MUNICIPIO.default;
     const msg = mensajes[turno] ?? mensajes[0];
 
-    // Lugares reales de SU municipio
-    const lugares = await prisma.$queryRaw`
-      SELECT name FROM places
-      WHERE municipio = ${row.municipio} AND is_active = true
-      ORDER BY RANDOM() LIMIT 3
-    `;
-
+    const lugares = lugaresPorMunicipio[row.municipio] ?? [];
     const cuerpoFinal = lugares.length > 0
       ? `${msg.cuerpo}: ${lugares.map(l => l.name).join(', ')}`
       : msg.cuerpo;
@@ -105,11 +116,18 @@ async function sendDailyNotifications(turno) {
       enviadas++;
     } catch (err) {
       errores++;
-      console.error(`[FCM] token ${row.token.slice(0,20)}...: ${err.message}`);
+      // Token inválido/expirado — limpiar para no acumular tokens muertos
+      if (err.code === 'messaging/registration-token-not-registered') {
+        await prisma.$executeRaw`DELETE FROM device_tokens WHERE token = ${row.token}`;
+        console.warn(`[FCM] Token expirado eliminado: ${row.token.slice(0, 20)}...`);
+      } else {
+        console.error(`[FCM] token ${row.token.slice(0, 20)}...: ${err.message}`);
+      }
     }
   }
 
-  console.log(`[Notificaciones turno ${turno}] ✅ ${enviadas} enviadas ❌ ${errores} errores`);
+  console.log(`[Notificaciones turno ${turno}] ✅ ${enviadas} enviadas ❌ ${errores} errores de ${rows.length} dispositivos`);
+  return { turno, enviadas, errores, total: rows.length };
 }
 
 module.exports = { sendDailyNotifications };
