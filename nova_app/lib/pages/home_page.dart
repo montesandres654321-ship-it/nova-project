@@ -16,11 +16,13 @@
 /// [onNavigateToTab] — callback para navegar a otras tabs del [MainNavigationPage]
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../models/scan_record.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -108,7 +110,7 @@ const _kChips = [
   'Playas'
 ];
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ScanRecord? _lastScan;
   bool _loading = true;
   String _userName = '';
@@ -126,6 +128,7 @@ class _HomePageState extends State<HomePage> {
 
   // Badge de la campana de notificaciones.
   int _unreadCount = 0;
+  StreamSubscription<RemoteMessage>? _fcmSub;
 
   // Municipio resuelto por GPS (slug: 'sampues', 'sincelejo', etc.)
   String? _userMunicipio;
@@ -135,12 +138,36 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadUserData();
     _loadUnreadCount();
     _loadLastScan();
     _loadTopPlaces();
     _checkLocation();
     _loadMunicipioAndPing();
+
+    // Listener en tiempo real: cuando llega una notificación FCM con la
+    // app en foreground, actualiza el badge de la campana al instante
+    // sin esperar a que el usuario navegue al home.
+    _fcmSub = FirebaseMessaging.onMessage.listen((_) {
+      if (mounted) _loadUnreadCount();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _fcmSub?.cancel();
+    super.dispose();
+  }
+
+  // Recarga el badge cuando la app vuelve al primer plano (usuario cierra
+  // la pantalla de notificaciones con el botón back del sistema).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      _loadUnreadCount();
+    }
   }
 
   Future<void> _loadUnreadCount() async {
