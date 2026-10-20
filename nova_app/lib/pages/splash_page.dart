@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../core/design/app_colors.dart';
 import '../services/auth_service.dart';
@@ -28,9 +29,49 @@ class _SplashPageState extends State<SplashPage> {
   // muestra el flujo de bienvenida completo (permisos → onboarding →
   // login) — no se recuerda si el usuario ya lo vio antes.
   Future<void> _navigateNext() async {
+    // Ejecutamos splash y verificación de notificación en paralelo
     await Future.delayed(const Duration(milliseconds: 2500));
     if (!mounted) return;
 
+    // ── Verificar si la app fue abierta desde una notificación (app cerrada) ──
+    // getInitialMessage() solo devuelve algo cuando el usuario tocó una
+    // notificación FCM con la app completamente cerrada (terminated state).
+    final initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      // La app se abrió por tap en notificación — interceptamos el flujo normal
+      final municipio = initialMessage.data['municipio'] ?? '';
+      final title     = initialMessage.notification?.title ?? '';
+      final body      = initialMessage.notification?.body  ?? '';
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(AppConstants.keyToken);
+      final tieneSession = token != null && token.isNotEmpty;
+
+      if (!mounted) return;
+
+      if (tieneSession) {
+        // Usuario logueado → directo a recomendaciones
+        Navigator.of(context).pushReplacementNamed(
+          '/recomendaciones',
+          arguments: municipio,
+        );
+      } else {
+        // Sin sesión → preview público con info de los lugares
+        Navigator.of(context).pushReplacementNamed(
+          '/notificacion-preview',
+          arguments: {
+            'municipio': municipio,
+            'title':     title,
+            'body':      body,
+          },
+        );
+      }
+      return; // No continuar con el flujo normal de splash
+    }
+
+    // ── Flujo normal (app abierta sin notificación) ───────────────────────
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AppConstants.keyToken);
 
