@@ -126,6 +126,9 @@ class PlaceService {
       if (place.rewardIcon        != null) body['reward_icon']        = place.rewardIcon;
       body['reward_stock'] = place.rewardStock;
 
+      if (place.municipio != null) body['municipio'] = place.municipio;
+      if (place.latitud  != null) body['latitud']   = place.latitud;
+      if (place.longitud != null) body['longitud']  = place.longitud;
       if (place.ownerAdminId != null) body['owner_id'] = place.ownerAdminId;
 
       final response = await ApiClient.post<dynamic>('/places', body: body);

@@ -207,12 +207,14 @@ class Place {
     'sincelejo',
     'santiago_de_tolu',
     'covenas',
+    'sampues',
   ];
 
   static const Map<String, String> municipiosLabels = {
     'sincelejo':         'Sincelejo',
     'santiago_de_tolu':  'Santiago de Tolú',
     'covenas':           'Coveñas',
+    'sampues':           'Sampués',
   };
 
   // ── Getters ──────────────────────────────────────────
