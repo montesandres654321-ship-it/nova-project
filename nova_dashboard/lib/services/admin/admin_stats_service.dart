@@ -20,26 +20,30 @@ class AdminStatsService {
   }
 
   // ─── ESTADÍSTICAS DASHBOARD ────────────────────────────
-  // FIX: ahora incluye scansByDay en el return
+  // FIX: endpoint corregido → /dashboard/summary (el único que existe en backend).
+  // La respuesta viene como { success, data: { totalUsers, totalScans,
+  // activePlaces, pendingRewards, topPlaces, scansByDay, recentActivity } }
   static Future<Map<String, dynamic>> getDashboardStats() async {
     try {
-      final r = await ApiClient.get<dynamic>('/stats/dashboard');
+      final r = await ApiClient.get<dynamic>('/dashboard/summary');
       final d = r.data;
       if (d is! Map<String, dynamic>) throw ApiException('Formato inválido');
 
-      final raw = d['stats'] as Map<String, dynamic>? ?? d;
+      // El backend anida todo bajo 'data' cuando lo extrae ApiClient
+      final inner = d['data'] as Map<String, dynamic>? ?? d;
 
       return {
         'success': true,
         'stats': {
-          'users':   _toInt(raw['users']   ?? raw['totalUsers']   ?? d['totalUsers']),
-          'places':  _toInt(raw['places']  ?? raw['totalPlaces']  ?? d['totalPlaces']),
-          'scans':   _toInt(raw['scans']   ?? raw['totalScans']   ?? d['totalScans']),
-          'rewards': _toInt(raw['rewards'] ?? raw['totalRewards'] ?? d['totalRewards']),
+          'users':   _toInt(inner['totalUsers']   ?? inner['users']),
+          'places':  _toInt(inner['activePlaces'] ?? inner['totalPlaces'] ?? inner['places']),
+          'scans':   _toInt(inner['totalScans']   ?? inner['scans']),
+          'rewards': _toInt(inner['pendingRewards'] ?? inner['rewards']),
         },
-        'scansByDay':   d['scansByDay']   ?? [],   // ← FIX: ahora incluye scansByDay
-        'topPlaces':    d['topPlaces']    ?? [],
-        'placesByType': d['placesByType'] ?? {},
+        'scansByDay':     inner['scansByDay']     ?? [],
+        'topPlaces':      inner['topPlaces']      ?? [],
+        'placesByType':   inner['placesByType']   ?? {},
+        'recentActivity': inner['recentActivity'] ?? [],
       };
     } catch (e) {
       debugPrint('❌ getDashboardStats: $e');
@@ -47,9 +51,10 @@ class AdminStatsService {
         'success': false,
         'error': e.toString(),
         'stats': {'users': 0, 'places': 0, 'scans': 0, 'rewards': 0},
-        'scansByDay': [],   // ← FIX: también en el fallback
+        'scansByDay': [],
         'topPlaces': [],
         'placesByType': {},
+        'recentActivity': [],
       };
     }
   }

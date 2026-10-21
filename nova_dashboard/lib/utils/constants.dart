@@ -79,7 +79,7 @@ class AppConstants {
   // ──────────────────────────────────────────────────────────
   // ENDPOINTS — ESTADÍSTICAS DASHBOARD
   // ──────────────────────────────────────────────────────────
-  static const String dashboardStatsEndpoint    = '/stats/dashboard';
+  static const String dashboardStatsEndpoint    = '/dashboard/summary'; // FIX: corregido (antes: '/stats/dashboard' que no existe en el backend)
   static const String analyticsUsersEndpoint    = '/analytics/users/stats';
   static const String analyticsPlacesEndpoint   = '/analytics/places/stats';
 
@@ -93,7 +93,7 @@ class AppConstants {
   // ──────────────────────────────────────────────────────────
   // IMAGEN CONFIG
   // ──────────────────────────────────────────────────────────
-  static const int maxImageSizeBytes            = 2 * 1024 * 1024; // 2MB
+  static const int maxImageSizeBytes            = 5 * 1024 * 1024; // 5MB — alineado con el backend (multer)
   static const List<String> validImageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
 
   // ──────────────────────────────────────────────────────────
