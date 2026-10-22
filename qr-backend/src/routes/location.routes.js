@@ -49,6 +49,33 @@ router.post('/ping', authenticateToken, async (req, res) => {
       `;
     }
 
+    // ── Crear job de recomendación IA si el usuario está en un municipio ──
+    // Condición: tiene municipio resuelto + no tiene job pendiente/processing
+    // en las últimas 2 horas (evitar inundar el outbox con pings frecuentes)
+    if (municipio) {
+      try {
+        const recentJob = await prisma.$queryRaw`
+          SELECT id FROM notification_jobs
+          WHERE user_id = ${userId}
+            AND estado IN ('pending', 'processing')
+            AND created_at > NOW() - INTERVAL '2 hours'
+          LIMIT 1
+        `;
+
+        if (recentJob.length === 0) {
+          const eventId = `loc-${userId}-${Date.now()}`;
+          await prisma.$executeRaw`
+            INSERT INTO notification_jobs (event_id, user_id, municipio, estado)
+            VALUES (${eventId}, ${userId}, ${municipio}, 'pending')
+            ON CONFLICT (event_id) DO NOTHING
+          `;
+        }
+      } catch (jobErr) {
+        // No bloquear el ping si falla la creación del job
+        console.warn('[location/ping] No se pudo crear job de recomendación:', jobErr.message);
+      }
+    }
+
     res.json({ success: true, municipio });
   } catch (err) {
     console.error('[location/ping]', err.message);

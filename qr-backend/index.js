@@ -118,6 +118,7 @@ const devicesRouter   = require('./src/routes/devices.routes');
 const locationRouter  = require('./src/routes/location.routes');
 const recommendationsRouter = require('./src/routes/recommendations.routes');
 const notificationsRouter   = require('./src/routes/notifications.routes');
+const internalRouter        = require('./src/routes/internal.routes');
 const { authenticateToken } = require('./src/middleware/auth');
 const { startScheduler } = require('./src/cron/scheduler');
 
@@ -164,6 +165,13 @@ app.use('/recommendations', authenticateToken, recommendationsRouter);
 
 // Notifications: /notifications/send-test, /notifications/log (requiere JWT + admin)
 app.use('/notifications', notificationsRouter);
+
+// Internal (service-to-service, protegido por x-internal-secret / x-webhook-secret):
+//   GET  /internal/user-context/:userId     → contexto para n8n
+//   GET  /internal/recommendation-jobs      → outbox polling para n8n
+//   POST /webhooks/notificacion-ia          → n8n envía recomendación → backend FCM
+app.use('/internal', internalRouter);
+app.use('/webhooks', internalRouter);
 
 // auth-v2 desactivado — pendiente migración a PG antes de reactivar
 // app.use('/', authV2Router);

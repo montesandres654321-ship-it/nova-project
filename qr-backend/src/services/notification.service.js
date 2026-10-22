@@ -130,4 +130,37 @@ async function sendDailyNotifications(turno) {
   return { turno, enviadas, errores, total: rows.length };
 }
 
-module.exports = { sendDailyNotifications };
+
+// ─── sendNotificationToUser ───────────────────────────────────────────────────
+// Envía FCM a un token específico.
+// Usado por el webhook de n8n (/webhooks/notificacion-ia).
+//
+// @param {string} token       — FCM registration token del dispositivo
+// @param {string} titulo      — Título de la notificación (≤100 chars)
+// @param {string} cuerpo      — Cuerpo de la notificación (≤300 chars)
+// @param {object} [extraData] — Campos adicionales en data payload (strings únicamente)
+// @throws {Error}             — Si Firebase no está configurado o falla el envío
+async function sendNotificationToUser(token, titulo, cuerpo, extraData = {}) {
+  const firebaseAdmin = getFirebaseAdmin();
+  if (!firebaseAdmin) {
+    throw new Error('Firebase Admin no configurado — notificaciones desactivadas');
+  }
+
+  // Convertir todos los valores de extraData a string (FCM solo acepta strings)
+  const dataPayload = {};
+  for (const [k, v] of Object.entries(extraData)) {
+    dataPayload[k] = String(v);
+  }
+
+  await firebaseAdmin.messaging().send({
+    token,
+    notification: { title: titulo, body: cuerpo },
+    data: dataPayload,
+    android: {
+      priority: 'high',
+      notification: { sound: 'default', channelId: 'nova_recomendaciones' },
+    },
+  });
+}
+
+module.exports = { sendDailyNotifications, sendNotificationToUser };
