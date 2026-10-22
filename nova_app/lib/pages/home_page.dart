@@ -41,6 +41,8 @@ import 'deportes_page.dart';
 import 'escenarios_page.dart';
 import 'cultura_page.dart';
 import 'categoria_places_page.dart';
+import 'manglares_page.dart';
+import 'cienagas_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -407,6 +409,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 titulo: 'Naturaleza y parques',
                 verMasLabel: 'Ver lugares',
                 items: _kNaturalezaItems,
+                onTapItem: (i) {
+                  if (i == 0) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const ManglaresPage()));
+                  } else if (i == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const CienagasPage()));
+                  }
+                },
               ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
