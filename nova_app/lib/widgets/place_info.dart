@@ -9,6 +9,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_colors.dart';
@@ -36,7 +37,7 @@ class PlaceInfo extends StatelessWidget {
             'Descripción',
             Text(
               place.description,
-              style: const TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 14,
                 height: 1.6,
                 color: AppColors.textSecondary,
@@ -93,11 +94,11 @@ class PlaceInfo extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 14, color: AppColors.primary),
+                Icon(icon, size: 14, color: AppColors.bienvenidaAzul),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: GoogleFonts.openSans(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -107,10 +108,10 @@ class PlaceInfo extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               value,
-              style: const TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+                color: AppColors.bienvenidaTextoFuerte,
               ),
             ),
           ],
@@ -127,10 +128,10 @@ class PlaceInfo extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: AppColors.bienvenidaTextoFuerte,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -151,18 +152,18 @@ class PlaceInfo extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: AppColors.bienvenidaAzul.withValues(alpha: 0.08),
                   borderRadius: AppRadius.pillAll,
                   border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.20),
+                    color: AppColors.bienvenidaAzul.withValues(alpha: 0.20),
                   ),
                 ),
                 child: Text(
                   a,
-                  style: const TextStyle(
+                  style: GoogleFonts.openSans(
                     fontSize: 12,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.bienvenidaAzul,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ))
@@ -180,7 +181,7 @@ class PlaceInfo extends StatelessWidget {
         children: [
           Text(
             type.priceLabel.trim().replaceAll(':', ''),
-            style: const TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
@@ -189,10 +190,10 @@ class PlaceInfo extends StatelessWidget {
           const Spacer(),
           Text(
             place.priceRange ?? 'Consultar',
-            style: const TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              fontWeight: FontWeight.w700,
+              color: AppColors.bienvenidaAzul,
             ),
           ),
         ],
@@ -206,12 +207,12 @@ class PlaceInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contacto',
-            style: TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: AppColors.bienvenidaTextoFuerte,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -241,7 +242,7 @@ class PlaceInfo extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

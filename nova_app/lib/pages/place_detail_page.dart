@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_back_button.dart';
@@ -63,7 +64,7 @@ class PlaceDetailPage extends StatelessWidget {
         place.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        style: GoogleFonts.openSans(fontSize: 16, fontWeight: FontWeight.w700),
       ),
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.parallax,
@@ -78,38 +79,63 @@ class PlaceDetailPage extends StatelessWidget {
       children: [
         Hero(
           tag: 'place-hero-${place.id}',
-          child: Image.network(
-            place.imageUrl ?? type.placeholderImage,
-            fit: BoxFit.cover,
-            loadingBuilder: (_, child, prog) {
-              if (prog == null) return child;
-              return const ColoredBox(
-                color: AppColors.surfaceVariant,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                    strokeWidth: 2,
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (_, __, ___) => ColoredBox(
-              color: AppColors.surfaceVariant,
-              child: Icon(type.icon, size: 64, color: AppColors.textHint),
-            ),
-          ),
+          child: place.imageUrl != null
+              ? Image.network(
+                  place.imageUrl!,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (_, child, prog) {
+                    if (prog == null) return child;
+                    return _buildPlaceholderHero(type);
+                  },
+                  errorBuilder: (_, __, ___) => _buildPlaceholderHero(type),
+                )
+              : _buildPlaceholderHero(type),
         ),
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black38],
-              stops: [0.55, 1.0],
+              colors: [Colors.transparent, Colors.black45],
+              stops: [0.45, 1.0],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  /// Placeholder con gradiente + ícono del tipo — se muestra cuando
+  /// el lugar no tiene imagen o la URL falla.
+  Widget _buildPlaceholderHero(PlaceType type) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.bienvenidaAzul,
+            AppColors.primary,
+          ],
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(type.icon, size: 72, color: Colors.white.withValues(alpha: 0.6)),
+            const SizedBox(height: 12),
+            Text(
+              type.singular,
+              style: GoogleFonts.openSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

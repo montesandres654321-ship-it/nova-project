@@ -9,6 +9,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_colors.dart';
@@ -45,10 +46,10 @@ class PlaceHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   place.name,
-                  style: const TextStyle(
+                  style: GoogleFonts.openSans(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.bienvenidaTextoFuerte,
                   ),
                 ),
               ),
@@ -59,15 +60,15 @@ class PlaceHeader extends StatelessWidget {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.10),
+                  color: AppColors.bienvenidaAzul.withValues(alpha: 0.10),
                   borderRadius: AppRadius.pillAll,
                 ),
                 child: Text(
                   place.tipoLabel,
-                  style: const TextStyle(
+                  style: GoogleFonts.openSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: AppColors.bienvenidaAzul,
                   ),
                 ),
               ),
@@ -83,9 +84,9 @@ class PlaceHeader extends StatelessWidget {
                   color: AppColors.bienvenidaRojo.withValues(alpha: 0.10),
                   borderRadius: AppRadius.pillAll,
                 ),
-                child: const Text(
+                child: Text(
                   'Sede oficial · Juegos 2027',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
+                  style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
                 ),
               ),
             ),
@@ -102,7 +103,7 @@ class PlaceHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   place.lugar,
-                  style: const TextStyle(
+                  style: GoogleFonts.openSans(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -129,10 +130,10 @@ class PlaceHeader extends StatelessWidget {
           const SizedBox(width: AppSpacing.xs),
           Text(
             place.rating.toStringAsFixed(1),
-            style: const TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+              color: AppColors.bienvenidaTextoFuerte,
             ),
           ),
           const Spacer(),
@@ -145,10 +146,10 @@ class PlaceHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               place.priceRange!,
-              style: const TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+                color: AppColors.bienvenidaAzul,
               ),
             ),
           ] else if (type.hours.isNotEmpty) ...[
@@ -160,7 +161,7 @@ class PlaceHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               type.hours,
-              style: const TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

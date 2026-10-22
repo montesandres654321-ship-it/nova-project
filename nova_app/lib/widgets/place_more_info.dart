@@ -13,6 +13,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -20,6 +21,7 @@ import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
 import '../pages/place_detail_page.dart';
+import '../pages/mapa_page.dart';
 
 class PlaceMoreInfo extends StatelessWidget {
   final Place place;
@@ -62,7 +64,7 @@ class PlaceMoreInfo extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+        style: GoogleFonts.openSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
       ),
     );
   }
@@ -90,7 +92,7 @@ class PlaceMoreInfo extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: Text(d, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                        child: Text(d, style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
                       ),
                     ],
                   ),
@@ -136,7 +138,7 @@ class PlaceMoreInfo extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+            child: Text(text, style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textPrimary)),
           ),
         ],
       ),
@@ -150,37 +152,80 @@ class PlaceMoreInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: AppRadius.mdAll,
-            child: SizedBox(
-              height: 140,
-              child: IgnorePointer(
-                child: FlutterMap(
-                  options: MapOptions(
-                    initialCenter: punto,
-                    initialZoom: 14.5,
-                    interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
-                  ),
+          Builder(
+            builder: (ctx) => GestureDetector(
+              onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => const MapaPage())),
+              child: Stack(
                   children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.nova_app',
-                    ),
-                    MarkerLayer(markers: [
-                      Marker(
-                        point: punto,
-                        width: 32,
-                        height: 32,
-                        child: const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 32),
+                    ClipRRect(
+                      borderRadius: AppRadius.mdAll,
+                      child: SizedBox(
+                        height: 160,
+                        child: IgnorePointer(
+                          child: FlutterMap(
+                            options: MapOptions(
+                              initialCenter: punto,
+                              initialZoom: 14.5,
+                              interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName: 'com.example.nova_app',
+                              ),
+                              MarkerLayer(markers: [
+                                Marker(
+                                  point: punto,
+                                  width: 36,
+                                  height: 36,
+                                  child: const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 36),
+                                ),
+                              ]),
+                            ],
+                          ),
+                        ),
                       ),
-                    ]),
+                    ),
+                    // Botón "Ver en mapa"
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(999),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6)],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.map_rounded, size: 14, color: AppColors.primary),
+                            const SizedBox(width: 5),
+                            Text('Ver en mapa',
+                                style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
           const SizedBox(height: AppSpacing.xs),
-          Text(place.lugar, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          Row(
+            children: [
+              const Icon(Icons.location_on_rounded, size: 13, color: AppColors.textHint),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  place.lugar,
+                  style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -239,15 +284,15 @@ class _PlaceDondeQuedarse extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(hotel.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                  Text(hotel.lugar, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                      style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                  Text(hotel.lugar, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
                   Row(
                     children: [
                       const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
                       const SizedBox(width: 2),
-                      Text(hotel.rating.toStringAsFixed(1), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                      const Text(' · ', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
-                      const Text('Ver disponibilidad', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
+                      Text(hotel.rating.toStringAsFixed(1), style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                      Text(' · ', style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint)),
+                      Text('Ver disponibilidad', style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
                     ],
                   ),
                 ],
