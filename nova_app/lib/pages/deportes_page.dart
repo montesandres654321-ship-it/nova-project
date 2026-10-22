@@ -328,7 +328,7 @@ class DeportesPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 1.35,
+          childAspectRatio: 1.05,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),
@@ -358,7 +358,7 @@ class DeportesPage extends StatelessWidget {
             ),
             child: Icon(d.icono, size: 18, color: AppColors.bienvenidaCoral),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             d.nombre,
             style: GoogleFonts.openSans(

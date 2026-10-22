@@ -336,28 +336,27 @@ class _CienagasPageState extends State<CienagasPage> {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: destacada ? _kAzul2 : _kFondo,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(
-              f.icono,
-              size: 22,
-              color: destacada ? Colors.white : _kAzul2,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: destacada ? _kAzul2 : _kFondo,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  f.icono,
+                  size: 20,
+                  color: destacada ? Colors.white : _kAzul2,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
                   f.titulo,
                   style: GoogleFonts.openSans(
                     fontSize: 14,
@@ -365,16 +364,16 @@ class _CienagasPageState extends State<CienagasPage> {
                     color: AppColors.bienvenidaTextoFuerte,
                   ),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  f.descripcion,
-                  style: GoogleFonts.openSans(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            f.descripcion,
+            style: GoogleFonts.openSans(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              height: 1.55,
             ),
           ),
         ],

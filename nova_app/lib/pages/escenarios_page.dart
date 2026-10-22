@@ -380,47 +380,33 @@ class _EscenariosPageState extends State<EscenariosPage> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           // Dirección
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF7F9FB),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.directions_rounded, size: 14, color: AppColors.textHint),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    e.direccion,
-                    style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
-                  ),
+          Row(
+            children: [
+              const Icon(Icons.location_on_rounded, size: 12, color: AppColors.textHint),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  e.direccion,
+                  style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           // Disciplinas
-          Text(
-            'Disciplinas',
-            style: GoogleFonts.openSans(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppColors.bienvenidaTextoFuerte,
-            ),
-          ),
-          const SizedBox(height: 8),
           Wrap(
-            spacing: 8,
-            runSpacing: 6,
+            spacing: 6,
+            runSpacing: 5,
             children: [
               for (final d in e.disciplinas)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.bienvenidaBorde),
+                    color: const Color(0xFFE6F2FA),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
@@ -434,15 +420,18 @@ class _EscenariosPageState extends State<EscenariosPage> {
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           // Capacidad
           Row(
             children: [
-              const Icon(Icons.people_rounded, size: 14, color: AppColors.textHint),
-              const SizedBox(width: 6),
-              Text(
-                'Capacidad: ${e.capacidad.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} espectadores',
-                style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
+              const Icon(Icons.people_rounded, size: 12, color: AppColors.textHint),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  '${e.capacidad.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} espectadores',
+                  style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
