@@ -46,6 +46,7 @@ import 'cienagas_page.dart';
 import 'ruta_costera_page.dart';
 import 'ruta_patrimonio_page.dart';
 import 'ruta_cienagas_page.dart';
+import 'platos_tipicos_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -437,6 +438,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 titulo: 'Sabores y compras locales',
                 verMasLabel: 'Ver lugares',
                 items: _kSaboresItems,
+                onTapItem: (i) {
+                  if (i == 0) {
+                    // Restaurantes — usa CategoriaPlacesPage existente
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => const CategoriaPlacesPage(
+                        titulo: 'Restaurantes',
+                        tipo: 'restaurant',
+                      ),
+                    ));
+                  } else if (i == 1) {
+                    // Platos típicos — página dedicada con contenido curado
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => const PlatosTipicosPage(),
+                    ));
+                  } else if (i == 2) {
+                    // Compras y artesanías — CategoriaPlacesPage con tipo compras
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => const CategoriaPlacesPage(
+                        titulo: 'Compras y artesanías',
+                        tipo: 'compras',
+                      ),
+                    ));
+                  }
+                },
               ),
               const SizedBox(height: 24),
               _buildLoMejorValorado(),

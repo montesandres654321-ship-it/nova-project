@@ -48,8 +48,12 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
         return AppColors.bienvenidaVerde;
       case 'artesania':
         return const Color(0xFF8B4513);
+      case 'compras':
+        return const Color(0xFF7B3F00);
       case 'playa':
         return const Color(0xFF0891B2);
+      case 'gastronomia':
+        return const Color(0xFFB45309);
       default:
         return AppColors.bienvenidaAzul;
     }
@@ -65,8 +69,12 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
         return const Color(0xFFE7F4EB);
       case 'artesania':
         return const Color(0xFFFFF3E0);
+      case 'compras':
+        return const Color(0xFFFFF3E0);
       case 'playa':
         return const Color(0xFFE0F7FA);
+      case 'gastronomia':
+        return const Color(0xFFFFF8F0);
       default:
         return const Color(0xFFE6F2FA);
     }
@@ -82,8 +90,12 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
         return Icons.park_rounded;
       case 'artesania':
         return Icons.brush_rounded;
+      case 'compras':
+        return Icons.shopping_bag_rounded;
       case 'playa':
         return Icons.beach_access_rounded;
+      case 'gastronomia':
+        return Icons.set_meal_rounded;
       default:
         return Icons.place_rounded;
     }
@@ -99,8 +111,12 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
         return 'Parques y espacios naturales';
       case 'artesania':
         return 'Artesanías y cultura local';
+      case 'compras':
+        return 'Artesanías, sombreros y mercados locales';
       case 'playa':
         return 'Playas del Golfo de Morrosquillo';
+      case 'gastronomia':
+        return 'Cocina típica del Golfo de Morrosquillo';
       default:
         return 'Lugares destacados';
     }
