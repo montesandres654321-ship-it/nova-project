@@ -174,100 +174,110 @@ class DeportesPage extends StatelessWidget {
   }
 
   // ── Hero ─────────────────────────────────────────────────────
+  static const _kCoral1 = AppColors.bienvenidaCoral;
+  static const _kCoral2 = Color(0xFFD9502B);
+
   Widget _buildHero(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.bienvenidaCoral, Color(0xFFD9502B)],
-        ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      child: Stack(
-        children: [
-          // Resplandores decorativos
-          Positioned(left: -30, top: -20, child: _resplandor(120)),
-          Positioned(right: -20, bottom: -10, child: _resplandor(150)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Botón atrás
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white),
+      height: 240,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Foto de portada
+            Image.asset(
+              'assets/images/home/foto-deportes.png',
+              fit: BoxFit.cover,
+            ),
+            // Gradiente de color encima
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _kCoral1.withValues(alpha: 0.30),
+                    _kCoral2.withValues(alpha: 0.88),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              // Chip
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  'Juegos Nacionales y Paranacionales',
-                  style: GoogleFonts.openSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Deportes 2027',
-                style: GoogleFonts.openSans(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Golfo de Morrosquillo, Sucre · Octubre 2027',
-                style: GoogleFonts.openSans(
-                  fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
-              ),
-              const SizedBox(height: 18),
-              // Stats rápidos
-              Row(
+            ),
+            // Contenido
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatChip(Icons.emoji_events_rounded, '${_kDisciplinas.length}', 'Disciplinas'),
-                  const SizedBox(width: 10),
-                  _buildStatChip(Icons.calendar_today_rounded, '${_kCalendario.length}', 'Eventos'),
-                  const SizedBox(width: 10),
-                  _buildStatChip(Icons.location_on_rounded, '3', 'Sedes'),
+                  // Botón atrás
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white),
+                    ),
+                  ),
+                  const Spacer(),
+                  // Chip
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
+                    ),
+                    child: Text(
+                      'Juegos Nacionales y Paranacionales',
+                      style: GoogleFonts.openSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Deportes 2027',
+                    style: GoogleFonts.openSans(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Golfo de Morrosquillo, Sucre · Octubre 2027',
+                    style: GoogleFonts.openSans(
+                      fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  // Stats rápidos
+                  Row(
+                    children: [
+                      _buildStatChip(Icons.emoji_events_rounded, '${_kDisciplinas.length}', 'Disciplinas'),
+                      const SizedBox(width: 10),
+                      _buildStatChip(Icons.calendar_today_rounded, '${_kCalendario.length}', 'Eventos'),
+                      const SizedBox(width: 10),
+                      _buildStatChip(Icons.location_on_rounded, '3', 'Sedes'),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
-
-  Widget _resplandor(double size) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: Colors.white.withValues(alpha: 0.08),
-    ),
-  );
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
