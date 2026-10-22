@@ -43,6 +43,9 @@ import 'cultura_page.dart';
 import 'categoria_places_page.dart';
 import 'manglares_page.dart';
 import 'cienagas_page.dart';
+import 'ruta_costera_page.dart';
+import 'ruta_patrimonio_page.dart';
+import 'ruta_cienagas_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -401,8 +404,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 onVerMasTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const RutasPage())),
                 items: _kRutaItems,
-                onTapItem: (_) => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const RutasPage())),
+                onTapItem: (i) {
+                  if (i == 0) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const RutaCosteraPage()));
+                  } else if (i == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const RutaPatrimonioPage()));
+                  } else if (i == 2) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const RutaCienagasPage()));
+                  }
+                },
               ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
