@@ -101,6 +101,26 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
     }
   }
 
+  String get _fotoAsset {
+    switch (widget.tipo) {
+      case 'restaurant':
+        return 'assets/images/gastronomia/foto-restaurantes.png';
+      case 'compras':
+      case 'artesania':
+        return 'assets/images/rutas/foto-compras-artesanias.png';
+      case 'escenario_deportivo':
+        return 'assets/images/rutas/foto-escenarios-deportivos.png';
+      case 'parque':
+        return 'assets/images/rutas/foto-naturaleza-parques.png';
+      case 'playa':
+        return 'assets/images/rutas/foto-ruta-costera.png';
+      case 'gastronomia':
+        return 'assets/images/rutas/foto-gastronomia.png';
+      default:
+        return 'assets/images/rutas/foto-naturaleza-parques.png';
+    }
+  }
+
   String get _subtitulo {
     switch (widget.tipo) {
       case 'escenario_deportivo':
@@ -168,102 +188,114 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
 
   // ── Hero ──────────────────────────────────────────────────────
   Widget _buildHero(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_colorPrimario, _colorPrimario.withValues(alpha: 0.75)],
-        ),
+      height: 240,
+      child: ClipRRect(
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      child: Stack(
-        children: [
-          Positioned(left: -30, top: -20, child: _resplandor(130)),
-          Positioned(right: -20, bottom: -10, child: _resplandor(160)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_icono, size: 12, color: Colors.white),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Nova · Golfo de Morrosquillo',
-                      style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
-                    ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Foto de portada
+            Image.asset(
+              _fotoAsset,
+              fit: BoxFit.cover,
+            ),
+            // Gradiente de color encima
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _colorPrimario.withValues(alpha: 0.30),
+                    _colorPrimario.withValues(alpha: 0.88),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                widget.titulo,
-                style: GoogleFonts.openSans(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _subtitulo,
-                style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
-              ),
-              const SizedBox(height: 16),
-              if (!_loading && _error == null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.place_rounded, size: 14, color: Colors.white),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${_places.length} lugar${_places.length != 1 ? 'es' : ''} encontrado${_places.length != 1 ? 's' : ''}',
-                        style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+            ),
+            // Contenido
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
                       ),
-                    ],
+                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white),
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ],
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_icono, size: 12, color: Colors.white),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Nova · Golfo de Morrosquillo',
+                          style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.titulo,
+                    style: GoogleFonts.openSans(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _subtitulo,
+                    style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                  ),
+                  if (!_loading && _error == null) ...[
+                    const SizedBox(height: 14),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.place_rounded, size: 14, color: Colors.white),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${_places.length} lugar${_places.length != 1 ? 'es' : ''} encontrado${_places.length != 1 ? 's' : ''}',
+                            style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-
-  Widget _resplandor(double size) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.08)),
-  );
 
   // ── Cuerpo ────────────────────────────────────────────────────
   Widget _buildCuerpo() {

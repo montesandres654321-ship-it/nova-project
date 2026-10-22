@@ -112,7 +112,7 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/images/gastronomia/foto-restaurantes.png',
+              'assets/images/gastronomia/foto-platos-tipicos.png',
               fit: BoxFit.cover,
             ),
             Container(
