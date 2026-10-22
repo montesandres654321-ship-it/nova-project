@@ -79,72 +79,94 @@ class RutaJuegosPage extends StatelessWidget {
   }
 
   Widget _buildHero(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: 230,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      clipBehavior: Clip.antiAlias,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
-      ),
-      child: Stack(
-        children: [
-          Positioned(left: 75, top: -60, child: _resplandor(140)),
-          Positioned(left: 293, top: 0, child: _resplandor(160)),
-          Positioned(left: 125, top: 120, child: _resplandor(180)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      height: 240,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Foto de portada
+            Image.asset(
+              'assets/images/rutas/foto-escenarios-deportivos.png',
+              fit: BoxFit.cover,
+            ),
+            // Gradiente naranja encima
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xFFD97706).withValues(alpha: 0.35),
+                    const Color(0xFF92400E).withValues(alpha: 0.90),
+                  ],
+                ),
+              ),
+            ),
+            // Contenido encima
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), shape: BoxShape.circle),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: AppColors.bienvenidaAzul),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.25),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white),
+                        ),
+                      ),
+                      SvgPicture.asset('assets/images/logos/logo-juegos-nacionales-2027.svg', width: 92, height: 41),
+                    ],
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
+                    ),
+                    child: Text(
+                      'Nova · Rutas y recorridos',
+                      style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),
-                  SvgPicture.asset('assets/images/logos/logo-juegos-nacionales-2027.svg', width: 92, height: 41),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ruta oficial Juegos 2027',
+                    style: GoogleFonts.openSans(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '3 días · Coveñas, Santiago de Tolú y Sincelejo',
+                    style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFCD34D)),
+                      const SizedBox(width: 5),
+                      Text('4.9', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                      const SizedBox(width: 4),
+                      Text('(87 viajeros)', style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70)),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
-              Text(
-                'Ruta oficial Juegos Nacionales 2027',
-                style: GoogleFonts.openSans(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.bienvenidaAzul),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '3 días · Coveñas, Santiago de Tolú y Sincelejo',
-                style: GoogleFonts.openSans(fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  SvgPicture.asset('assets/icons/ic-estrella.svg', width: 14),
-                  const SizedBox(width: 6),
-                  Text('4.9', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
-                  const SizedBox(width: 4),
-                  Text('(87 viajeros)', style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint)),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _resplandor(double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.bienvenidaDorado.withValues(alpha: 0.18),
+            ),
+          ],
+        ),
       ),
     );
   }
