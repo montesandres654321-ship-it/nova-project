@@ -47,9 +47,21 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
     : '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'Origin',
+    'X-Requested-With',
+    // Headers internos (n8n service-to-service)
+    'x-internal-secret',
+    'x-webhook-secret',
+  ],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
   credentials: true,
+  // Cachear preflight 10 minutos — reduce latencia en uploads frecuentes
+  maxAge: 600,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

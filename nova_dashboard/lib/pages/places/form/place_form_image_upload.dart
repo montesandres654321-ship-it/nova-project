@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/constants.dart';
 
@@ -53,8 +54,20 @@ Future<String?> uploadPlaceImage(
       Uri.parse('${AppConstants.backendUrl}${AppConstants.uploadImageEndpoint}'),
     );
     request.headers['Authorization'] = 'Bearer $token';
+
+    // Determinar contentType a partir de la extensión del archivo.
+    // Sin esto, Dart envía application/octet-stream y multer rechaza el archivo.
+    final ext = file.name.split('.').last.toLowerCase();
+    final mimeSubtype = ext == 'jpg' ? 'jpeg' : ext; // jpg → jpeg
+    final contentType = MediaType('image', mimeSubtype);
+
     request.files.add(
-      http.MultipartFile.fromBytes('image', file.bytes!, filename: file.name),
+      http.MultipartFile.fromBytes(
+        'image',
+        file.bytes!,
+        filename: file.name,
+        contentType: contentType,
+      ),
     );
 
     final response = await request.send();
