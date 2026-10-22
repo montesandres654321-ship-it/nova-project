@@ -144,110 +144,117 @@ class _CienagasPageState extends State<CienagasPage> {
 
   // ── Hero ──────────────────────────────────────────────────────
   Widget _buildHero(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_kAzul1, _kAzul2],
-        ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      child: Stack(
-        children: [
-          Positioned(left: -30, top: -20, child: _resplandor(130)),
-          Positioned(right: -20, bottom: -10, child: _resplandor(160)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Botón atrás
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+      height: 240,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Foto de portada
+            Image.asset(
+              'assets/images/rutas/foto-ruta-cienagas.png',
+              fit: BoxFit.cover,
+            ),
+            // Gradiente azul agua encima
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _kAzul1.withValues(alpha: 0.30),
+                    _kAzul2.withValues(alpha: 0.88),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              // Chip categoría
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.water_rounded,
-                        size: 12, color: Colors.white),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Nova · Naturaleza y parques',
-                      style: GoogleFonts.openSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+            ),
+            // Contenido
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Botón atrás
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 16,
                         color: Colors.white,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Ciénagas',
-                style: GoogleFonts.openSans(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Humedales y fauna acuática del Golfo de Morrosquillo',
-                style: GoogleFonts.openSans(
-                  fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Stats
-              Row(
-                children: [
-                  for (final d in _kDatos) ...[
-                    _buildStatChip(d.icono, d.valor, d.etiqueta),
-                    const SizedBox(width: 10),
-                  ],
+                  ),
+                  const Spacer(),
+                  // Chip categoría
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.water_rounded,
+                            size: 12, color: Colors.white),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Nova · Naturaleza y parques',
+                          style: GoogleFonts.openSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Ciénagas',
+                    style: GoogleFonts.openSans(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Humedales y fauna acuática del Golfo de Morrosquillo',
+                    style: GoogleFonts.openSans(
+                      fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  // Stats
+                  Row(
+                    children: [
+                      for (final d in _kDatos) ...[
+                        _buildStatChip(d.icono, d.valor, d.etiqueta),
+                        const SizedBox(width: 10),
+                      ],
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
-
-  Widget _resplandor(double size) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.07),
-        ),
-      );
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
