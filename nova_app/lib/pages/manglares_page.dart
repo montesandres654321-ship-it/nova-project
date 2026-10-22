@@ -229,12 +229,12 @@ class _ManglaresPageState extends State<ManglaresPage> {
               ),
               const SizedBox(height: 20),
               // Stats
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  for (final d in _kDatos) ...[
+                  for (final d in _kDatos)
                     _buildStatChip(d.icono, d.valor, d.etiqueta),
-                    const SizedBox(width: 10),
-                  ],
                 ],
               ),
             ],

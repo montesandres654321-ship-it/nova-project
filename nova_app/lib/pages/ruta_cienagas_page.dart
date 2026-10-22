@@ -235,12 +235,16 @@ class _RutaCienagasPageState extends State<RutaCienagasPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(p.titulo,
                           style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
-                              color: AppColors.bienvenidaTextoFuerte)),
+                              color: AppColors.bienvenidaTextoFuerte),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
