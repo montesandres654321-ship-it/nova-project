@@ -39,6 +39,8 @@ import 'municipio_page.dart';
 import 'rutas_page.dart';
 import 'deportes_page.dart';
 import 'escenarios_page.dart';
+import 'cultura_page.dart';
+import 'categoria_places_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -368,6 +370,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 titulo: 'Juegos 2027',
                 tituloEspecial: true,
                 items: _kJuegosItems,
+                onTapItem: (i) {
+                  if (i == 0) {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const DeportesPage()));
+                  } else if (i == 1) {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EscenariosPage()));
+                  } else if (i == 2) {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturaPage()));
+                  }
+                },
               ),
               const SizedBox(height: 24),
               _buildSeccionCarrusel(
@@ -851,11 +862,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: _kChips.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (_, i) => NovaChip(
-          label: _kChips[i],
-          active: _chipActivo == _kChips[i],
-          onTap: () => setState(() => _chipActivo = _kChips[i]),
-        ),
+        itemBuilder: (_, i) {
+          const chipTipos = [
+            'escenario_deportivo',
+            'restaurant',
+            'parque',
+            'artesania',
+            'playa',
+          ];
+          return NovaChip(
+            label: _kChips[i],
+            active: _chipActivo == _kChips[i],
+            onTap: () {
+              setState(() => _chipActivo = _kChips[i]);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CategoriaPlacesPage(
+                    titulo: _kChips[i],
+                    tipo: chipTipos[i],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
