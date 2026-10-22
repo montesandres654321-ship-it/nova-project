@@ -37,6 +37,8 @@ import '../widgets/error_display_widget.dart';
 import 'place_detail_page.dart';
 import 'municipio_page.dart';
 import 'rutas_page.dart';
+import 'deportes_page.dart';
+import 'escenarios_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.onNavigateToTab});
@@ -762,10 +764,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Row(
                   children: [
                     Expanded(
-                        child: _buildBotonBanner('Deportes', solido: true)),
+                      child: _buildBotonBanner(
+                        'Deportes',
+                        solido: true,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DeportesPage(),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
-                        child: _buildBotonBanner('Escenarios', solido: false)),
+                      child: _buildBotonBanner(
+                        'Escenarios',
+                        solido: false,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const EscenariosPage(),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -791,23 +813,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildBotonBanner(String texto, {required bool solido}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: solido ? Colors.white : Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(999),
-        border: solido
-            ? null
-            : Border.all(color: Colors.white.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        texto,
-        style: GoogleFonts.openSans(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: solido ? AppColors.bienvenidaCoral : Colors.white,
+  Widget _buildBotonBanner(
+    String texto, {
+    required bool solido,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: solido ? Colors.white : Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(999),
+          border: solido
+              ? null
+              : Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        ),
+        child: Text(
+          texto,
+          style: GoogleFonts.openSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: solido ? AppColors.bienvenidaCoral : Colors.white,
+          ),
         ),
       ),
     );
