@@ -39,8 +39,8 @@ const _kMilestones = [500, 1000, 2000, 3500, 5000, 10000];
 
 // Colores cíclicos de las tarjetas de premio (azul/verde/coral del Figma)
 const _kPremioColores = [
-  (bg: Color(0xFFE6F2FA), fg: AppColors.bienvenidaAzul, icon: 'assets/icons/ic-gift-blue.svg'),
-  (bg: Color(0xFFE7F4EB), fg: AppColors.bienvenidaVerde, icon: 'assets/icons/ic-gift-green.svg'),
+  (bg: AppColors.sistemaAzulClaro, fg: AppColors.bienvenidaAzul, icon: 'assets/icons/ic-gift-blue.svg'),
+  (bg: AppColors.sistemaVerdeClaro, fg: AppColors.bienvenidaVerde, icon: 'assets/icons/ic-gift-green.svg'),
   (bg: Color(0xFFFDF1E3), fg: AppColors.bienvenidaCoral, icon: 'assets/icons/ic-gift-orange.svg'),
 ];
 
@@ -156,7 +156,7 @@ class _HistoryPageState extends State<HistoryPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0071BD), Color(0xFF005A96)],
+          colors: [AppColors.bienvenidaAzul, AppColors.sistemaAzulOscuro],
         ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
       ),
@@ -307,7 +307,7 @@ class _HistoryPageState extends State<HistoryPage> {
               onTap: isRedeeming ? null : () => _redeem(reward),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(color: const Color(0xFFF0F3F7), borderRadius: BorderRadius.circular(999)),
+                decoration: BoxDecoration(color: const AppColors.bienvenidaFondoChip, borderRadius: BorderRadius.circular(999)),
                 child: isRedeeming
                     ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
                     : Text('Canjear', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoMedio)),
@@ -458,7 +458,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget _buildItemEscaneo(ScanRecord scan) {
     final esVerde = scan.hasReward;
-    final colorFondoIcono = esVerde ? const Color(0xFFE7F4EB) : const Color(0xFFEAF7FF);
+    final colorFondoIcono = esVerde ? const AppColors.sistemaVerdeClaro : const Color(0xFFEAF7FF);
     final colorTextoReward = esVerde ? AppColors.bienvenidaVerde : AppColors.bienvenidaAzul;
     final hora = '${scan.time.toLocal().hour.toString().padLeft(2, '0')}:${scan.time.toLocal().minute.toString().padLeft(2, '0')}';
 

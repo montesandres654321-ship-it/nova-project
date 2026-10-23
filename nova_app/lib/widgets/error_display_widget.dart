@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_colors.dart';
 
 class ErrorDisplayWidget extends StatelessWidget {
   final String mensaje;
@@ -21,14 +22,14 @@ class ErrorDisplayWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.wifi_off_rounded, size: 56, color: Color(0xFF9CA3AF)),
+            const Icon(Icons.wifi_off_rounded, size: 56, color: AppColors.textHint),
             const SizedBox(height: 16),
             Text(
               mensaje,
               style: GoogleFonts.openSans(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
-                color: const Color(0xFF6B7280),
+                color: const AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -37,7 +38,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               ElevatedButton(
                 onPressed: onRetry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0071BD),
+                  backgroundColor: const AppColors.bienvenidaAzul,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   elevation: 0,
@@ -81,13 +82,13 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icono, size: 56, color: const Color(0xFF9CA3AF)),
+            Icon(icono, size: 56, color: const AppColors.textHint),
             const SizedBox(height: 16),
             Text(
               mensaje,
               style: GoogleFonts.openSans(
                 fontSize: 15,
-                color: const Color(0xFF6B7280),
+                color: const AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -100,7 +101,7 @@ class EmptyStateWidget extends StatelessWidget {
                   style: GoogleFonts.openSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0071BD),
+                    color: const AppColors.bienvenidaAzul,
                   ),
                 ),
               ),

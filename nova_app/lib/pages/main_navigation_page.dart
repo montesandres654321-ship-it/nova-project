@@ -30,6 +30,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/design/app_colors.dart';
 import 'home_page.dart';
 import 'places_page.dart';
 import 'history_page.dart';
@@ -110,7 +111,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
       height: 52,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF0071BD), Color(0xFF078930)],
+          colors: [AppColors.bienvenidaAzul, AppColors.bienvenidaVerde],
         ),
         shape: BoxShape.circle,
       ),

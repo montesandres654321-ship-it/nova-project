@@ -76,7 +76,7 @@ class _Dato {
 // ── Colores del tema ──────────────────────────────────────────
 const _kVerde1 = Color(0xFF14532D);
 const _kVerde2 = Color(0xFF166534);
-const _kFondo = Color(0xFFE7F4EB);
+const _kFondo = AppColors.sistemaVerdeClaro;
 
 // ── Widget principal ──────────────────────────────────────────
 class ManglaresPage extends StatefulWidget {

@@ -73,7 +73,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FB),
+      backgroundColor: const AppColors.bienvenidaFondoInput,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -105,7 +105,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
                     Container(
                       width: 139,
                       height: 139,
-                      decoration: const BoxDecoration(color: Color(0xFFE7F4EB), shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: AppColors.sistemaVerdeClaro, shape: BoxShape.circle),
                       child: Center(
                         child: Container(
                           width: 84,
@@ -121,7 +121,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
 
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(color: const Color(0xFFE7F4EB), borderRadius: BorderRadius.circular(999)),
+                      decoration: BoxDecoration(color: const AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
                       child: Text(
                         'TU ESCANEO FUE VALIDADO',
                         style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde, letterSpacing: 0.5),

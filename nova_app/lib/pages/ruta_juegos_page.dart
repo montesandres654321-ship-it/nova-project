@@ -197,7 +197,7 @@ class RutaJuegosPage extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(color: const Color(0xFFE6F2FA), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: const AppColors.sistemaAzulClaro, borderRadius: BorderRadius.circular(10)),
             child: Text(d.dia, style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.bienvenidaAzul)),
           ),
           const SizedBox(width: 14),
@@ -267,7 +267,7 @@ class RutaJuegosPage extends StatelessWidget {
                     Container(
                       width: 48,
                       height: 48,
-                      decoration: const BoxDecoration(color: Color(0xFFE6F2FA), shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: AppColors.sistemaAzulClaro, shape: BoxShape.circle),
                       child: const Icon(Icons.apartment_rounded, color: AppColors.bienvenidaAzul, size: 22),
                     ),
                     const SizedBox(width: 12),
@@ -285,7 +285,7 @@ class RutaJuegosPage extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(color: const Color(0xFFE7F4EB), borderRadius: BorderRadius.circular(999)),
+                      decoration: BoxDecoration(color: const AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
                       child: Text('Verificado', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
                     ),
                   ],
@@ -329,7 +329,7 @@ class RutaJuegosPage extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(color: const Color(0xFFF7F9FB), borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: const AppColors.bienvenidaFondoInput, borderRadius: BorderRadius.circular(12)),
         child: Row(
           children: [
             SvgPicture.asset(icon, width: 20, height: 20),

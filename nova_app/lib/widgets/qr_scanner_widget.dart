@@ -14,7 +14,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../core/design/app_colors.dart';
 
 // Colores del marco de escaneo — Figma NOVA_MAPA_RUTAS_SCAN_RECOMPENSAS_PLAN.md
-const _kMarcoVerde = Color(0xFF078930);
+const _kMarcoVerde = AppColors.bienvenidaVerde;
 const _kLineaVerdeClara = Color(0xFF4ADE80);
 
 class QrScannerWidget extends StatefulWidget {

@@ -187,7 +187,7 @@ class _NotificacionPreviewPageState
     final municipioLabel = _kMunicipioLabels[_municipio] ?? _municipio;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FB),
+      backgroundColor: const AppColors.bienvenidaFondoInput,
       body: CustomScrollView(
         slivers: [
           // ── AppBar con gradiente del sistema de diseño ────────────────

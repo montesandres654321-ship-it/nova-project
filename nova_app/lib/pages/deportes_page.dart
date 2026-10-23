@@ -175,7 +175,7 @@ class DeportesPage extends StatelessWidget {
 
   // ── Hero ─────────────────────────────────────────────────────
   static const _kCoral1 = AppColors.bienvenidaCoral;
-  static const _kCoral2 = Color(0xFFD9502B);
+  static const _kCoral2 = AppColors.categoriaGastro;
 
   Widget _buildHero(BuildContext context) {
     return SizedBox(
@@ -353,7 +353,7 @@ class DeportesPage extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: const BoxDecoration(
-              color: Color(0xFFFFF0EC),
+              color: AppColors.categoriaGastroBg,
               shape: BoxShape.circle,
             ),
             child: Icon(d.icono, size: 18, color: AppColors.bienvenidaCoral),
@@ -414,7 +414,7 @@ class DeportesPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: esPrimero ? const Color(0xFFFFF0EC) : Colors.white,
+        color: esPrimero ? const AppColors.categoriaGastroBg : Colors.white,
         border: Border.all(
           color: esPrimero
               ? AppColors.bienvenidaCoral.withValues(alpha: 0.3)

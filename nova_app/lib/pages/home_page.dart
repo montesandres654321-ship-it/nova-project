@@ -638,7 +638,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF0071BD), Color(0xFF078930)],
+            colors: [AppColors.bienvenidaAzul, AppColors.bienvenidaVerde],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white.withValues(alpha: 0.15)),

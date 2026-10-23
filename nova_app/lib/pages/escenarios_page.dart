@@ -43,7 +43,7 @@ const _kEscenarios = [
     capacidad: 5000,
     estado: 'Habilitado',
     icono: Icons.stadium_rounded,
-    colorFondo: Color(0xFFE6F2FA),
+    colorFondo: AppColors.sistemaAzulClaro,
   ),
   _Escenario(
     nombre: 'Estadio Jaraguay',
@@ -53,7 +53,7 @@ const _kEscenarios = [
     capacidad: 12000,
     estado: 'Habilitado',
     icono: Icons.sports_soccer_rounded,
-    colorFondo: Color(0xFFE7F4EB),
+    colorFondo: AppColors.sistemaVerdeClaro,
   ),
   _Escenario(
     nombre: 'Unidad Acuática Municipal',
@@ -63,7 +63,7 @@ const _kEscenarios = [
     capacidad: 2000,
     estado: 'En adecuación',
     icono: Icons.pool_rounded,
-    colorFondo: Color(0xFFE6F2FA),
+    colorFondo: AppColors.sistemaAzulClaro,
   ),
   _Escenario(
     nombre: 'Escenario Deportivo Coveñas',
@@ -73,7 +73,7 @@ const _kEscenarios = [
     capacidad: 3000,
     estado: 'Habilitado',
     icono: Icons.directions_bike_rounded,
-    colorFondo: Color(0xFFFFF0EC),
+    colorFondo: AppColors.categoriaGastroBg,
   ),
   _Escenario(
     nombre: 'Polideportivo Santiago de Tolú',
@@ -83,7 +83,7 @@ const _kEscenarios = [
     capacidad: 1500,
     estado: 'Habilitado',
     icono: Icons.sports_martial_arts_rounded,
-    colorFondo: Color(0xFFF5F0FF),
+    colorFondo: AppColors.categoriaPatrimonioBg,
   ),
   _Escenario(
     nombre: 'Cancha Múltiple Tolú',
@@ -366,7 +366,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: habilitado ? const Color(0xFFE7F4EB) : const Color(0xFFFFF8E1),
+                  color: habilitado ? const AppColors.sistemaVerdeClaro : const Color(0xFFFFF8E1),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -406,7 +406,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE6F2FA),
+                    color: const AppColors.sistemaAzulClaro,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
