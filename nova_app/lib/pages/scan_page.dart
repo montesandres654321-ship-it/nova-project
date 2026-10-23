@@ -35,7 +35,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
@@ -166,7 +165,7 @@ class _ScanPageState extends State<ScanPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: _kFondoOscuro,
         title: Text('Ingresar código manualmente',
-            style: GoogleFonts.openSans(color: Colors.white, fontWeight: FontWeight.w700)),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -211,12 +210,12 @@ class _ScanPageState extends State<ScanPage> {
                   children: [
                     Text(
                       'Escanea y descubre',
-                      style: GoogleFonts.openSans(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'En escenarios, parques, museos, restaurantes y comercios aliados encontrarás códigos QR que te permiten descubrir historias, información del evento y recompensas exclusivas de los Juegos Nacionales y Paranacionales 2027.',
-                      style: GoogleFonts.openSans(fontSize: 14, color: _kTextoSuave, height: 22 / 14),
+                      style: TextStyle(fontSize: 14, color: _kTextoSuave, height: 22 / 14),
                     ),
                   ],
                 ),
@@ -317,12 +316,12 @@ class _ScanPageState extends State<ScanPage> {
                               children: [
                                 Text(
                                   'Ganas 150 puntos por cada escaneo',
-                                  style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'Llevas ${_totalScans * 150} puntos acumulados',
-                                  style: GoogleFonts.openSans(fontSize: 12, color: _kTextoSuave),
+                                  style: TextStyle(fontSize: 12, color: _kTextoSuave),
                                 ),
                               ],
                             ),
@@ -342,7 +341,7 @@ class _ScanPageState extends State<ScanPage> {
                         ),
                         child: Text(
                           'Ingresar el código manualmente',
-                          style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
                         ),
                       ),
                     ),

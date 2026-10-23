@@ -14,7 +14,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
@@ -53,7 +52,7 @@ class EmailInput extends StatelessWidget {
         children: [
           Text(
             figmaLabel!,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.bienvenidaTextoMedio,
@@ -70,14 +69,14 @@ class EmailInput extends StatelessWidget {
               controller: controller,
               keyboardType: TextInputType.emailAddress,
               enabled: enabled,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: AppColors.bienvenidaTextoFuerte,
               ),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: GoogleFonts.openSans(
+                hintStyle: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textHint,

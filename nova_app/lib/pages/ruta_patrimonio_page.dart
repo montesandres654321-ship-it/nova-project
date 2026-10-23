@@ -5,7 +5,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -134,14 +134,14 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
                       border: Border.all(color: _kChip.withValues(alpha: 0.5)),
                     ),
                     child: Text('Ruta Patrimonio',
-                        style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
                   ),
                   const SizedBox(height: 8),
                   Text('Historia y cultura',
-                      style: GoogleFonts.openSans(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('Sincelejo · Sampués · Patrimonio sabanero',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70)),
                 ],
               ),
             ),
@@ -182,7 +182,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
           Icon(icon, size: 14, color: _kAmbar1),
           const SizedBox(width: 6),
           Text(label,
-              style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: _kAmbar1)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kAmbar1)),
         ],
       ),
     );
@@ -196,7 +196,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Itinerario del día',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 14),
           for (int i = 0; i < _kParadas.length; i++) ...[
             _buildParada(_kParadas[i]),
@@ -238,7 +238,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
                   children: [
                     Expanded(
                       child: Text(p.titulo,
-                          style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                               color: AppColors.bienvenidaTextoFuerte)),
                     ),
                     Container(
@@ -248,13 +248,13 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(p.tiempo,
-                          style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: _kAmbar1)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _kAmbar1)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 5),
                 Text(p.descripcion,
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
               ],
             ),
           ),
@@ -271,10 +271,10 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Sitios culturales registrados',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 4),
           Text('Museos, galerías y centros culturales',
-              style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 14),
           _buildLugaresContent(),
         ],
@@ -291,7 +291,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
         child: Column(
           children: [
             Text('No se pudo cargar los lugares',
-                style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                style: AppTextStyles.bodySm),
             const SizedBox(height: 8),
             TextButton(onPressed: _cargarLugares, child: const Text('Reintentar')),
           ],
@@ -303,7 +303,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text('Próximamente más sitios culturales',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textHint)),
+              style: TextStyle(fontSize: 13, color: AppColors.textHint)),
         ),
       );
     }
@@ -337,15 +337,15 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(place.displayName,
-                        style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                             color: AppColors.bienvenidaTextoFuerte)),
                     const SizedBox(height: 3),
                     Text('${place.tipoEmoji} ${place.tipoLabel}',
-                        style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary)),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                     if (place.lugar != null) ...[
                       const SizedBox(height: 2),
                       Text(place.lugar!,
-                          style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
+                          style: TextStyle(fontSize: 11, color: AppColors.textHint)),
                     ],
                   ],
                 ),
@@ -389,10 +389,10 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Patrimonio nacional',
-                      style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('El sombrero vueltiao de Sampués es Patrimonio Cultural Inmaterial de la Humanidad (UNESCO 2017).',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70, height: 1.4)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.4)),
                 ],
               ),
             ),

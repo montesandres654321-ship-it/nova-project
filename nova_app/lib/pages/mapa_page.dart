@@ -21,8 +21,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -240,7 +240,7 @@ class _MapaPageState extends State<MapaPage> {
                 children: [
                   SvgPicture.asset('assets/icons/ic-buscar.svg', width: 18),
                   const SizedBox(width: 10),
-                  Text('Explorar Sucre', style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textHint)),
+                  Text('Explorar Sucre', style: TextStyle(fontSize: 14, color: AppColors.textHint)),
                 ],
               ),
             ),
@@ -314,7 +314,7 @@ class _MapaPageState extends State<MapaPage> {
         ),
         child: Text(
           texto,
-          style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: activo ? Colors.white : AppColors.bienvenidaTextoMedio),
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: activo ? Colors.white : AppColors.bienvenidaTextoMedio),
         ),
       ),
     );
@@ -343,19 +343,19 @@ class _MapaPageState extends State<MapaPage> {
                           Text(
                             _error!,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                            style: AppTextStyles.bodySm,
                           ),
                           const SizedBox(height: 8),
                           TextButton(
                             onPressed: _loadPlaces,
                             child: Text('Reintentar',
-                                style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
                           ),
                         ],
                       )
                     : Text(
                         _loading ? 'Cargando lugares…' : 'Aún no hay lugares con ubicación en el mapa.',
-                        style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                        style: AppTextStyles.bodySm,
                       ),
               ),
             )
@@ -378,17 +378,17 @@ class _MapaPageState extends State<MapaPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(p.name, style: GoogleFonts.openSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                        Text(p.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                         const SizedBox(height: 4),
                         Text('${p.tipoLabel} · ${p.lugar}',
-                            style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                            style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         const SizedBox(height: 6),
                         Row(
                           children: [
                             const Icon(Icons.star_rounded, size: 15, color: AppColors.bienvenidaDorado),
                             const SizedBox(width: 4),
-                            Text('${p.rating}', style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
-                            Text(' · Ver disponibilidad', style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
+                            Text('${p.rating}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                            Text(' · Ver disponibilidad', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
                           ],
                         ),
                       ],
@@ -412,7 +412,7 @@ class _MapaPageState extends State<MapaPage> {
                         minimumSize: const Size(0, 45),
                       ),
                       child: Text('Cómo llegar',
-                          style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -426,7 +426,7 @@ class _MapaPageState extends State<MapaPage> {
                         elevation: 0,
                       ),
                       child: Text('Ver lugar',
-                          style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
                   ),
                 ],

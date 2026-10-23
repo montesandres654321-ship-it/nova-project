@@ -5,7 +5,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -134,14 +134,14 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
                       border: Border.all(color: _kChip.withValues(alpha: 0.6)),
                     ),
                     child: Text('Ruta Costera',
-                        style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
                   ),
                   const SizedBox(height: 8),
                   Text('Playas y manglares',
-                      style: GoogleFonts.openSans(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('Coveñas · Santiago de Tolú · Golfo de Morrosquillo',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70)),
                 ],
               ),
             ),
@@ -182,7 +182,7 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
           Icon(icon, size: 14, color: _kTeal1),
           const SizedBox(width: 6),
           Text(label,
-              style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: _kTeal1)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kTeal1)),
         ],
       ),
     );
@@ -196,7 +196,7 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Itinerario del día',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 14),
           for (int i = 0; i < _kParadas.length; i++) ...[
             _buildParada(_kParadas[i], i),
@@ -245,7 +245,7 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
                   children: [
                     Expanded(
                       child: Text(p.titulo,
-                          style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                               color: AppColors.bienvenidaTextoFuerte)),
                     ),
                     Container(
@@ -255,13 +255,13 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(p.tiempo,
-                          style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: _kTeal1)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _kTeal1)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 5),
                 Text(p.descripcion,
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
               ],
             ),
           ),
@@ -278,10 +278,10 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Playas y lugares cercanos',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 4),
           Text('Establecimientos registrados en la ruta',
-              style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 14),
           _buildLugaresContent(),
         ],
@@ -303,7 +303,7 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
         child: Column(
           children: [
             Text('No se pudo cargar los lugares',
-                style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                style: AppTextStyles.bodySm),
             const SizedBox(height: 8),
             TextButton(onPressed: _cargarLugares, child: const Text('Reintentar')),
           ],
@@ -315,7 +315,7 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text('Próximamente más lugares en esta ruta',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textHint)),
+              style: TextStyle(fontSize: 13, color: AppColors.textHint)),
         ),
       );
     }
@@ -351,15 +351,15 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(place.displayName,
-                        style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                             color: AppColors.bienvenidaTextoFuerte)),
                     const SizedBox(height: 3),
                     Text('${place.tipoEmoji} ${place.tipoLabel}',
-                        style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary)),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                     if (place.lugar != null) ...[
                       const SizedBox(height: 2),
                       Text(place.lugar!,
-                          style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
+                          style: TextStyle(fontSize: 11, color: AppColors.textHint)),
                     ],
                   ],
                 ),
@@ -403,10 +403,10 @@ class _RutaCosteraPageState extends State<RutaCosteraPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Consejo de viaje',
-                      style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('Sal temprano para aprovechar la marea baja en el manglar y llegar a Múcura antes del mediodía.',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70, height: 1.4)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.4)),
                 ],
               ),
             ),

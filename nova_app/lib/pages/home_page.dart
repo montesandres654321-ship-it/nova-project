@@ -21,7 +21,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../models/scan_record.dart';
 import '../models/place_model.dart';
@@ -554,7 +553,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         children: [
                           Text(
                             'Hola, $_userName',
-                            style: GoogleFonts.openSans(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -572,7 +571,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               Flexible(
                                 child: Text(
                                   'Estás en $_userLocation',
-                                  style: GoogleFonts.openSans(
+                                  style: TextStyle(
                                       fontSize: 13, color: Colors.white),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -616,7 +615,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         const SizedBox(width: 10),
                         Text(
                           '¿Tienes un lugar en mente?',
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                               fontSize: 14, color: AppColors.textHint),
                         ),
                       ],
@@ -674,7 +673,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       children: [
                         Text(
                           'Escanear QR',
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -682,7 +681,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ),
                         Text(
                           'Toca para escanear un lugar',
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                               fontSize: 12,
                               color: AppColors.bienvenidaAzulClaro),
                         ),
@@ -726,7 +725,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 children: [
                   Text(
                     _lastScan!.local,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaTextoFuerte,
@@ -737,7 +736,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   const SizedBox(height: 2),
                   Text(
                     _lastScan!.place,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 12, color: AppColors.textSecondary),
                   ),
                 ],
@@ -751,7 +750,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               child: Text(
                 'Hoy',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaAzul,
@@ -804,7 +803,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 const SizedBox(height: 14),
                 Text(
                   'Juegos Nacionales y Paranacionales 2027',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -814,7 +813,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 const SizedBox(height: 6),
                 Text(
                   'Agenda, escenarios, cultura, gastronomía y naturaleza de los tres municipios sede.',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.bienvenidaAzulClaro,
                     height: 19 / 13,
@@ -867,7 +866,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
       child: Text(
         texto,
-        style: GoogleFonts.openSans(
+        style: TextStyle(
             fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
       ),
     );
@@ -892,7 +891,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         child: Text(
           texto,
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: solido ? AppColors.bienvenidaCoral : Colors.white,
@@ -959,7 +958,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             children: [
               Text(
                 titulo,
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: tituloEspecial ? 15 : 18,
                   fontWeight: FontWeight.w700,
                   color: tituloEspecial
@@ -972,7 +971,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   onTap: onVerMasTap,
                   child: Text(
                     verMasLabel,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.bienvenidaAzul,
@@ -1011,7 +1010,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Lo mejor valorado',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaTextoFuerte,
@@ -1034,7 +1033,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Aún no hay lugares para mostrar.',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                   fontSize: 13, color: AppColors.textSecondary),
             ),
           )

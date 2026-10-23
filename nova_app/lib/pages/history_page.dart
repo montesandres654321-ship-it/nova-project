@@ -23,7 +23,7 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../models/scan_record.dart';
 import '../services/api_service.dart';
@@ -165,7 +165,7 @@ class _HistoryPageState extends State<HistoryPage> {
         children: [
           Text(
             'Mis beneficios · Juegos 2027',
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
           ),
           const SizedBox(height: 20),
           Container(
@@ -180,11 +180,11 @@ class _HistoryPageState extends State<HistoryPage> {
               children: [
                 Text(
                   '$_totalPoints',
-                  style: GoogleFonts.openSans(fontSize: 40, fontWeight: FontWeight.w800, color: Colors.white),
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
                 Text(
                   'puntos Nova acumulados',
-                  style: GoogleFonts.openSans(fontSize: 13, color: AppColors.bienvenidaAzulClaro),
+                  style: TextStyle(fontSize: 13, color: AppColors.bienvenidaAzulClaro),
                 ),
                 const SizedBox(height: 14),
                 ClipRRect(
@@ -201,7 +201,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   restantes > 0
                       ? '$restantes puntos más para tu próximo nivel'
                       : '¡Alcanzaste el nivel máximo por ahora!',
-                  style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
+                  style: TextStyle(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
                 ),
               ],
             ),
@@ -220,7 +220,7 @@ class _HistoryPageState extends State<HistoryPage> {
         children: [
           Text(
             'Tus recompensas',
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
           ),
           const SizedBox(height: 12),
           if (_rewardsLoading)
@@ -229,11 +229,11 @@ class _HistoryPageState extends State<HistoryPage> {
               child: LinearProgressIndicator(minHeight: 2),
             )
           else if (_rewardsError.isNotEmpty)
-            Text(_rewardsError, style: GoogleFonts.openSans(fontSize: 13, color: AppColors.error))
+            Text(_rewardsError, style: TextStyle(fontSize: 13, color: AppColors.error))
           else if (_rewards.isEmpty)
             Text(
               'Escanea QR en los establecimientos aliados para ganar recompensas.',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+              style: AppTextStyles.bodySm,
             )
           else
             Column(
@@ -281,14 +281,14 @@ class _HistoryPageState extends State<HistoryPage> {
               children: [
                 Text(
                   nombre,
-                  style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
                 Text(
                   lugar,
-                  style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: colores.fg),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colores.fg),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -300,7 +300,7 @@ class _HistoryPageState extends State<HistoryPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
-              child: Text('Canjeada', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.success)),
+              child: Text('Canjeada', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.success)),
             )
           else
             GestureDetector(
@@ -310,7 +310,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 decoration: BoxDecoration(color: const AppColors.bienvenidaFondoChip, borderRadius: BorderRadius.circular(999)),
                 child: isRedeeming
                     ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                    : Text('Canjear', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoMedio)),
+                    : Text('Canjear', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoMedio)),
               ),
             ),
         ],
@@ -329,7 +329,7 @@ class _HistoryPageState extends State<HistoryPage> {
             children: [
               Text(
                 'Historial de escaneos',
-                style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
               ),
               IconButton(
                 icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textSecondary),
@@ -385,7 +385,7 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Center(
-            child: Text('Sin resultados para tu búsqueda', style: GoogleFonts.openSans(color: AppColors.textSecondary)),
+            child: Text('Sin resultados para tu búsqueda', style: TextStyle(color: AppColors.textSecondary)),
           ),
         ),
       );
@@ -422,7 +422,7 @@ class _HistoryPageState extends State<HistoryPage> {
         padding: const EdgeInsets.only(bottom: 10, top: 4),
         child: Text(
           label,
-          style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.4),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.4),
         ),
       ));
       for (final r in items) {
@@ -493,20 +493,20 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: [
                     Text(
                       scan.local,
-                      style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       '${scan.place} · ${_tipoLabel(scan.type)}',
-                      style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Text(hora, style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
+              Text(hora, style: TextStyle(fontSize: 11, color: AppColors.textHint)),
             ],
           ),
           if (scan.hasReward) ...[
@@ -522,7 +522,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   Expanded(
                     child: Text(
                       'Beneficio registrado al escanear QR',
-                      style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: colorTextoReward),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colorTextoReward),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

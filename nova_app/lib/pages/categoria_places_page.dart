@@ -12,7 +12,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -247,7 +247,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                         const SizedBox(width: 6),
                         Text(
                           'Nova · Golfo de Morrosquillo',
-                          style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                         ),
                       ],
                     ),
@@ -255,7 +255,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                   const SizedBox(height: 10),
                   Text(
                     widget.titulo,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -265,7 +265,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                   const SizedBox(height: 6),
                   Text(
                     _subtitulo,
-                    style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                    style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   if (!_loading && _error == null) ...[
                     const SizedBox(height: 14),
@@ -282,7 +282,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                           const SizedBox(width: 6),
                           Text(
                             '${_places.length} lugar${_places.length != 1 ? 'es' : ''} encontrado${_places.length != 1 ? 's' : ''}',
-                            style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
                           ),
                         ],
                       ),
@@ -314,7 +314,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
           const SizedBox(height: 16),
           Text(
             'Cargando lugares…',
-            style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -333,13 +333,13 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: _cargarPlaces,
               icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: Text('Reintentar', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600)),
+              label: Text('Reintentar', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _colorPrimario,
                 foregroundColor: Colors.white,
@@ -364,12 +364,12 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
           Text(
             'Aún no hay lugares\nregistrados en esta categoría',
             textAlign: TextAlign.center,
-            style: GoogleFonts.openSans(fontSize: 15, color: AppColors.textSecondary, height: 1.5),
+            style: TextStyle(fontSize: 15, color: AppColors.textSecondary, height: 1.5),
           ),
           const SizedBox(height: 8),
           Text(
             'Vuelve pronto',
-            style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint),
+            style: AppTextStyles.caption,
           ),
         ],
       ),
@@ -434,7 +434,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                       Expanded(
                         child: Text(
                           place.displayName,
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: AppColors.bienvenidaTextoFuerte,
@@ -456,7 +456,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                         Expanded(
                           child: Text(
                             place.lugar!,
-                            style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -497,7 +497,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
         const SizedBox(width: 3),
         Text(
           rating.toStringAsFixed(1),
-          style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
         ),
       ],
     );
@@ -512,7 +512,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
       ),
       child: Text(
         tipo,
-        style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: _colorPrimario),
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _colorPrimario),
       ),
     );
   }

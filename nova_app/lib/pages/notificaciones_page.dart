@@ -4,6 +4,7 @@
 // (ver notification_service.dart) cada vez que llega un push, en
 // foreground o background.
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/design/app_colors.dart';
 
@@ -152,7 +153,7 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                 const Spacer(),
                 Text(
                   _formatearHora(_hora),
-                  style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+                  style: const AppTextStyles.caption,
                 ),
               ],
             ),

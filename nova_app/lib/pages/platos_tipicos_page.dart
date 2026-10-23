@@ -5,7 +5,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -142,14 +142,14 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
                       border: Border.all(color: _kChip.withValues(alpha: 0.5)),
                     ),
                     child: Text('Gastronomía local',
-                        style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _kChip)),
                   ),
                   const SizedBox(height: 8),
                   Text('Platos típicos',
-                      style: GoogleFonts.openSans(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('Cocina de Sucre · Golfo de Morrosquillo',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70)),
                 ],
               ),
             ),
@@ -190,7 +190,7 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
           Text(emoji, style: const TextStyle(fontSize: 13)),
           const SizedBox(width: 6),
           Text(label,
-              style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: _kNaranja1)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kNaranja1)),
         ],
       ),
     );
@@ -204,11 +204,11 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Sabores que debes probar',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700,
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 4),
           Text('Los platos más representativos de la región',
-              style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 14),
           ...  _kPlatos.map((p) => _buildTarjetaPlato(p)).toList(),
         ],
@@ -245,11 +245,11 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(p.nombre,
-                    style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaTextoFuerte)),
                 const SizedBox(height: 4),
                 Text(p.descripcion,
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -257,7 +257,7 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(p.donde,
-                          style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint,
+                          style: TextStyle(fontSize: 11, color: AppColors.textHint,
                               fontStyle: FontStyle.italic),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2),
@@ -280,11 +280,11 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Restaurantes y fondas',
-              style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700,
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 4),
           Text('Establecimientos de gastronomía registrados',
-              style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 14),
           _buildLugaresContent(),
         ],
@@ -302,7 +302,7 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
         child: Column(
           children: [
             Text('No se pudo cargar los lugares',
-                style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                style: AppTextStyles.bodySm),
             const SizedBox(height: 8),
             TextButton(onPressed: _cargarLugares, child: const Text('Reintentar')),
           ],
@@ -314,7 +314,7 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text('Próximamente más restaurantes y fondas',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textHint)),
+              style: TextStyle(fontSize: 13, color: AppColors.textHint)),
         ),
       );
     }
@@ -349,15 +349,15 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(place.displayName,
-                        style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
                             color: AppColors.bienvenidaTextoFuerte)),
                     const SizedBox(height: 3),
                     Text('${place.tipoEmoji} ${place.tipoLabel}',
-                        style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary)),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                     if (place.lugar != null) ...[
                       const SizedBox(height: 2),
                       Text(place.lugar!,
-                          style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
+                          style: TextStyle(fontSize: 11, color: AppColors.textHint)),
                     ],
                   ],
                 ),
@@ -400,11 +400,11 @@ class _PlatosTipicosPageState extends State<PlatosTipicosPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('¿Sabías que…?',
-                      style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700,
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
                           color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('La arepa de huevo de Coveñas es tan famosa que tiene su propio festival gastronómico cada año en la Costa Caribe.',
-                      style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70, height: 1.4)),
+                      style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.4)),
                 ],
               ),
             ),

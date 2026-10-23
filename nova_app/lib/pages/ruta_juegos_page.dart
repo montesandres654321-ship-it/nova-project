@@ -14,8 +14,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/design/app_colors.dart';
 
@@ -139,27 +139,27 @@ class RutaJuegosPage extends StatelessWidget {
                     ),
                     child: Text(
                       'Nova · Rutas y recorridos',
-                      style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Ruta oficial Juegos 2027',
-                    style: GoogleFonts.openSans(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '3 días · Coveñas, Santiago de Tolú y Sincelejo',
-                    style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70),
+                    style: TextStyle(fontSize: 12, color: Colors.white70),
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
                       const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFCD34D)),
                       const SizedBox(width: 5),
-                      Text('4.9', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                      Text('4.9', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
                       const SizedBox(width: 4),
-                      Text('(87 viajeros)', style: GoogleFonts.openSans(fontSize: 12, color: Colors.white70)),
+                      Text('(87 viajeros)', style: TextStyle(fontSize: 12, color: Colors.white70)),
                     ],
                   ),
                 ],
@@ -177,7 +177,7 @@ class RutaJuegosPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Itinerario', style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.bienvenidaVerde)),
+          Text('Itinerario', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.bienvenidaVerde)),
           const SizedBox(height: 14),
           for (var i = 0; i < _kItinerario.length; i++) ...[
             _buildDiaItinerario(_kItinerario[i]),
@@ -198,16 +198,16 @@ class RutaJuegosPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(color: const AppColors.sistemaAzulClaro, borderRadius: BorderRadius.circular(10)),
-            child: Text(d.dia, style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.bienvenidaAzul)),
+            child: Text(d.dia, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.bienvenidaAzul)),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(d.lugar, style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                Text(d.lugar, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 const SizedBox(height: 4),
-                Text(d.descripcion, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 17 / 12)),
+                Text(d.descripcion, style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 17 / 12)),
               ],
             ),
           ),
@@ -222,7 +222,7 @@ class RutaJuegosPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Qué incluye', style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+          Text('Qué incluye', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 16,
@@ -237,7 +237,7 @@ class RutaJuegosPage extends StatelessWidget {
                     children: [
                       SvgPicture.asset(item.$1, width: 14, height: 14),
                       const SizedBox(width: 8),
-                      Text(item.$2, style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
+                      Text(item.$2, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
                     ],
                   ),
                 ),
@@ -254,7 +254,7 @@ class RutaJuegosPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Operador', style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+          Text('Operador', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
@@ -277,16 +277,16 @@ class RutaJuegosPage extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('Sucre Turismo Operador',
-                              style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                           Text('Servicio local verificado',
-                              style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ],
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(color: const AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
-                      child: Text('Verificado', style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
+                      child: Text('Verificado', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
                     ),
                   ],
                 ),
@@ -337,8 +337,8 @@ class RutaJuegosPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(etiqueta, style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint)),
-                Text(accion, style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
+                Text(etiqueta, style: TextStyle(fontSize: 11, color: AppColors.textHint)),
+                Text(accion, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
               ],
             ),
           ],
@@ -361,8 +361,8 @@ class RutaJuegosPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Consultar tarifa', style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
-                Text('por persona · 3 días', style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint)),
+                Text('Consultar tarifa', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                Text('por persona · 3 días', style: AppTextStyles.caption),
               ],
             ),
           ),
@@ -374,7 +374,7 @@ class RutaJuegosPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               elevation: 0,
             ),
-            child: Text('Reservar ruta', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+            child: Text('Reservar ruta', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
           ),
         ],
       ),

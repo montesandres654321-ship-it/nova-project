@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_back_button.dart';
@@ -64,7 +63,7 @@ class PlaceDetailPage extends StatelessWidget {
         place.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.openSans(fontSize: 16, fontWeight: FontWeight.w700),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
       ),
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.parallax,
@@ -127,7 +126,7 @@ class PlaceDetailPage extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               type.singular,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.white.withValues(alpha: 0.8),

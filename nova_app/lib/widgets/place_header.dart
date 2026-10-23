@@ -9,7 +9,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_colors.dart';
@@ -46,7 +45,7 @@ class PlaceHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   place.name,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: AppColors.bienvenidaTextoFuerte,
@@ -65,7 +64,7 @@ class PlaceHeader extends StatelessWidget {
                 ),
                 child: Text(
                   place.tipoLabel,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.bienvenidaAzul,
@@ -86,7 +85,7 @@ class PlaceHeader extends StatelessWidget {
                 ),
                 child: Text(
                   'Sede oficial · Juegos 2027',
-                  style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.bienvenidaRojo),
                 ),
               ),
             ),
@@ -103,7 +102,7 @@ class PlaceHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   place.lugar,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -130,7 +129,7 @@ class PlaceHeader extends StatelessWidget {
           const SizedBox(width: AppSpacing.xs),
           Text(
             place.rating.toStringAsFixed(1),
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaTextoFuerte,
@@ -146,7 +145,7 @@ class PlaceHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               place.priceRange!,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AppColors.bienvenidaAzul,
@@ -161,7 +160,7 @@ class PlaceHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               type.hours,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

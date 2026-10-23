@@ -6,8 +6,8 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/design/app_colors.dart';
 
@@ -76,9 +76,9 @@ class AboutPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Acerca de Nova',
-                    style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 Text('Información de la plataforma',
-                    style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                    style: AppTextStyles.bodySm),
               ],
             ),
           ),
@@ -93,9 +93,9 @@ class AboutPage extends StatelessWidget {
         SvgPicture.asset('assets/images/logos/logo-nova-verde.svg', width: 112, height: 67),
         const SizedBox(height: 8),
         Text('Nova Sucre',
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
         Text('Versión 1.0.0',
-            style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
       ],
     );
   }
@@ -113,18 +113,18 @@ class AboutPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Identidad de turismo integral',
-              style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
           const SizedBox(height: 12),
           Text(
             'Nova permite descubrir y gestionar lugares, escenarios deportivos '
             'y servicios de Coveñas, Santiago de Tolú y Sincelejo mediante QR.',
-            style: GoogleFonts.openSans(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
           ),
           const SizedBox(height: 12),
           Text(
             'Conéctate directamente con el patrimonio local, la gastronomía '
             'tradicional y vive los Juegos Nacionales y Paranacionales 2027.',
-            style: GoogleFonts.openSans(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
           ),
         ],
       ),
@@ -159,7 +159,7 @@ class AboutPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('Más información',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColors.bienvenidaAzul,

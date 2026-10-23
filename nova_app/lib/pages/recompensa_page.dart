@@ -13,8 +13,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
 import 'main_navigation_page.dart';
@@ -90,9 +90,9 @@ class _RecompensaPageState extends State<RecompensaPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('¡Felicidades!',
-                        style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                     Text('Nueva recompensa desbloqueada',
-                        style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                        style: AppTextStyles.bodySm),
                   ],
                 ),
               ),
@@ -124,7 +124,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
                       decoration: BoxDecoration(color: const AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
                       child: Text(
                         'TU ESCANEO FUE VALIDADO',
-                        style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde, letterSpacing: 0.5),
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde, letterSpacing: 0.5),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -140,25 +140,25 @@ class _RecompensaPageState extends State<RecompensaPage> {
                       child: Column(
                         children: [
                           Text('Establecimiento visitado',
-                              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                              style: AppTextStyles.bodySm),
                           const SizedBox(height: 4),
                           Text(
                             widget.placeName,
-                            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
                             textAlign: TextAlign.center,
                           ),
                           if (widget.placeCity.isNotEmpty)
                             Text(
                               widget.placeCity,
-                              style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul),
                             ),
                           const Divider(color: AppColors.bienvenidaBorde, height: 28),
                           Text('Tu beneficio',
-                              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                              style: AppTextStyles.bodySm),
                           const SizedBox(height: 4),
                           Text(
                             widget.rewardName,
-                            style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 4),
@@ -166,7 +166,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
                             widget.rewardDescription?.isNotEmpty == true
                                 ? widget.rewardDescription!
                                 : 'Consulta las condiciones y disponibilidad en la app.',
-                            style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint),
+                            style: AppTextStyles.caption,
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -187,7 +187,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
                         child: _confirming
                             ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : Text('Confirmar que recibí mi recompensa',
-                                style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -201,7 +201,7 @@ class _RecompensaPageState extends State<RecompensaPage> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         child: Text('Volver al Inicio',
-                            style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
                       ),
                     ),
                   ],

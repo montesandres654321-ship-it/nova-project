@@ -8,7 +8,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 // ── Modelo de sección ─────────────────────────────────────────
@@ -98,7 +97,7 @@ class TermsPage extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Última actualización: octubre 2026',
-                              style: GoogleFonts.openSans(
+                              style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFFB8860B)),
@@ -113,7 +112,7 @@ class TermsPage extends StatelessWidget {
                     Text(
                       'Bienvenido a Nova, la plataforma oficial de turismo digital del Golfo de Morrosquillo. '
                       'Antes de usar nuestra aplicación, te pedimos leer detenidamente los siguientes términos.',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                           height: 1.65),
@@ -130,7 +129,7 @@ class TermsPage extends StatelessWidget {
                           children: [
                             Text(
                               s.titulo,
-                              style: GoogleFonts.openSans(
+                              style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.bienvenidaTextoFuerte),
@@ -138,7 +137,7 @@ class TermsPage extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               s.cuerpo,
-                              style: GoogleFonts.openSans(
+                              style: TextStyle(
                                   fontSize: 13,
                                   color: AppColors.textSecondary,
                                   height: 1.65),
@@ -162,7 +161,7 @@ class TermsPage extends StatelessWidget {
                       ),
                       child: Text(
                         '© 2026 Nova App — Plataforma de Turismo Digital del Golfo de Morrosquillo, Sucre, Colombia.',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                             fontSize: 11,
                             color: AppColors.bienvenidaAzul,
                             height: 1.5),
@@ -207,12 +206,12 @@ class TermsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Términos y Condiciones',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaTextoFuerte)),
                 Text('Políticas de uso de la plataforma',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 13, color: AppColors.textSecondary)),
               ],
             ),

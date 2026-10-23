@@ -13,7 +13,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../utils/validators.dart';
 import '../pages/register_page.dart';
@@ -59,7 +58,7 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Bienvenido a Sucre.',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaVerde,
@@ -69,7 +68,7 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'Entra y sigue descubriendo el departamento.',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,
@@ -132,7 +131,7 @@ class LoginForm extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Recordarme',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColors.bienvenidaTextoMedio,
@@ -147,7 +146,7 @@ class LoginForm extends StatelessWidget {
                 ),
                 child: Text(
                   '¿Olvidaste tu contraseña?',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.bienvenidaAzul,
@@ -182,7 +181,7 @@ class LoginForm extends StatelessWidget {
                     )
                   : Text(
                       'Iniciar sesión',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -204,7 +203,7 @@ class LoginForm extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     'o continúa con',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: AppColors.textHint,
@@ -299,7 +298,7 @@ class LoginForm extends StatelessWidget {
                     children: [
                       Text(
                         'Juegos Nacionales 2027',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: AppColors.bienvenidaDorado,
@@ -309,7 +308,7 @@ class LoginForm extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         'Accede a lugares, reservas, resultados, clasificaciones y seguimiento en vivo.',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                           color: AppColors.textSecondary,
@@ -331,7 +330,7 @@ class LoginForm extends StatelessWidget {
               children: [
                 Text(
                   '¿Aún no tienes cuenta? ',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.textSecondary,
@@ -343,7 +342,7 @@ class LoginForm extends StatelessWidget {
                   ),
                   child: Text(
                     'Regístrate',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaVerde,
@@ -389,7 +388,7 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             label,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: AppColors.bienvenidaTextoMedio,

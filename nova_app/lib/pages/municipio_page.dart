@@ -15,8 +15,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -282,7 +282,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
                 children: [
                   Text(
                     data.nombre,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -291,7 +291,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
                   const SizedBox(height: 4),
                   Text(
                     data.subtitulo,
-                    style: GoogleFonts.openSans(fontSize: 13, color: Colors.white),
+                    style: TextStyle(fontSize: 13, color: Colors.white),
                   ),
                 ],
               ),
@@ -329,12 +329,12 @@ class _MunicipioPageState extends State<MunicipioPage> {
         children: [
           Text(
             valor,
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textHint),
+            style: TextStyle(fontSize: 11, color: AppColors.textHint),
           ),
         ],
       ),
@@ -349,12 +349,12 @@ class _MunicipioPageState extends State<MunicipioPage> {
         children: [
           Text(
             data.historiaTitulo,
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde),
           ),
           const SizedBox(height: 8),
           Text(
             data.historiaDescripcion,
-            style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary, height: 1.4),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.4),
           ),
           const SizedBox(height: 14),
           Container(
@@ -375,13 +375,13 @@ class _MunicipioPageState extends State<MunicipioPage> {
                         width: 44,
                         child: Text(
                           data.timeline[i].anio,
-                          style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul),
                         ),
                       ),
                       Expanded(
                         child: Text(
                           data.timeline[i].evento,
-                          style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                          style: AppTextStyles.bodySm,
                         ),
                       ),
                     ],
@@ -397,7 +397,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
                 const SizedBox(height: 14),
                 RichText(
                   text: TextSpan(
-                    style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
                     children: [
                       TextSpan(
                         text: data.textoFinalBold,
@@ -423,7 +423,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
         children: [
           Text(
             '¿Qué puedes hacer?',
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -444,7 +444,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
                       const SizedBox(width: 6),
                       Text(
                         chip.label,
-                        style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte),
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte),
                       ),
                     ],
                   ),
@@ -464,7 +464,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
         children: [
           Text(
             'Lugares',
-            style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
           ),
           const SizedBox(height: 12),
           if (_loading)
@@ -474,7 +474,7 @@ class _MunicipioPageState extends State<MunicipioPage> {
           else if (_lugares.isEmpty)
             Text(
               'Aún no hay lugares registrados en este municipio.',
-              style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+              style: AppTextStyles.bodySm,
             )
           else
             Column(

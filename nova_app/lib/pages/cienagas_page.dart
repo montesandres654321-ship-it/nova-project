@@ -8,7 +8,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -210,7 +209,7 @@ class _CienagasPageState extends State<CienagasPage> {
                         const SizedBox(width: 6),
                         Text(
                           'Nova · Naturaleza y parques',
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -222,7 +221,7 @@ class _CienagasPageState extends State<CienagasPage> {
                   const SizedBox(height: 10),
                   Text(
                     'Ciénagas',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -232,7 +231,7 @@ class _CienagasPageState extends State<CienagasPage> {
                   const SizedBox(height: 6),
                   Text(
                     'Humedales y fauna acuática del Golfo de Morrosquillo',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
@@ -274,7 +273,7 @@ class _CienagasPageState extends State<CienagasPage> {
             children: [
               Text(
                 valor,
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
@@ -282,7 +281,7 @@ class _CienagasPageState extends State<CienagasPage> {
               ),
               Text(
                 etiqueta,
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 9,
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
@@ -300,7 +299,7 @@ class _CienagasPageState extends State<CienagasPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         titulo,
-        style: GoogleFonts.openSans(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w800,
           color: _kAzul1,
@@ -358,7 +357,7 @@ class _CienagasPageState extends State<CienagasPage> {
               Expanded(
                 child: Text(
                   f.titulo,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.bienvenidaTextoFuerte,
@@ -370,7 +369,7 @@ class _CienagasPageState extends State<CienagasPage> {
           const SizedBox(height: 10),
           Text(
             f.descripcion,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
               height: 1.55,
@@ -405,7 +404,7 @@ class _CienagasPageState extends State<CienagasPage> {
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                   fontSize: 13, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 14),
@@ -414,7 +413,7 @@ class _CienagasPageState extends State<CienagasPage> {
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: Text(
                 'Reintentar',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.w600),
               ),
               style: ElevatedButton.styleFrom(
@@ -446,7 +445,7 @@ class _CienagasPageState extends State<CienagasPage> {
               Expanded(
                 child: Text(
                   'Aún no hay lugares registrados. Vuelve pronto.',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                       fontSize: 13, color: AppColors.textSecondary, height: 1.4),
                 ),
               ),
@@ -514,7 +513,7 @@ class _CienagasPageState extends State<CienagasPage> {
                       Expanded(
                         child: Text(
                           place.displayName,
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: AppColors.bienvenidaTextoFuerte,
@@ -531,7 +530,7 @@ class _CienagasPageState extends State<CienagasPage> {
                             const SizedBox(width: 3),
                             Text(
                               place.rating!.toStringAsFixed(1),
-                              style: GoogleFonts.openSans(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.bienvenidaTextoFuerte,
@@ -552,7 +551,7 @@ class _CienagasPageState extends State<CienagasPage> {
                         Expanded(
                           child: Text(
                             place.lugar!,
-                            style: GoogleFonts.openSans(
+                            style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary),
                             overflow: TextOverflow.ellipsis,
@@ -574,7 +573,7 @@ class _CienagasPageState extends State<CienagasPage> {
                         ),
                         child: Text(
                           place.tipoLabel,
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                             color: _kAzul2,
@@ -635,7 +634,7 @@ class _CienagasPageState extends State<CienagasPage> {
                 children: [
                   Text(
                     'Consejo de visita',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: _kAzul1,
@@ -644,7 +643,7 @@ class _CienagasPageState extends State<CienagasPage> {
                   const SizedBox(height: 3),
                   Text(
                     'El mejor horario para avistar aves es al amanecer. Usa repelente, lleva ropa de colores neutros y respeta la fauna silvestre.',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                       height: 1.4,

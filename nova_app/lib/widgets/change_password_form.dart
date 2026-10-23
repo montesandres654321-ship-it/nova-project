@@ -14,7 +14,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import 'password_input.dart';
 
@@ -98,7 +97,7 @@ class ChangePasswordForm extends StatelessWidget {
                       Flexible(
                         child: Text(
                           'Requisitos de seguridad',
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppColors.bienvenidaRojo,
@@ -110,7 +109,7 @@ class ChangePasswordForm extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     'Tu nueva contraseña debe tener al menos 8 caracteres, e incluir una combinación de letras mayúsculas, minúsculas, números y caracteres especiales.',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: AppColors.bienvenidaRojo,
@@ -148,7 +147,7 @@ class ChangePasswordForm extends StatelessWidget {
                       )
                     : Text(
                         'Actualizar contraseña',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,

@@ -9,7 +9,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
 import '../core/design/app_colors.dart';
@@ -37,7 +36,7 @@ class PlaceInfo extends StatelessWidget {
             'Descripción',
             Text(
               place.description,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 14,
                 height: 1.6,
                 color: AppColors.textSecondary,
@@ -98,7 +97,7 @@ class PlaceInfo extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   title,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -108,7 +107,7 @@ class PlaceInfo extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               value,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppColors.bienvenidaTextoFuerte,
@@ -128,7 +127,7 @@ class PlaceInfo extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaTextoFuerte,
@@ -160,7 +159,7 @@ class PlaceInfo extends StatelessWidget {
                 ),
                 child: Text(
                   a,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.bienvenidaAzul,
                     fontWeight: FontWeight.w600,
@@ -181,7 +180,7 @@ class PlaceInfo extends StatelessWidget {
         children: [
           Text(
             type.priceLabel.trim().replaceAll(':', ''),
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
@@ -190,7 +189,7 @@ class PlaceInfo extends StatelessWidget {
           const Spacer(),
           Text(
             place.priceRange ?? 'Consultar',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaAzul,
@@ -209,7 +208,7 @@ class PlaceInfo extends StatelessWidget {
         children: [
           Text(
             'Contacto',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaTextoFuerte,
@@ -242,7 +241,7 @@ class PlaceInfo extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

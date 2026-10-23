@@ -16,7 +16,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_radius.dart';
 import 'terms_checkbox.dart';
@@ -211,7 +210,7 @@ class RegisterForm extends StatelessWidget {
                 children: [
                   Text(
                     '¿Ya tienes cuenta? ',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondary,
@@ -221,7 +220,7 @@ class RegisterForm extends StatelessWidget {
                     onTap: () => Navigator.of(context).pop(),
                     child: Text(
                       'Inicia sesión',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaAzul,
@@ -252,7 +251,7 @@ class RegisterForm extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.bienvenidaTextoMedio,
@@ -271,14 +270,14 @@ class RegisterForm extends StatelessWidget {
             onTap: onTap,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: AppColors.bienvenidaTextoFuerte,
             ),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: GoogleFonts.openSans(
+              hintStyle: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textHint,
@@ -301,7 +300,7 @@ class RegisterForm extends StatelessWidget {
       children: [
         Text(
           'Género',
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.bienvenidaTextoMedio,
@@ -317,14 +316,14 @@ class RegisterForm extends StatelessWidget {
           child: DropdownButtonFormField<String>(
             initialValue: gender,
             isExpanded: true,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: AppColors.bienvenidaTextoFuerte,
             ),
             hint: Text(
               'Selecciona una opción',
-              style: GoogleFonts.openSans(fontSize: 15, color: AppColors.textHint),
+              style: TextStyle(fontSize: 15, color: AppColors.textHint),
             ),
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -349,7 +348,7 @@ class RegisterForm extends StatelessWidget {
       children: [
         Text(
           'Teléfono móvil',
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.bienvenidaTextoMedio,
@@ -370,7 +369,7 @@ class RegisterForm extends StatelessWidget {
                 child: DropdownButtonFormField<String>(
                   initialValue: countryCode,
                   isExpanded: true,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                       fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
                   decoration: const InputDecoration(
                     contentPadding:
@@ -397,14 +396,14 @@ class RegisterForm extends StatelessWidget {
                 child: TextFormField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                     color: AppColors.bienvenidaTextoFuerte,
                   ),
                   decoration: InputDecoration(
                     hintText: '300 000 0000',
-                    hintStyle: GoogleFonts.openSans(
+                    hintStyle: TextStyle(
                         fontSize: 15, color: AppColors.textHint),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 15),

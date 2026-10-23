@@ -12,7 +12,7 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../core/design/app_colors.dart';
 import 'ruta_juegos_page.dart';
@@ -58,12 +58,12 @@ class RutasPage extends StatelessWidget {
                   children: [
                     Text(
                       'Rutas en Coveñas, Santiago de Tolú y Sincelejo',
-                      style: GoogleFonts.openSans(fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Recorridos curados para descubrir lo mejor de los tres municipios sede.',
-                      style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary),
+                      style: AppTextStyles.bodySm,
                     ),
                   ],
                 ),
@@ -109,12 +109,12 @@ class RutasPage extends StatelessWidget {
                 children: [
                   Text(
                     'Ruta oficial Juegos Nacionales 2027',
-                    style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '3 días · Coveñas, Santiago de Tolú y Sincelejo',
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
+                    style: TextStyle(fontSize: 12, color: AppColors.bienvenidaAzulClaro),
                   ),
                 ],
               ),
@@ -147,7 +147,7 @@ class RutasPage extends StatelessWidget {
                   decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(999)),
                   child: Text(
                     r.etiqueta,
-                    style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
                   ),
                 ),
               ),
@@ -158,18 +158,18 @@ class RutasPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(r.titulo, style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                Text(r.titulo, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 const SizedBox(height: 6),
-                Text(r.subtitulo, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                Text(r.subtitulo, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                 const SizedBox(height: 6),
                 Row(
                   children: [
                     SvgPicture.asset('assets/icons/ic-estrella.svg', width: 13),
                     const SizedBox(width: 8),
-                    Text('${r.rating}', style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                    Text('${r.rating}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                     const Spacer(),
                     // Sin pantalla de detalle todavía — placeholder intencional
-                    Text('Consultar', style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
+                    Text('Consultar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
                   ],
                 ),
               ],

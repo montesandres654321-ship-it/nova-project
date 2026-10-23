@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../core/design/app_colors.dart';
 import 'onboarding_page.dart';
@@ -37,7 +36,7 @@ class PermissionsPage extends StatelessWidget {
                   const SizedBox(height: 30),
                   Text(
                     '¡Síguenos por nuestro\ndepartamento!',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaVerde,
@@ -83,7 +82,7 @@ class PermissionsPage extends StatelessWidget {
                   children: [
                     Text(
                       'Con el respaldo de',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: AppColors.bienvenidaTextoFuerte,
@@ -136,7 +135,7 @@ class PermissionsPage extends StatelessWidget {
                   ),
                   child: Text(
                     'Continuar',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -161,7 +160,7 @@ class PermissionsPage extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: AppColors.bienvenidaTextoMedio,

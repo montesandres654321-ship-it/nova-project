@@ -7,7 +7,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_radius.dart';
 
@@ -30,7 +29,7 @@ class RegisterNameField extends StatelessWidget {
       children: [
         Text(
           'Nombre',
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.bienvenidaTextoMedio,
@@ -45,14 +44,14 @@ class RegisterNameField extends StatelessWidget {
           ),
           child: TextFormField(
             controller: controller,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: AppColors.bienvenidaTextoFuerte,
             ),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: GoogleFonts.openSans(
+              hintStyle: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textHint,

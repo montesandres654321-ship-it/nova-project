@@ -10,8 +10,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class NovaListaCard extends StatelessWidget {
@@ -76,7 +76,7 @@ class NovaListaCard extends StatelessWidget {
                 children: [
                   Text(
                     nombre,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaTextoFuerte,
@@ -87,7 +87,7 @@ class NovaListaCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     descripcion,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
                       height: 18 / 12,
@@ -103,18 +103,18 @@ class NovaListaCard extends StatelessWidget {
                       const SizedBox(width: 5),
                       Text(
                         rating.toStringAsFixed(1),
-                        style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                       ),
                       if (reviews != null)
                         Text(
                           ' ($reviews)',
-                          style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint),
+                          style: AppTextStyles.caption,
                         ),
                       if (nLugares != null) ...[
-                        Text(' · ', style: GoogleFonts.openSans(fontSize: 12, color: AppColors.bienvenidaTextoFuerte)),
+                        Text(' · ', style: TextStyle(fontSize: 12, color: AppColors.bienvenidaTextoFuerte)),
                         Text(
                           '$nLugares lugares',
-                          style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint),
+                          style: AppTextStyles.caption,
                         ),
                       ],
                     ],
@@ -128,7 +128,7 @@ class NovaListaCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             beneficioTexto!,
-                            style: GoogleFonts.openSans(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppColors.bienvenidaAzul,

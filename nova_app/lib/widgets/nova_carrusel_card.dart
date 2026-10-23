@@ -9,7 +9,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class NovaCarruselCard extends StatelessWidget {
@@ -57,7 +56,7 @@ class NovaCarruselCard extends StatelessWidget {
                 children: [
                   Text(
                     titulo,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaTextoFuerte,
@@ -68,7 +67,7 @@ class NovaCarruselCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitulo,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 10,
                       color: AppColors.textHint,
                     ),

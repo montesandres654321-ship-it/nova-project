@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../core/design/app_colors.dart';
 import 'login_page.dart';
@@ -177,7 +176,7 @@ class _JuegosSlide extends StatelessWidget {
             children: [
               Text(
                 'La app oficial para vivir el evento y descubrir el departamento.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaVerde,
@@ -187,7 +186,7 @@ class _JuegosSlide extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 'Compara agenda, disciplinas, escenarios y rutas de Coveñas, Santiago de Tolú y Sincelejo antes y después de cada competencia.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.bienvenidaTextoMedio,
@@ -217,7 +216,7 @@ class _JuegosSlide extends StatelessWidget {
               ),
               child: Text(
                 'Continuar',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -275,7 +274,7 @@ class _DescubreSlide extends StatelessWidget {
             children: [
               Text(
                 'De la sabana al mar, en la palma de tu mano.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaVerde,
@@ -285,7 +284,7 @@ class _DescubreSlide extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 'Escenarios, restaurantes, parques, artesanías y hospedaje en las tres sedes.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: AppColors.bienvenidaTextoMedio,
@@ -315,7 +314,7 @@ class _DescubreSlide extends StatelessWidget {
               ),
               child: Text(
                 'Continuar',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -373,7 +372,7 @@ class _ViveSlide extends StatelessWidget {
             children: [
               Text(
                 'Sucre es mucho más que sol y playa.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaVerde,
@@ -383,7 +382,7 @@ class _ViveSlide extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 'Explora restaurantes, platos típicos, parques, compras, artesanías, alojamiento, rutas y servicios.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: AppColors.bienvenidaTextoMedio,
@@ -413,7 +412,7 @@ class _ViveSlide extends StatelessWidget {
               ),
               child: Text(
                 'Empezar',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,

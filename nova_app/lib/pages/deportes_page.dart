@@ -8,7 +8,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 // ── Modelos internos ─────────────────────────────────────────
@@ -234,7 +233,7 @@ class DeportesPage extends StatelessWidget {
                     ),
                     child: Text(
                       'Juegos Nacionales y Paranacionales',
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -244,7 +243,7 @@ class DeportesPage extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     'Deportes 2027',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -254,7 +253,7 @@ class DeportesPage extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     'Golfo de Morrosquillo, Sucre · Octubre 2027',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
@@ -295,8 +294,8 @@ class DeportesPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(valor, style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
-              Text(etiqueta, style: GoogleFonts.openSans(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
+              Text(valor, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
+              Text(etiqueta, style: TextStyle(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
             ],
           ),
         ],
@@ -310,7 +309,7 @@ class DeportesPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         titulo,
-        style: GoogleFonts.openSans(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w800,
           color: color,
@@ -361,7 +360,7 @@ class DeportesPage extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             d.nombre,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppColors.bienvenidaTextoFuerte,
@@ -375,7 +374,7 @@ class DeportesPage extends StatelessWidget {
               Flexible(
                 child: Text(
                   d.sede,
-                  style: GoogleFonts.openSans(fontSize: 10, color: AppColors.textHint),
+                  style: TextStyle(fontSize: 10, color: AppColors.textHint),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -384,7 +383,7 @@ class DeportesPage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             d.fecha,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 10,
               color: AppColors.bienvenidaCoral,
               fontWeight: FontWeight.w600,
@@ -436,7 +435,7 @@ class DeportesPage extends StatelessWidget {
             child: Text(
               e.fecha,
               textAlign: TextAlign.center,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 color: esPrimero ? Colors.white : AppColors.bienvenidaAzul,
@@ -450,7 +449,7 @@ class DeportesPage extends StatelessWidget {
               children: [
                 Text(
                   e.disciplina,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.bienvenidaTextoFuerte,
@@ -459,7 +458,7 @@ class DeportesPage extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   e.descripcion,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                     height: 16 / 12,
@@ -472,7 +471,7 @@ class DeportesPage extends StatelessWidget {
                     const SizedBox(width: 3),
                     Text(
                       e.sede,
-                      style: GoogleFonts.openSans(fontSize: 10, color: AppColors.textHint),
+                      style: TextStyle(fontSize: 10, color: AppColors.textHint),
                     ),
                   ],
                 ),
@@ -513,7 +512,7 @@ class DeportesPage extends StatelessWidget {
                 children: [
                   Text(
                     'Información tentativa',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaVerde,
@@ -522,7 +521,7 @@ class DeportesPage extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     'Los datos de disciplinas y fechas son aproximados. La programación oficial se publicará próximamente.',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                       height: 15 / 11,

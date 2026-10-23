@@ -8,7 +8,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class NovaChip extends StatelessWidget {
@@ -52,7 +51,7 @@ class NovaChip extends StatelessWidget {
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: active ? FontWeight.w600 : FontWeight.w500,
             color: active ? Colors.white : AppColors.bienvenidaTextoMedio,

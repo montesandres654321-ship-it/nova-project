@@ -7,8 +7,8 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../services/google_auth_service.dart';
 import 'about_page.dart';
@@ -120,9 +120,9 @@ class SettingsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Ajustes de Nova',
-                    style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 Text('Configuraciones de la aplicación',
-                    style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                    style: AppTextStyles.bodySm),
               ],
             ),
           ),
@@ -133,7 +133,7 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildSectionLabel(String text) {
     return Text(text,
-        style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary, letterSpacing: 0.5));
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary, letterSpacing: 0.5));
   }
 
   Widget _buildCard(List<_SettingsRow> rows) {
@@ -192,8 +192,8 @@ class _SettingsRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
-                  Text(subtitle, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                  Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                 ],
               ),
             ),

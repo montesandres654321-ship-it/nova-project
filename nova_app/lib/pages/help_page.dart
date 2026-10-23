@@ -7,7 +7,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 // ── Modelo FAQ ────────────────────────────────────────────────
@@ -69,7 +68,7 @@ class _HelpPageState extends State<HelpPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Correo copiado: $_kEmail',
-            style: GoogleFonts.openSans(fontSize: 13)),
+            style: TextStyle(fontSize: 13)),
         backgroundColor: AppColors.bienvenidaAzul,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
@@ -142,12 +141,12 @@ class _HelpPageState extends State<HelpPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Ayuda y Soporte',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaTextoFuerte)),
                 Text('Resolvemos tus dudas',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 13, color: AppColors.textSecondary)),
               ],
             ),
@@ -185,13 +184,13 @@ class _HelpPageState extends State<HelpPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('¿Necesitas ayuda directa?',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Colors.white)),
                 const SizedBox(height: 3),
                 Text('Escríbenos y te respondemos en 24 h hábiles.',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 12, color: Colors.white.withValues(alpha: 0.85))),
                 const SizedBox(height: 10),
                 GestureDetector(
@@ -211,7 +210,7 @@ class _HelpPageState extends State<HelpPage> {
                                 AppColors.bienvenidaAzul, BlendMode.srcIn)),
                         const SizedBox(width: 6),
                         Text(_kEmail,
-                            style: GoogleFonts.openSans(
+                            style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.bienvenidaAzul)),
@@ -232,7 +231,7 @@ class _HelpPageState extends State<HelpPage> {
 
   Widget _buildSectionLabel(String text) {
     return Text(text,
-        style: GoogleFonts.openSans(
+        style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: AppColors.textSecondary,
@@ -262,7 +261,7 @@ class _HelpPageState extends State<HelpPage> {
                       Expanded(
                         child: Text(
                           faq.pregunta,
-                          style: GoogleFonts.openSans(
+                          style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: isExpanded
@@ -292,7 +291,7 @@ class _HelpPageState extends State<HelpPage> {
                   color: AppColors.bienvenidaAzulClaro.withValues(alpha: 0.5),
                   child: Text(
                     faq.respuesta,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                         height: 1.6),
@@ -370,12 +369,12 @@ class _HelpPageState extends State<HelpPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(red,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.bienvenidaTextoFuerte)),
               Text(handle,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                       fontSize: 12, color: AppColors.textSecondary)),
             ],
           ),

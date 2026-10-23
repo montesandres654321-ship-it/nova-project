@@ -9,7 +9,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/place_model.dart';
 import '../models/place_type.dart';
@@ -61,7 +60,7 @@ class PlaceActionButtons extends StatelessWidget {
                 foregroundColor: AppColors.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
-                textStyle: GoogleFonts.openSans(
+                textStyle: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -81,7 +80,7 @@ class PlaceActionButtons extends StatelessWidget {
                   foregroundColor: AppColors.bienvenidaAzul,
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
-                  textStyle: GoogleFonts.openSans(
+                  textStyle: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),

@@ -20,7 +20,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_spacing.dart';
 import '../core/design/app_radius.dart';
@@ -91,7 +90,7 @@ class _PasswordInputState extends State<PasswordInput> {
         children: [
           Text(
             widget.label,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: widget.figmaBoldLabel ? FontWeight.w700 : FontWeight.w600,
               color: widget.figmaLabelColor,
@@ -108,14 +107,14 @@ class _PasswordInputState extends State<PasswordInput> {
               controller: widget.controller,
               obscureText: _obscure,
               enabled: widget.enabled,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: AppColors.bienvenidaTextoFuerte,
               ),
               decoration: InputDecoration(
                 hintText: widget.placeholder,
-                hintStyle: GoogleFonts.openSans(
+                hintStyle: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textHint,

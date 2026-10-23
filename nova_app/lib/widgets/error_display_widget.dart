@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class ErrorDisplayWidget extends StatelessWidget {
@@ -26,7 +25,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               mensaje,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: const AppColors.textSecondary,
@@ -45,7 +44,7 @@ class ErrorDisplayWidget extends StatelessWidget {
                 ),
                 child: Text(
                   labelBoton ?? 'Reintentar',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -86,7 +85,7 @@ class EmptyStateWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               mensaje,
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 15,
                 color: const AppColors.textSecondary,
               ),
@@ -98,7 +97,7 @@ class EmptyStateWidget extends StatelessWidget {
                 onPressed: onAction,
                 child: Text(
                   labelAccion ?? 'Acción',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: const AppColors.bienvenidaAzul,

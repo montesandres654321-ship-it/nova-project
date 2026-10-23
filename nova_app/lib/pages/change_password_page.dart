@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
 import '../core/design/app_radius.dart';
@@ -126,7 +125,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               children: [
                 Text(
                   'Cambiar contraseña',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppColors.bienvenidaTextoFuerte,
@@ -134,7 +133,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
                 Text(
                   'Protege la seguridad de tu cuenta',
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                     color: AppColors.textSecondary,

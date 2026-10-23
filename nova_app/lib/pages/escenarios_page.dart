@@ -8,7 +8,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 // ── Modelos internos ─────────────────────────────────────────
@@ -199,18 +198,18 @@ class _EscenariosPageState extends State<EscenariosPage> {
                     ),
                     child: Text(
                       'Juegos Nacionales y Paranacionales',
-                      style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Escenarios 2027',
-                    style: GoogleFonts.openSans(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2),
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Sedes de competencia en el Golfo de Morrosquillo',
-                    style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                    style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   const SizedBox(height: 18),
                   Wrap(
@@ -251,8 +250,8 @@ class _EscenariosPageState extends State<EscenariosPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(valor, style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
-              Text(etiqueta, style: GoogleFonts.openSans(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
+              Text(valor, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
+              Text(etiqueta, style: TextStyle(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
             ],
           ),
         ],
@@ -292,7 +291,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
         ),
         child: Text(
           municipio,
-          style: GoogleFonts.openSans(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: activo ? Colors.white : AppColors.bienvenidaTextoFuerte,
@@ -342,7 +341,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                   children: [
                     Text(
                       e.nombre,
-                      style: GoogleFonts.openSans(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaTextoFuerte,
@@ -355,7 +354,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                         const SizedBox(width: 3),
                         Text(
                           e.municipio,
-                          style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -371,7 +370,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                 ),
                 child: Text(
                   e.estado,
-                  style: GoogleFonts.openSans(
+                  style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
                     color: habilitado ? AppColors.bienvenidaVerde : const Color(0xFFB8860B),
@@ -389,7 +388,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
               Expanded(
                 child: Text(
                   e.direccion,
-                  style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -411,7 +410,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                   ),
                   child: Text(
                     d,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: AppColors.bienvenidaAzul,
@@ -429,7 +428,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
               Expanded(
                 child: Text(
                   '${e.capacidad.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} espectadores',
-                  style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -450,7 +449,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
           const SizedBox(height: 12),
           Text(
             'No hay escenarios en este municipio',
-            style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textHint),
+            style: TextStyle(fontSize: 14, color: AppColors.textHint),
           ),
         ],
       ),

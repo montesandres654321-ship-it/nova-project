@@ -6,7 +6,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class _EventoCultural {
@@ -151,18 +150,18 @@ class CulturaPage extends StatelessWidget {
                     ),
                     child: Text(
                       'Juegos Nacionales y Paranacionales',
-                      style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Cultura 2027',
-                    style: GoogleFonts.openSans(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2),
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Eventos, tradiciones y patrimonio del Golfo de Morrosquillo',
-                    style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                    style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   const SizedBox(height: 18),
                   Wrap(
@@ -199,8 +198,8 @@ class CulturaPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(valor, style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
-              Text(etiqueta, style: GoogleFonts.openSans(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
+              Text(valor, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
+              Text(etiqueta, style: TextStyle(fontSize: 9, color: Colors.white.withValues(alpha: 0.8))),
             ],
           ),
         ],
@@ -213,7 +212,7 @@ class CulturaPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         titulo,
-        style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w800, color: const AppColors.categoriaPatrimonio),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: const AppColors.categoriaPatrimonio),
       ),
     );
   }
@@ -262,10 +261,10 @@ class CulturaPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(e.nombre,
-                    style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 const SizedBox(height: 4),
                 Text(e.descripcion,
-                    style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
@@ -295,7 +294,7 @@ class CulturaPage extends StatelessWidget {
         children: [
           Icon(icon, size: 10, color: AppColors.textHint),
           const SizedBox(width: 4),
-          Text(texto, style: GoogleFonts.openSans(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+          Text(texto, style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -325,10 +324,10 @@ class CulturaPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Información tentativa',
-                      style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: const AppColors.categoriaPatrimonio)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: const AppColors.categoriaPatrimonio)),
                   const SizedBox(height: 3),
                   Text('La programación cultural oficial se publicará próximamente en el portal de los Juegos Nacionales 2027.',
-                      style: GoogleFonts.openSans(fontSize: 11, color: AppColors.textSecondary, height: 1.4)),
+                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.4)),
                 ],
               ),
             ),

@@ -18,8 +18,8 @@ library;
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
@@ -166,10 +166,10 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 16),
               Text('Cerrar sesión',
-                  style: GoogleFonts.openSans(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
               const SizedBox(height: 8),
               Text('¿Estás seguro de que quieres salir?',
-                  style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary), textAlign: TextAlign.center),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary), textAlign: TextAlign.center),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -277,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text('Ir a Ajustes de la Cuenta',
-                                style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
                             const SizedBox(width: 8),
                             SvgPicture.asset('assets/icons/ic-chevron-right.svg', width: 14),
                           ],
@@ -294,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           child: Text('Cerrar sesión',
-                              style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.error)),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.error)),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -334,9 +334,9 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Perfil del turista',
-                    style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 Text('Gestiona tus datos personales',
-                    style: GoogleFonts.openSans(fontSize: 13, color: AppColors.textSecondary)),
+                    style: AppTextStyles.bodySm),
               ],
             ),
           ),
@@ -359,7 +359,7 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: const BoxDecoration(color: Color(0xFFBFE0F2), shape: BoxShape.circle),
               child: Center(
                 child: Text(_inicialNombre,
-                    style: GoogleFonts.openSans(fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
               ),
             ),
           ),
@@ -375,7 +375,7 @@ class _ProfilePageState extends State<ProfilePage> {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text('Cambiar foto',
-                style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaAzul)),
           ),
         ),
       ],
@@ -400,7 +400,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: _loading
             ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : Text('Guardar cambios', style: GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+            : Text('Guardar cambios', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
       ),
     );
   }
@@ -414,7 +414,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
@@ -426,7 +426,7 @@ class _ProfilePageState extends State<ProfilePage> {
             controller: controller,
             enabled: !_loading,
             keyboardType: keyboardType,
-            style: GoogleFonts.openSans(fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
+            style: TextStyle(fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: InputBorder.none,

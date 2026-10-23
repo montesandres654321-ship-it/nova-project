@@ -8,7 +8,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/design/app_colors.dart';
 
@@ -88,7 +87,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                             Expanded(
                               child: Text(
                                 'Elige qué alertas quieres recibir sobre tu experiencia en Nova.',
-                                style: GoogleFonts.openSans(
+                                style: TextStyle(
                                     fontSize: 13, color: AppColors.bienvenidaAzul, height: 1.5),
                               ),
                             ),
@@ -146,7 +145,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                       const SizedBox(height: 20),
                       Text(
                         'Puedes cambiar estas preferencias en cualquier momento. Las notificaciones del sistema operativo deben habilitarse desde los ajustes de tu teléfono.',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                             fontSize: 11, color: AppColors.textHint, height: 1.6),
                         textAlign: TextAlign.center,
                       ),
@@ -187,12 +186,12 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Notificaciones',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.bienvenidaTextoFuerte)),
                 Text('Gestiona tus alertas',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 13, color: AppColors.textSecondary)),
               ],
             ),
@@ -204,7 +203,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
 
   Widget _buildSectionLabel(String text) {
     return Text(text,
-        style: GoogleFonts.openSans(
+        style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: AppColors.textSecondary,
@@ -255,12 +254,12 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.bienvenidaTextoFuerte)),
                     Text(subtitle,
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                             fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),

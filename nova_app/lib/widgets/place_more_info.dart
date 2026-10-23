@@ -12,8 +12,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import '../core/design/app_text_styles.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -64,7 +64,7 @@ class PlaceMoreInfo extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
       child: Text(
         title,
-        style: GoogleFonts.openSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte),
       ),
     );
   }
@@ -92,7 +92,7 @@ class PlaceMoreInfo extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: Text(d, style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
+                        child: Text(d, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoFuerte)),
                       ),
                     ],
                   ),
@@ -138,7 +138,7 @@ class PlaceMoreInfo extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(text, style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textPrimary)),
+            child: Text(text, style: TextStyle(fontSize: 14, color: AppColors.textPrimary)),
           ),
         ],
       ),
@@ -203,7 +203,7 @@ class PlaceMoreInfo extends StatelessWidget {
                             const Icon(Icons.map_rounded, size: 14, color: AppColors.primary),
                             const SizedBox(width: 5),
                             Text('Ver en mapa',
-                                style: GoogleFonts.openSans(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
                           ],
                         ),
                       ),
@@ -220,7 +220,7 @@ class PlaceMoreInfo extends StatelessWidget {
               Expanded(
                 child: Text(
                   place.lugar,
-                  style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -284,15 +284,15 @@ class _PlaceDondeQuedarse extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(hotel.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.openSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
-                  Text(hotel.lugar, style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary)),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                  Text(hotel.lugar, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                   Row(
                     children: [
                       const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
                       const SizedBox(width: 2),
-                      Text(hotel.rating.toStringAsFixed(1), style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
-                      Text(' · ', style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textHint)),
-                      Text('Ver disponibilidad', style: GoogleFonts.openSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
+                      Text(hotel.rating.toStringAsFixed(1), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
+                      Text(' · ', style: AppTextStyles.caption),
+                      Text('Ver disponibilidad', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.bienvenidaVerde)),
                     ],
                   ),
                 ],

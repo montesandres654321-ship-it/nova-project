@@ -7,7 +7,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class TermsCheckbox extends StatelessWidget {
@@ -44,7 +43,7 @@ class TermsCheckbox extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,

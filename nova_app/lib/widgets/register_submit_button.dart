@@ -7,7 +7,6 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 
 class RegisterSubmitButton extends StatelessWidget {
@@ -46,7 +45,7 @@ class RegisterSubmitButton extends StatelessWidget {
               )
             : Text(
                 buttonText,
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,

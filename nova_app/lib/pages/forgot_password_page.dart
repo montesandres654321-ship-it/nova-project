@@ -11,7 +11,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../core/design/app_colors.dart';
@@ -228,14 +227,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           const SizedBox(height: 16),
           Text('¿Olvidaste tu contraseña?',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 8),
           Text(
             'Te enviaremos un código de 6 dígitos a tu email',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
                 fontSize: 14, color: AppColors.textSecondary, height: 1.5),
           ),
           const SizedBox(height: 24),
@@ -276,14 +275,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           const SizedBox(height: 16),
           Text('Revisa tu correo',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColors.bienvenidaTextoFuerte)),
           const SizedBox(height: 8),
           Text(
             'Si el correo está registrado recibirás un código de 6 dígitos (vence en 15 minutos). Ingrésalo aquí junto con tu nueva contraseña.',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
                 fontSize: 14, color: AppColors.textSecondary, height: 1.5),
           ),
           const SizedBox(height: 8),
@@ -303,7 +302,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Expanded(
                   child: Text(
                     _emailCtrl.text,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                         fontSize: 13,
                         color: AppColors.bienvenidaTextoMedio),
                     overflow: TextOverflow.ellipsis,
@@ -322,7 +321,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             keyboardType: TextInputType.number,
             maxLength: 6,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: GoogleFonts.openSans(
+            style: TextStyle(
                 fontSize: 18,
                 letterSpacing: 6,
                 fontWeight: FontWeight.w700,
@@ -351,7 +350,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             controller: _confirmCtrl,
             obscureText: !_showPass,
             enabled: !_loading,
-            style: GoogleFonts.openSans(
+            style: TextStyle(
                 fontSize: 13, color: AppColors.bienvenidaTextoFuerte),
             decoration: _inputDecoration('Repite la contraseña').copyWith(
               suffixIcon: GestureDetector(
@@ -394,14 +393,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
         const SizedBox(height: 16),
         Text('¡Contraseña actualizada!',
-            style: GoogleFonts.openSans(
+            style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: AppColors.bienvenidaTextoFuerte)),
         const SizedBox(height: 8),
         Text(
           'Tu contraseña se cambió correctamente. Ya puedes iniciar sesión con tus nuevas credenciales.',
-          style: GoogleFonts.openSans(
+          style: TextStyle(
               fontSize: 14, color: AppColors.textSecondary, height: 1.5),
         ),
         const SizedBox(height: 32),
@@ -416,7 +415,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               elevation: 0,
             ),
             child: Text('Ir al inicio de sesión',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white)),
@@ -442,7 +441,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: GoogleFonts.openSans(
+      style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: AppColors.bienvenidaTextoMedio),
@@ -452,7 +451,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.openSans(
+      hintStyle: TextStyle(
           fontSize: 13, color: AppColors.textHint),
       filled: true,
       fillColor: AppColors.bienvenidaFondoInput,
@@ -506,7 +505,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: CircularProgressIndicator(
                     strokeWidth: 2, color: Colors.white))
             : Text(label,
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white)),
@@ -523,7 +522,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         onTap: onTap,
         child: Text(
           label,
-          style: GoogleFonts.openSans(
+          style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary),

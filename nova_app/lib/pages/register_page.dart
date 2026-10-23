@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../core/design/app_colors.dart';
 import '../widgets/register_form.dart';
@@ -167,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 10),
               Text(
                 'Crea tu cuenta y empieza\na recorrer Sucre.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
                   color: AppColors.bienvenidaVerde,
@@ -177,7 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 10),
               Text(
                 'Guarda tus lugares, reserva y acumula recompensas.',
-                style: GoogleFonts.openSans(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,

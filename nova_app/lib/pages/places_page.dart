@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/design/app_colors.dart';
 import '../models/place_model.dart';
 import '../services/api_service.dart';
@@ -209,7 +208,7 @@ class _PlacesPageState extends State<PlacesPage> {
           Expanded(
             child: Text(
               'Explora los municipios sede',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppColors.bienvenidaRojo,
@@ -311,7 +310,7 @@ class _PlacesPageState extends State<PlacesPage> {
                   const SizedBox(width: 6),
                   Text(
                     'Ver mapa completo',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaAzul,
@@ -336,7 +335,7 @@ class _PlacesPageState extends State<PlacesPage> {
               ),
               child: Text(
                 '${_placesParaMapa.length} lugares en el mapa',
-                style: GoogleFonts.openSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
               ),
             ),
           ),
@@ -351,10 +350,10 @@ class _PlacesPageState extends State<PlacesPage> {
       child: TextField(
         controller: _searchCtrl,
         onChanged: (v) => setState(() => _busqueda = v.trim()),
-        style: GoogleFonts.openSans(fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
+        style: TextStyle(fontSize: 14, color: AppColors.bienvenidaTextoFuerte),
         decoration: InputDecoration(
           hintText: 'Buscar municipio, escenario o experiencia',
-          hintStyle: GoogleFonts.openSans(fontSize: 14, color: AppColors.textHint),
+          hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
           prefixIcon: Padding(
             padding: const EdgeInsets.all(12),
             child: SvgPicture.asset('assets/icons/ic-buscar.svg', width: 18, height: 18),
@@ -443,7 +442,7 @@ class _PlacesPageState extends State<PlacesPage> {
                 Expanded(
                   child: Text(
                     'Oferta integral de Sucre',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaTextoFuerte,
@@ -458,7 +457,7 @@ class _PlacesPageState extends State<PlacesPage> {
                   ),
                   child: Text(
                     '7 experiencias',
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -470,7 +469,7 @@ class _PlacesPageState extends State<PlacesPage> {
             const SizedBox(height: 8),
             Text(
               'Hospedaje, gastronomía, cultura, naturaleza y deporte en los cuatro municipios sede.',
-              style: GoogleFonts.openSans(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -504,7 +503,7 @@ class _PlacesPageState extends State<PlacesPage> {
                         children: [
                           Text(
                             chip['label']!,
-                            style: GoogleFonts.openSans(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppColors.bienvenidaTextoFuerte,
@@ -552,7 +551,7 @@ class _PlacesPageState extends State<PlacesPage> {
               const SizedBox(height: 10),
               Text(
                 'Sin resultados para "$_busqueda"',
-                style: GoogleFonts.openSans(fontSize: 14, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -599,7 +598,7 @@ class _PlacesPageState extends State<PlacesPage> {
                 children: [
                   Text(
                     m.nombre,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.bienvenidaTextoFuerte,
@@ -608,7 +607,7 @@ class _PlacesPageState extends State<PlacesPage> {
                   const SizedBox(height: 4),
                   Text(
                     m.descripcion,
-                    style: GoogleFonts.openSans(
+                    style: TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                       height: 18 / 13,
@@ -623,21 +622,21 @@ class _PlacesPageState extends State<PlacesPage> {
                       const SizedBox(width: 5),
                       Text(
                         rating > 0 ? rating.toStringAsFixed(1) : '—',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         ' · ',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.bienvenidaTextoFuerte,
                         ),
                       ),
                       Text(
                         '${places.length} lugares',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textHint,
                         ),
@@ -651,7 +650,7 @@ class _PlacesPageState extends State<PlacesPage> {
                       const SizedBox(width: 6),
                       Text(
                         'Beneficios al escanear QR',
-                        style: GoogleFonts.openSans(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.bienvenidaAzul,
