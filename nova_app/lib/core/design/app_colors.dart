@@ -85,6 +85,13 @@ class AppColors {
   static const Color sistemaVerdeClaro = Color(0xFFE7F4EB);
   static const Color sistemaArena      = Color(0xFFF4EFE6);
 
+  // Categorías de contenido (Figma — sistema de iconografía por tipo de lugar)
+  // Cada categoría tiene un color de acento y su variante de fondo para chips/cards.
+  static const Color categoriaPatrimonio   = Color(0xFF6B21A8); // Púrpura — ruta patrimonio, cultura
+  static const Color categoriaPatrimonioBg = Color(0xFFF5F0FF); // Fondo chip/card patrimonio
+  static const Color categoriaGastro       = Color(0xFFD9502B); // Coral-terracota — platos típicos
+  static const Color categoriaGastroBg     = Color(0xFFFFF0EC); // Fondo chip/card gastronomía
+
   // EVENTO · JUEGOS 2027 — variantes de marca (ninguna existía antes)
   static const Color azulMarcaJuegos  = Color(0xFF0170BA);
   static const Color azulOscuroJuegos = Color(0xFF005490);

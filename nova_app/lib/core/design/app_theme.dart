@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_spacing.dart';
@@ -11,6 +12,10 @@ class AppTheme {
       seedColor: AppColors.primary,
       brightness: Brightness.light,
     ),
+    // Open Sans global: toda la app usa este typeface por defecto.
+    // Los GoogleFonts.openSans() inline siguen funcionando como override
+    // pero ya no son necesarios para la familia — solo para tamaño/peso/color.
+    fontFamily: GoogleFonts.openSans().fontFamily,
     useMaterial3: true,
     scaffoldBackgroundColor: AppColors.surface,
     appBarTheme: const AppBarTheme(
