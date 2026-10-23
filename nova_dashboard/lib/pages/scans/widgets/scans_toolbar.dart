@@ -1,6 +1,5 @@
 // lib/pages/scans/widgets/scans_toolbar.dart
-// Extraído de scans_page.dart (header + buscador de build()) sin cambios
-// de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../scans_tokens.dart';
 
@@ -33,20 +32,17 @@ class ScansToolbar extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         const Text('Escaneos',
-          style: TextStyle(fontSize: 20,
-              fontWeight: FontWeight.w700)),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
         const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 10, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
             color: kScansPrimary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text('$total registros',
             style: TextStyle(fontSize: 12,
-                color: kScansPrimary,
-                fontWeight: FontWeight.w500)),
+                color: kScansPrimary, fontWeight: FontWeight.w500)),
         ),
         const Spacer(),
         IconButton(
@@ -63,14 +59,12 @@ class ScansToolbar extends StatelessWidget {
           onChanged: onSearch,
           decoration: InputDecoration(
             hintText: 'Buscar por turista, lugar...',
-            hintStyle: TextStyle(
-                fontSize: 13, color: Colors.grey[400]),
-            prefixIcon: Icon(Icons.search_rounded,
-                color: Colors.grey[400], size: 20),
+            hintStyle: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+            prefixIcon: const Icon(Icons.search_rounded,
+                color: AppTheme.textMuted, size: 20),
             suffixIcon: search.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close_rounded,
-                        size: 18),
+                    icon: const Icon(Icons.close_rounded, size: 18),
                     onPressed: () {
                       searchCtrl.clear();
                       onSearch('');
@@ -78,18 +72,17 @@ class ScansToolbar extends StatelessWidget {
                 : null,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 10),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              borderSide: const BorderSide(color: AppTheme.border),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              borderSide: const BorderSide(color: AppTheme.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               borderSide: const BorderSide(color: kScansPrimary),
             ),
           ),

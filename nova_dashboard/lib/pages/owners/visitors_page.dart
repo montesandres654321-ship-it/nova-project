@@ -18,7 +18,6 @@ class OwnerVisitorsPage extends StatefulWidget {
 
 class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
   static const _teal  = AppTheme.primary;
-  static const _teal2 = Color(0xFF0891B2);
 
   bool   _loading = true;
   String _error   = '';
@@ -83,7 +82,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDFA),
+      backgroundColor: AppTheme.backgroundGray,
       appBar: AppBar(
         backgroundColor: _teal,
         foregroundColor: Colors.white,
@@ -126,11 +125,11 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
                         : null,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey[300]!)),
+                        borderSide: const BorderSide(color: AppTheme.border)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(color: _teal)),
-                    filled: true, fillColor: Colors.grey[50],
+                    filled: true, fillColor: AppTheme.backgroundGray,
                     isDense: true),
                 onChanged: _filterVisitors)),
 
@@ -176,7 +175,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
     // Color del ranking top 3
     Color rankColor = _teal;
     if (rank == 1) rankColor = AppTheme.warning;
-    if (rank == 2) rankColor = Colors.grey[600]!;
+    if (rank == 2) rankColor = AppTheme.textBody;
     if (rank == 3) rankColor = const Color(0xFF92400E);
 
     return Container(
@@ -196,13 +195,13 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
               decoration: BoxDecoration(
                   color: rank <= 3
                       ? rankColor.withOpacity(0.12)
-                      : Colors.grey[100],
+                      : AppTheme.backgroundGray,
                   borderRadius: BorderRadius.circular(6)),
               child: Center(child: Text('$rank',
                   style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: rank <= 3 ? rankColor : Colors.grey[500])))),
+                      color: rank <= 3 ? rankColor : AppTheme.textMuted)))),
 
           const SizedBox(width: 12),
 
@@ -227,8 +226,8 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
                         fontSize: 14, fontWeight: FontWeight.w600)),
                 if (email.isNotEmpty)
                   Text(email,
-                      style: TextStyle(
-                          fontSize: 11, color: Colors.grey[500]),
+                      style: const TextStyle(
+                          fontSize: 11, color: AppTheme.textMuted),
                       overflow: TextOverflow.ellipsis),
               ])),
 
@@ -246,12 +245,12 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
                       fontWeight: FontWeight.bold,
                       color: _teal)),
               const SizedBox(width: 4),
-              Text(visits == 1 ? 'visita' : 'visitas',
-                  style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+              const Text('visitas',
+                  style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
             ]),
             const SizedBox(height: 3),
             Text(lastVisit,
-                style: TextStyle(fontSize: 10, color: Colors.grey[400])),
+                style: const TextStyle(fontSize: 10, color: AppTheme.textMuted)),
           ]),
         ]),
       ),
@@ -276,13 +275,13 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
   Widget _buildEmpty() => Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
+        const Icon(Icons.people_outline, size: 64, color: AppTheme.border),
         const SizedBox(height: 12),
         Text(
             _search.isNotEmpty
                 ? 'Sin resultados para "$_search"'
                 : 'Aún no hay visitantes registrados.\nColoca el código QR en tu establecimiento.',
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
             textAlign: TextAlign.center),
       ]));
 }

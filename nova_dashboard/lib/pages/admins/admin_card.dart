@@ -5,6 +5,7 @@
 // REFACTOR: tokens y _StatusBadge movidos a admin_tokens.dart /
 // widgets/admin_status_badge.dart para bajar de 310 a <300 líneas.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../models/admin_stats_model.dart';
 import '../../utils/constants.dart';
@@ -42,7 +43,7 @@ class AdminCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: isActive ? kAdminBorder : const Color(0xFFEEF2F7)),
+            color: isActive ? kAdminBorder : AppTheme.backgroundGray),
         boxShadow: [
           BoxShadow(
             color: roleClr.withOpacity(isActive ? 0.07 : 0.02),

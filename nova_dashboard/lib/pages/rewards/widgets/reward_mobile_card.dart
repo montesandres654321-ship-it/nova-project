@@ -1,6 +1,5 @@
 // lib/pages/rewards/widgets/reward_mobile_card.dart
-// Extraído de rewards_detail_page.dart (item de _buildRewardsList) sin
-// cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/reward_model.dart';
 import '../rewards_detail_tokens.dart';
@@ -31,11 +30,7 @@ class RewardMobileCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
+      decoration: AppTheme.cardDecoration(),
       child: Row(children: [
         CircleAvatar(
           radius: 18,
@@ -53,16 +48,16 @@ class RewardMobileCard extends StatelessWidget {
             const SizedBox(height: 2),
             Row(children: [
               Flexible(child: Text(placeName,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                  style: const TextStyle(fontSize: 11, color: AppTheme.textBody),
                   overflow: TextOverflow.ellipsis)),
-              const Text(' · ', style: TextStyle(color: Colors.grey)),
-              Text(date, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              const Text(' · ', style: TextStyle(color: AppTheme.textMuted)),
+              Text(date, style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
             ]),
             const SizedBox(height: 4),
             Row(children: [
               Text('$rewardIcon ', style: const TextStyle(fontSize: 12)),
               Flexible(child: Text(rewardName,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                  style: const TextStyle(fontSize: 12, color: AppTheme.textHead),
                   overflow: TextOverflow.ellipsis)),
             ]),
           ]),

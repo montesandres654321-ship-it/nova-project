@@ -41,12 +41,12 @@ class _UserCardItemState extends State<UserCardItem> {
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: _hovered ? const Color(0xFFF0FDFA) : Colors.white,
+            color: _hovered ? AppTheme.primaryLight.withOpacity(0.08) : Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: _hovered
                   ? AppTheme.primary.withOpacity(0.35)
-                  : const Color(0xFFE2E8F0),
+                  : AppTheme.border,
             ),
             boxShadow: [
               BoxShadow(
@@ -79,10 +79,10 @@ class _UserCardItemState extends State<UserCardItem> {
                     Text(user.displayName,
                         style: const TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 15,
-                            color: Color(0xFF111827))),
+                            color: AppTheme.textHead)),
                     const SizedBox(height: 3),
                     Text(user.email,
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        style: const TextStyle(fontSize: 12, color: AppTheme.textBody),
                         maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 7),
                     Row(children: [
@@ -100,17 +100,17 @@ class _UserCardItemState extends State<UserCardItem> {
                               style: TextStyle(
                                   fontSize: 11, fontWeight: FontWeight.w600,
                                   color: user.isActive
-                                      ? const Color(0xFF059669)
+                                      ? AppTheme.success
                                       : AppTheme.error))),
                       const SizedBox(width: 8),
                       Text('${user.scansCount} escaneos',
                           style: const TextStyle(
-                              fontSize: 11, color: Color(0xFF9CA3AF))),
+                              fontSize: 11, color: AppTheme.textMuted)),
                       if (user.isGoogleUser) ...[
                         const SizedBox(width: 8),
                         const Text('Google',
                             style: TextStyle(
-                                fontSize: 11, color: Color(0xFF9CA3AF))),
+                                fontSize: 11, color: AppTheme.textMuted)),
                       ],
                     ]),
                   ])),

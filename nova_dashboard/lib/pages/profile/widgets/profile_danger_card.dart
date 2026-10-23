@@ -1,6 +1,7 @@
 // lib/pages/profile/widgets/profile_danger_card.dart
 // Extraído de profile_page.dart (_buildDangerCard) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../profile_tokens.dart';
 import 'profile_shared.dart';
@@ -15,7 +16,7 @@ class ProfileDangerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFFEE2E2)),
+        border: Border.all(color: AppTheme.error.withOpacity(0.25)),
         boxShadow: [BoxShadow(
           color: Colors.black.withOpacity(0.04),
           blurRadius: 8, offset: const Offset(0, 2),
@@ -36,8 +37,8 @@ class ProfileDangerCard extends StatelessWidget {
                     fontWeight: FontWeight.w700, color: kProfileRed)),
           ]),
         ),
-        const Divider(height: 20, thickness: 0.5,
-            color: Color(0xFFFEE2E2)),
+        Divider(height: 20, thickness: 0.5,
+            color: AppTheme.error.withOpacity(0.25)),
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
           child: profileActionRow(

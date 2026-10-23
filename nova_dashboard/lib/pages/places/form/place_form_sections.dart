@@ -78,7 +78,7 @@ List<Widget> buildImagenSection({
     Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-            color: Colors.green[50],
+            color: AppTheme.success.withOpacity(0.08),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppTheme.success)),
         child: Row(children: [
@@ -123,7 +123,7 @@ List<Widget> buildDetallesSection({
     value: selectedMunicipio,
     decoration: placeFormInputDecoration('Municipio', Icons.map_outlined,
         hint: 'Sin municipio asignado'),
-    style: const TextStyle(fontSize: 13, color: Colors.black87),
+    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
     items: Place.municipiosValidos
         .map((m) => DropdownMenuItem(
             value: m, child: Text(Place.municipiosLabels[m] ?? m)))
@@ -150,7 +150,7 @@ List<Widget> buildDetallesSection({
     title: const Text('Lugar activo', style: TextStyle(fontSize: 13)),
     subtitle: Text(
         isActive ? 'Visible en la app' : 'Oculto',
-        style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        style: const TextStyle(fontSize: 11, color: AppTheme.textBody)),
     value: isActive,
     onChanged: onActiveChanged,
     activeColor: kPlaceFormTeal,
@@ -176,7 +176,7 @@ List<Widget> buildRecompensaSection({
         hasReward
             ? 'Los turistas ganan al escanear el QR'
             : 'No se otorga recompensa al escanear',
-        style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        style: const TextStyle(fontSize: 11, color: AppTheme.textBody)),
     value: hasReward,
     onChanged: onHasRewardChanged,
     activeColor: kPlaceFormTeal,
@@ -197,7 +197,7 @@ List<Widget> buildRecompensaSection({
               child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                      color: sel ? kPlaceFormTeal.withOpacity(0.15) : Colors.grey[100],
+                      color: sel ? kPlaceFormTeal.withOpacity(0.15) : AppTheme.backgroundGray,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                           color: sel ? kPlaceFormTeal : Colors.transparent,
@@ -209,7 +209,7 @@ List<Widget> buildRecompensaSection({
                     Text(item['label']!,
                         style: TextStyle(
                             fontSize: 9,
-                            color: sel ? kPlaceFormTeal : Colors.grey[700])),
+                            color: sel ? kPlaceFormTeal : AppTheme.textBody)),
                   ])));
         }).toList()),
     const SizedBox(height: 14),
@@ -247,22 +247,22 @@ List<Widget> buildRecompensaSection({
     ),
     const SizedBox(height: 4),
     Text('Vacío o 0 = sin límite de recompensas',
-        style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+        style: const TextStyle(fontSize: 10, color: AppTheme.textMuted)),
   ] else ...[
     const SizedBox(height: 8),
     Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        color: AppTheme.warning.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange[200]!),
+        border: Border.all(color: AppTheme.warning.withOpacity(0.3)),
       ),
       child: Row(children: [
-        Icon(Icons.info_outline, size: 16, color: Colors.orange[700]),
+        const Icon(Icons.info_outline, size: 16, color: AppTheme.warning),
         const SizedBox(width: 8),
-        Expanded(child: Text(
+        const Expanded(child: Text(
           'Activa la recompensa para que los turistas reciban un premio al escanear el código QR del establecimiento.',
-          style: TextStyle(fontSize: 11, color: Colors.orange[800]),
+          style: TextStyle(fontSize: 11, color: AppTheme.warning),
         )),
       ]),
     ),

@@ -2,6 +2,7 @@
 // Extraído de profile_page.dart (_SectionCard/_infoRow/_actionRow/
 // _rowDivider/_field/_dec/_cardDec) sin cambios de comportamiento ni de
 // estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../profile_tokens.dart';
 
@@ -129,7 +130,7 @@ InputDecoration profileFieldDecoration(String label, IconData icon) => InputDeco
       borderRadius: BorderRadius.circular(10),
       borderSide: const BorderSide(color: kProfilePrimary, width: 1.5)),
   filled: true,
-  fillColor: const Color(0xFFF8FAFC),
+  fillColor: AppTheme.backgroundGray,
 );
 
 Widget profileField(String label, TextEditingController ctrl, IconData icon) =>

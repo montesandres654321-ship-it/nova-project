@@ -1,26 +1,27 @@
 // lib/pages/owners/place_edit/place_edit_fields.dart
 // Extraído de place_edit_page.dart (_readOnlyField/_dec/_sectionCard) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'place_edit_tokens.dart';
 
 Widget placeEditReadOnlyField(String label, String value, IconData icon) {
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text(label,
-        style: TextStyle(fontSize: 10, color: Colors.grey[500],
+        style: const TextStyle(fontSize: 10, color: AppTheme.textMuted,
             fontWeight: FontWeight.w600)),
     const SizedBox(height: 3),
     Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: AppTheme.backgroundGray,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!)),
+            border: Border.all(color: AppTheme.border)),
         child: Row(children: [
-          Icon(icon, size: 16, color: Colors.grey[400]),
+          Icon(icon, size: 16, color: AppTheme.textMuted),
           const SizedBox(width: 8),
           Expanded(child: Text(value,
-              style: const TextStyle(fontSize: 13, color: Colors.black87))),
+              style: const TextStyle(fontSize: 13, color: AppTheme.textHead))),
         ])),
   ]);
 }

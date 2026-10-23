@@ -69,7 +69,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.backgroundGray,
       appBar: AppBar(
         title: Text(_user?.displayName ?? 'Detalle de Usuario'),
         backgroundColor: kUserDetailTeal,

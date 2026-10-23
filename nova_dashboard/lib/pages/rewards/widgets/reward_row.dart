@@ -1,6 +1,5 @@
 // lib/pages/rewards/widgets/reward_row.dart
-// Extraído de rewards_detail_page.dart (_RewardRow/_RewardRowState) sin
-// cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../models/reward_model.dart';
@@ -52,14 +51,14 @@ class _RewardRowState extends State<RewardRow> {
       dateLabel = r.earnedAt.length >= 10 ? r.earnedAt.substring(0, 10) : r.earnedAt;
     }
 
-    // Fondo: hover > striped
+    // Fondo: hover usa primaryLight, striped usa backgroundGray
     Color rowBg;
     if (_hovered) {
-      rowBg = const Color(0xFFEEFBFA);
+      rowBg = AppTheme.primaryLight.withOpacity(0.08);
     } else if (widget.index % 2 == 0) {
       rowBg = Colors.white;
     } else {
-      rowBg = const Color(0xFFF8FAFC);
+      rowBg = AppTheme.backgroundGray;
     }
 
     return MouseRegion(
@@ -71,9 +70,9 @@ class _RewardRowState extends State<RewardRow> {
           color: rowBg,
           border: widget.isLast
               ? null
-              : const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 0.8)),
+              : const Border(bottom: BorderSide(color: AppTheme.border, width: 0.8)),
           borderRadius: widget.isLast
-              ? const BorderRadius.vertical(bottom: Radius.circular(12))
+              ? const BorderRadius.vertical(bottom: Radius.circular(AppTheme.radiusMD))
               : null,
         ),
         child: Padding(
@@ -94,7 +93,7 @@ class _RewardRowState extends State<RewardRow> {
                     fontSize: 13, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
                 if (r.email != null)
                   Text(r.email!, style: const TextStyle(
-                      fontSize: 10, color: Color(0xFF9CA3AF)), overflow: TextOverflow.ellipsis),
+                      fontSize: 10, color: AppTheme.textMuted), overflow: TextOverflow.ellipsis),
               ])),
             ])),
 
@@ -107,7 +106,7 @@ class _RewardRowState extends State<RewardRow> {
                     fontSize: 13, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
                 if (r.lugar != null)
                   Text(r.lugar!, style: const TextStyle(
-                      fontSize: 10, color: Color(0xFF9CA3AF)), overflow: TextOverflow.ellipsis),
+                      fontSize: 10, color: AppTheme.textMuted), overflow: TextOverflow.ellipsis),
               ])),
             ])),
 
@@ -121,9 +120,9 @@ class _RewardRowState extends State<RewardRow> {
 
             // Fecha
             Expanded(flex: 2, child: Text(dateLabel,
-                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)))),
+                style: const TextStyle(fontSize: 12, color: AppTheme.textBody))),
 
-            // Estado — badge mejorado
+            // Estado — badge
             Expanded(flex: 2, child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
@@ -153,7 +152,7 @@ class _RewardRowState extends State<RewardRow> {
               ]),
             )),
 
-            // Acción — botón Entregar / spinner / check
+            // Acción
             Expanded(flex: 2, child: r.isRedeemedBool
                 ? Center(child: Icon(Icons.check_circle_rounded,
                     color: kRewardsGreen.withOpacity(0.5), size: 20))

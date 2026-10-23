@@ -93,7 +93,7 @@ class _RewardsPageState extends State<RewardsPage> {
   Widget _buildPeriodDropdown() => DropdownButton<int>(
     value: _selectedDays,
     underline: const SizedBox(),
-    style: const TextStyle(fontSize: 13, color: Colors.black87),
+    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
     items: _daysOptions.map((d) => DropdownMenuItem(value: d,
         child: Text(d == 0 ? 'Todo el historial' : '$d días'))).toList(),
     onChanged: (v) { if (v != null) { setState(() => _selectedDays = v); _loadData(); } },
@@ -115,7 +115,7 @@ class _RewardsPageState extends State<RewardsPage> {
             IconButton(icon: const Icon(Icons.refresh_rounded, color: _teal, size: 20),
                 onPressed: _loadData, tooltip: 'Actualizar'),
           ]),
-          Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          const Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: AppTheme.textBody)),
           const SizedBox(height: 8),
           _buildPeriodDropdown(),
         ]),
@@ -129,7 +129,7 @@ class _RewardsPageState extends State<RewardsPage> {
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('Recompensas', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: Colors.grey[600]))])),
+            const Text('Gestión y análisis', style: TextStyle(fontSize: 12, color: AppTheme.textBody))])),
           _buildPeriodDropdown(),
           const SizedBox(width: 8),
           IconButton(icon: const Icon(Icons.refresh_rounded, color: _teal), onPressed: _loadData, tooltip: 'Actualizar'),
@@ -171,8 +171,8 @@ class _RewardsPageState extends State<RewardsPage> {
                     child: Icon(icon, color: color, size: 16)),
                 const SizedBox(width: 10),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), height: 1.1)),
-                  Text(title, style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280))),
+                  Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.textHead, height: 1.1)),
+                  Text(title, style: const TextStyle(fontSize: 10, color: AppTheme.textBody)),
                   if (tapFilter != null) Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.open_in_new_rounded, size: 10, color: color.withOpacity(0.5)), const SizedBox(width: 3),
                     Text('Ver detalle', style: TextStyle(fontSize: 9, color: color.withOpacity(0.6)))]),
@@ -202,8 +202,8 @@ class _RewardsPageState extends State<RewardsPage> {
 
   Widget _emptyChart(String msg) => Container(decoration: AppTheme.cardDecoration(),
       child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(Icons.bar_chart_rounded, size: 44, color: Colors.grey[300]), const SizedBox(height: 8),
-        Text(msg, style: TextStyle(fontSize: 12, color: Colors.grey[500]))])));
+        const Icon(Icons.bar_chart_rounded, size: 44, color: AppTheme.border), const SizedBox(height: 8),
+        Text(msg, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted))])));
 
   Widget _buildError() => Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
     const Icon(Icons.error_outline, size: 56, color: AppTheme.error), const SizedBox(height: 16),

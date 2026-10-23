@@ -144,11 +144,11 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
 
           // ── Selector de ícono ─────────────────────────
-          Align(alignment: Alignment.centerLeft,
+          const Align(alignment: Alignment.centerLeft,
               child: Text('Ícono',
                   style: TextStyle(fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[700]))),
+                      color: AppTheme.textBody))),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8,
               children: _icons.map((item) {
@@ -159,7 +159,7 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
                     child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: sel ? _teal.withOpacity(0.12) : Colors.grey[100],
+                            color: sel ? _teal.withOpacity(0.12) : AppTheme.backgroundGray,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                                 color: sel ? _teal : Colors.transparent,
@@ -170,7 +170,7 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
                           const SizedBox(height: 2),
                           Text(item['label']!,
                               style: TextStyle(fontSize: 9,
-                                  color: sel ? _teal : Colors.grey[600])),
+                                  color: sel ? _teal : AppTheme.textBody)),
                         ])));
               }).toList()),
 
@@ -203,9 +203,9 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
           Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: AppTheme.backgroundGray,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!)),
+                  border: Border.all(color: AppTheme.border)),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -220,8 +220,8 @@ class _OwnerRewardDialogState extends State<OwnerRewardDialog> {
                                 _unlimited
                                     ? 'Sin límite — todos los turistas pueden ganar la recompensa'
                                     : 'Máximo de recompensas a otorgar en total',
-                                style: TextStyle(fontSize: 10,
-                                    color: Colors.grey[600])),
+                                style: const TextStyle(fontSize: 10,
+                                    color: AppTheme.textBody)),
                           ])),
                       Switch(
                           value: _unlimited,

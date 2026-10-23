@@ -229,7 +229,7 @@ class _OwnersListTabState extends State<OwnersListTab> {
             title: Text(owner.displayName,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: owner.isActive ? Colors.black87 : Colors.grey)),
+                    color: owner.isActive ? AppTheme.textHead : AppTheme.textMuted)),
             subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(owner.email, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 4),
@@ -287,11 +287,11 @@ class _OwnersListTabState extends State<OwnersListTab> {
   Widget _buildEmpty() => Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
+        const Icon(Icons.people_outline, size: 64, color: AppTheme.border),
         const SizedBox(height: 12),
         Text(_searchQuery.isNotEmpty
             ? 'No se encontraron administradores'
             : 'No hay administradores registrados',
-            style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+            style: const TextStyle(fontSize: 14, color: AppTheme.textMuted)),
       ]));
 }

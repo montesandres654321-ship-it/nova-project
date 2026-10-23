@@ -1,6 +1,7 @@
 // lib/pages/places/qr/qr_dialog_actions.dart
 // Extraído de qr_dialog.dart (instrucciones + botones) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
 import 'qr_download.dart';
@@ -24,7 +25,7 @@ Widget qrInstructions(Place place) {
           'Imprime este QR y colócalo en el establecimiento. '
               'Los turistas lo escanean con la app Nova para '
               'acumular puntos y obtener recompensas.',
-          style: TextStyle(fontSize: 11, color: Colors.grey[700]),
+          style: const TextStyle(fontSize: 11, color: AppTheme.textBody),
         ),
       ),
     ]),

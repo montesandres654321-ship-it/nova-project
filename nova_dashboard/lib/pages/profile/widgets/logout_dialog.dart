@@ -1,6 +1,7 @@
 // lib/pages/profile/widgets/logout_dialog.dart
 // Extraído de profile_page.dart (_LogoutDialog) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../profile_tokens.dart';
 
@@ -19,7 +20,7 @@ class LogoutDialog extends StatelessWidget {
         Container(
           width: 64, height: 64,
           decoration: BoxDecoration(
-            color: const Color(0xFFFEE2E2),
+            color: AppTheme.error.withOpacity(0.12),
             borderRadius: BorderRadius.circular(18),
           ),
           child: const Icon(Icons.logout_rounded,

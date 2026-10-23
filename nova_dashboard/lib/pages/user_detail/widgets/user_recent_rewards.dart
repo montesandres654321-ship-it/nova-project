@@ -1,6 +1,7 @@
 // lib/pages/user_detail/widgets/user_recent_rewards.dart
 // Extraído de user_detail_page.dart (_buildRecentRewards) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../user_detail_tokens.dart';
 import 'user_detail_shared.dart';
@@ -28,10 +29,10 @@ class UserRecentRewardsCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Center(child: Column(children: [
-              Icon(Icons.card_giftcard, size: 32, color: Colors.grey[300]),
+              const Icon(Icons.card_giftcard, size: 32, color: AppTheme.border),
               const SizedBox(height: 8),
-              Text('Sin recompensas registradas',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+              const Text('Sin recompensas registradas',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
             ])),
           )
         else
@@ -47,7 +48,7 @@ class UserRecentRewardsCard extends StatelessWidget {
               title: Text(r['reward_name'] ?? 'N/A',
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
               subtitle: Text(r['place_name'] ?? 'N/A',
-                  style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                  style: const TextStyle(fontSize: 10, color: AppTheme.textBody)),
               trailing: isPending
                   ? SizedBox(
                       height: 28,

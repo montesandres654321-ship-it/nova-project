@@ -1,6 +1,7 @@
 // lib/pages/user_detail/widgets/user_detail_shared.dart
 // Extraído de user_detail_page.dart (_sectionHeader/_cardDec/_badge/
 // _miniStat/_formatDate) sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../user_detail_tokens.dart';
 
@@ -10,16 +11,16 @@ Widget userDetailSectionHeader(String title, Color color) => Row(children: [
           color: kUserDetailTeal, borderRadius: BorderRadius.circular(2))),
   const SizedBox(width: 8),
   Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
-      color: Color(0xFF0F172A))),
+      color: AppTheme.textHead)),
 ]);
 
 BoxDecoration userDetailCardDecoration() => BoxDecoration(
   color: Colors.white,
   borderRadius: BorderRadius.circular(14),
-  border: Border.all(color: const Color(0xFFE2E8F0)),
+  border: Border.all(color: AppTheme.border),
   boxShadow: [
     BoxShadow(
-      color: Colors.grey.withOpacity(0.06),
+      color: Colors.black.withOpacity(0.04),
       blurRadius: 8,
       offset: const Offset(0, 2),
     ),
@@ -42,9 +43,9 @@ Widget userDetailMiniStat(String label, String value, IconData icon, Color color
     Expanded(child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.backgroundGray,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Row(children: [
         Icon(icon, size: 18, color: color),
@@ -52,7 +53,7 @@ Widget userDetailMiniStat(String label, String value, IconData icon, Color color
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(value, style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w800, color: color, height: 1.1)),
-          Text(label, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+          Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.textMuted)),
         ])),
       ]),
     ));

@@ -1,6 +1,7 @@
 // lib/pages/owners/place_edit/place_edit_reward_section.dart
 // Extraído de place_edit_page.dart (sección "🎁 Recompensa") sin cambios
 // de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'place_edit_tokens.dart';
 
@@ -23,7 +24,7 @@ List<Widget> buildPlaceEditRewardSection({
         hasReward
             ? 'Los turistas ganan al escanear tu QR'
             : 'No se otorga recompensa',
-        style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        style: const TextStyle(fontSize: 11, color: AppTheme.textBody)),
     value: hasReward,
     onChanged: onHasRewardChanged,
     activeColor: kPlaceEditTeal,
@@ -44,7 +45,7 @@ List<Widget> buildPlaceEditRewardSection({
               child: Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                      color: sel ? kPlaceEditAmber.withOpacity(0.12) : Colors.grey[100],
+                      color: sel ? kPlaceEditAmber.withOpacity(0.12) : AppTheme.backgroundGray,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                           color: sel ? kPlaceEditAmber : Colors.transparent,
@@ -57,7 +58,7 @@ List<Widget> buildPlaceEditRewardSection({
                         const SizedBox(height: 2),
                         Text(item['label']!,
                             style: TextStyle(fontSize: 9,
-                                color: sel ? kPlaceEditAmber : Colors.grey[600])),
+                                color: sel ? kPlaceEditAmber : AppTheme.textBody)),
                       ])));
         }).toList()),
     const SizedBox(height: 14),
@@ -99,9 +100,9 @@ List<Widget> buildPlaceEditRewardSection({
     Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: AppTheme.backgroundGray,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!)),
+            border: Border.all(color: AppTheme.border)),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -112,12 +113,10 @@ List<Widget> buildPlaceEditRewardSection({
                       const Text('Stock disponible',
                           style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text(
-                          unlimitedStock
-                              ? 'Sin límite — todos pueden ganar'
-                              : 'Cantidad máxima de recompensas',
+                      const Text(
+                          'Cantidad máxima de recompensas',
                           style: TextStyle(fontSize: 10,
-                              color: Colors.grey[600])),
+                              color: AppTheme.textBody)),
                     ])),
                 Switch(
                     value: unlimitedStock,
@@ -158,16 +157,16 @@ List<Widget> buildPlaceEditRewardSection({
     Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        color: AppTheme.warning.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange[200]!),
+        border: Border.all(color: AppTheme.warning.withOpacity(0.3)),
       ),
       child: Row(children: [
-        Icon(Icons.info_outline, size: 16, color: Colors.orange[700]),
+        const Icon(Icons.info_outline, size: 16, color: AppTheme.warning),
         const SizedBox(width: 8),
-        Expanded(child: Text(
+        const Expanded(child: Text(
           'Activa la recompensa para premiar a los turistas que escanean tu código QR.',
-          style: TextStyle(fontSize: 11, color: Colors.orange[800]),
+          style: TextStyle(fontSize: 11, color: AppTheme.warning),
         )),
       ]),
     ),

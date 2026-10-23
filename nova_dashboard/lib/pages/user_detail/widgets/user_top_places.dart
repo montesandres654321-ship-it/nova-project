@@ -1,6 +1,7 @@
 // lib/pages/user_detail/widgets/user_top_places.dart
 // Extraído de user_detail_page.dart (_buildTopPlaces) sin cambios de
 // comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../user_detail_tokens.dart';
 import 'user_detail_shared.dart';
@@ -40,7 +41,7 @@ class UserTopPlacesCard extends StatelessWidget {
             title: Text(n, style: const TextStyle(
                 fontSize: 13, fontWeight: FontWeight.w600)),
             subtitle: Text('$e $t · $l',
-                style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                style: const TextStyle(fontSize: 11, color: AppTheme.textBody)),
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(

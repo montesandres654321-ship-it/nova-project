@@ -70,7 +70,7 @@ class DashboardUserMenu extends StatelessWidget {
           enabled: false,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text(userEmail, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            Text(userEmail, style: const TextStyle(fontSize: 11, color: AppTheme.textBody)),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

@@ -102,7 +102,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
           const Expanded(child: Text('Entregar Recompensa', style: TextStyle(fontSize: 16))),
         ]),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('¿Entregar esta recompensa?', style: TextStyle(color: Colors.grey[700])),
+          const Text('¿Entregar esta recompensa?', style: TextStyle(color: AppTheme.textBody)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(12),
@@ -110,8 +110,8 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Turista: ${[reward.firstName, reward.lastName].where((s) => s != null && s.isNotEmpty).join(' ')}',
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-              Text('Lugar: ${reward.placeName ?? 'N/A'}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-              Text('Premio: ${reward.rewardName}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              Text('Lugar: ${reward.placeName ?? 'N/A'}', style: const TextStyle(fontSize: 12, color: AppTheme.textBody)),
+              Text('Premio: ${reward.rewardName}', style: const TextStyle(fontSize: 12, color: AppTheme.textBody)),
             ]),
           ),
           const SizedBox(height: 8),
@@ -178,7 +178,7 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.backgroundGray,
       appBar: AppBar(
         title: Text(_pageTitle),
         backgroundColor: kRewardsTeal, foregroundColor: Colors.white,
@@ -210,15 +210,15 @@ class _RewardsDetailPageState extends State<RewardsDetailPage> {
         ),
         const SizedBox(height: 8),
         Text('${_filteredRewards.length} resultados',
-            style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
         const SizedBox(height: 8),
         if (_filteredRewards.isEmpty)
           Center(child: Padding(
             padding: const EdgeInsets.all(32),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.card_giftcard_outlined, size: 52, color: Colors.grey[300]),
+              const Icon(Icons.card_giftcard_outlined, size: 52, color: AppTheme.border),
               const SizedBox(height: 12),
-              Text(_emptyLabel, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+              Text(_emptyLabel, style: const TextStyle(fontSize: 14, color: AppTheme.textMuted)),
             ]),
           ))
         else

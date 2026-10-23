@@ -1,6 +1,7 @@
 // lib/pages/places/qr/qr_image_card.dart
 // Extraído de qr_dialog.dart (contenedor del QR + chip de código) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
 import 'qr_type_style.dart';
@@ -51,14 +52,14 @@ Widget qrImageCard(Place place) {
           },
           errorBuilder: (context, error, stack) => Container(
             width: 260, height: 260,
-            color: Colors.grey[100],
+            color: AppTheme.backgroundGray,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.qr_code, size: 60, color: Colors.grey[400]),
+                const Icon(Icons.qr_code, size: 60, color: AppTheme.border),
                 const SizedBox(height: 8),
-                Text('Error al cargar QR',
-                    style: TextStyle(color: Colors.grey[500])),
+                const Text('Error al cargar QR',
+                    style: TextStyle(color: AppTheme.textMuted)),
               ],
             ),
           ),

@@ -23,10 +23,10 @@ List<Widget> buildPlaceEditImageSection({
           height: 140, width: double.infinity,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Container(
-              height: 80, color: Colors.grey[100],
+              height: 80, color: AppTheme.backgroundGray,
               child: const Center(
                   child: Icon(Icons.image_not_supported,
-                      color: Colors.grey))),
+                      color: AppTheme.textMuted))),
         )),
     const SizedBox(height: 10),
   ],
@@ -59,7 +59,7 @@ List<Widget> buildPlaceEditImageSection({
         padding: const EdgeInsets.symmetric(
             horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-            color: Colors.green[50],
+            color: AppTheme.success.withOpacity(0.08),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppTheme.success)),
         child: Row(children: [

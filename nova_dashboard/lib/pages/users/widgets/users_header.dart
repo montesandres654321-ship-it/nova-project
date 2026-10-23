@@ -1,6 +1,7 @@
 // lib/pages/users/widgets/users_header.dart
 // Extraído de users_page.dart (_buildPageHeader/_buildIconButton) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class UsersPageHeader extends StatelessWidget {
@@ -17,10 +18,10 @@ class UsersPageHeader extends StatelessWidget {
           Text('Turistas',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontSize: 20, fontWeight: FontWeight.w700,
-                  color: const Color(0xFF0F172A))),
+                  color: AppTheme.textHead)),
           const SizedBox(height: 2),
           const Text('Gestión de usuarios registrados',
-              style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+              style: TextStyle(fontSize: 12, color: AppTheme.textBody)),
         ]),
         const Spacer(),
         usersIconButton(icon: Icons.refresh_rounded, tooltip: 'Actualizar', onTap: onRefresh),
@@ -40,9 +41,9 @@ Widget usersIconButton({required IconData icon, required String tooltip, require
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: AppTheme.border),
         ),
-        child: Icon(icon, size: 18, color: const Color(0xFF64748B)),
+        child: const Icon(Icons.refresh_rounded, size: 18, color: AppTheme.textBody),
       ),
     ),
   );

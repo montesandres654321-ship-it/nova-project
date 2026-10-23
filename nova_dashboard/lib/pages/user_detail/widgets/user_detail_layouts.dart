@@ -25,7 +25,7 @@ Widget _sectionTitle(String title, IconData icon, Color color) {
       const SizedBox(width: 6),
       Text(title, style: const TextStyle(
         fontSize: 14, fontWeight: FontWeight.w600,
-        color: Color(0xFF1F2937),
+        color: AppTheme.textHead,
       )),
     ],
   );
@@ -78,7 +78,7 @@ class UserDetailContent extends StatelessWidget {
             ),
           ),
         ),
-        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+        const VerticalDivider(width: 1, color: AppTheme.border),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -93,7 +93,7 @@ class UserDetailContent extends StatelessWidget {
             ),
           ),
         ),
-        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+        const VerticalDivider(width: 1, color: AppTheme.border),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -101,14 +101,14 @@ class UserDetailContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sectionTitle('Recompensas Recientes',
-                    Icons.card_giftcard_rounded, const Color(0xFFF59E0B)),
+                    Icons.card_giftcard_rounded, AppTheme.warning),
                 const SizedBox(height: 12),
                 UserRecentRewardsCard(rewards: rewards, onDeliver: onDeliverReward),
               ],
             ),
           ),
         ),
-        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+        const VerticalDivider(width: 1, color: AppTheme.border),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -116,7 +116,7 @@ class UserDetailContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sectionTitle('Últimos Escaneos',
-                    Icons.qr_code_scanner_rounded, const Color(0xFF3B82F6)),
+                    Icons.qr_code_scanner_rounded, AppTheme.info),
                 const SizedBox(height: 12),
                 UserRecentScansCard(scans: scans),
               ],

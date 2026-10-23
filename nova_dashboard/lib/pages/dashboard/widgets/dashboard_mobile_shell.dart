@@ -60,10 +60,10 @@ class DashboardMobileDrawer extends StatelessWidget {
                 final selected = selectedIndex == i;
                 return ListTile(
                   leading: Icon(item.icon,
-                      color: selected ? kDashboardMobileTeal : Colors.grey[600], size: 22),
+                      color: selected ? kDashboardMobileTeal : AppTheme.textBody, size: 22),
                   title: Text(item.label,
                       style: TextStyle(
-                        color: selected ? kDashboardMobileTeal : Colors.grey[800],
+                        color: selected ? kDashboardMobileTeal : AppTheme.textHead,
                         fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                         fontSize: 14,
                       )),

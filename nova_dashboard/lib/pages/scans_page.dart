@@ -174,14 +174,14 @@ class _ScansPageState extends State<ScansPage> {
   Widget _buildEmpty() => Center(child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      Icon(Icons.qr_code_scanner_rounded,
-          size: 48, color: Colors.grey[300]),
+      const Icon(Icons.qr_code_scanner_rounded,
+          size: 48, color: AppTheme.border),
       const SizedBox(height: 12),
       Text(_search.isNotEmpty
           ? 'Sin resultados para "$_search"'
           : 'No hay escaneos registrados',
-        style: TextStyle(fontSize: 14,
-            color: Colors.grey[500])),
+        style: const TextStyle(fontSize: 14,
+            color: AppTheme.textMuted)),
     ],
   ));
 }

@@ -1,6 +1,5 @@
 // lib/pages/rewards/widgets/rewards_table.dart
-// Extraído de rewards_detail_page.dart (_buildDesktopContent, la tabla)
-// sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/reward_model.dart';
 import 'reward_row.dart';
@@ -23,22 +22,16 @@ class RewardsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 3)),
-        ],
-      ),
+      decoration: AppTheme.cardDecoration(),
       child: Column(children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-          decoration: const BoxDecoration(
-            color: Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-            border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundGray,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(AppTheme.cardRadius),
+              topRight: Radius.circular(AppTheme.cardRadius)),
+            border: const Border(bottom: BorderSide(color: AppTheme.border)),
           ),
           child: Row(children: [
             rewardsColHead('Turista', flex: 3),
@@ -52,9 +45,9 @@ class RewardsTable extends StatelessWidget {
         Expanded(
           child: rewards.isEmpty
               ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.card_giftcard_outlined, size: 52, color: Colors.grey[300]),
+            Icon(Icons.card_giftcard_outlined, size: 52, color: AppTheme.gray200),
             const SizedBox(height: 12),
-            Text(emptyLabel, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+            Text(emptyLabel, style: const TextStyle(fontSize: 14, color: AppTheme.textMuted)),
           ]))
               : ListView.builder(
             padding: EdgeInsets.zero,

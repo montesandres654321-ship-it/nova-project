@@ -1,6 +1,7 @@
 // lib/pages/places/widgets/place_card.dart
 // Extraído de list_tab.dart (_buildPlaceCard/_menuItem/_StatusBadge) sin
 // cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
 import '../places_tokens.dart';
@@ -30,7 +31,7 @@ class PlaceCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: isInactive ? const Color(0xFFEEF2F7) : kPlacesBorder),
+            color: isInactive ? AppTheme.backgroundGray : kPlacesBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isInactive ? 0.02 : 0.04),

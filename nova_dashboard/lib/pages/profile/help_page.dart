@@ -92,12 +92,12 @@ class HelpPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Versión 1.0.0',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: const TextStyle(color: AppTheme.textBody),
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   '© 2024 Nova App. Todos los derechos reservados.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: AppTheme.textBody),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -131,7 +131,7 @@ class HelpPage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Text(
             answer,
-            style: TextStyle(color: Colors.grey[700]),
+            style: const TextStyle(color: AppTheme.textBody),
           ),
         ),
       ],

@@ -8,6 +8,7 @@
 // actual, según AUDITORIA_DASHBOARD_REPORTE.md) — se refactoriza igual
 // por pedido explícito, sin cambiar su comportamiento.
 // ============================================================
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'settings/dialogs/clear_cache_dialog.dart';
@@ -183,7 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                          color: const Color(0xFFFEE2E2)),
+                          color: AppTheme.error.withOpacity(0.25)),
                       boxShadow: [BoxShadow(
                         color: Colors.black.withOpacity(0.04),
                         blurRadius: 8, offset: const Offset(0, 2),
@@ -207,8 +208,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                     color: kSettingsRed)),
                           ]),
                         ),
-                        const Divider(height: 20, thickness: 0.5,
-                            color: Color(0xFFFEE2E2)),
+                        Divider(height: 20, thickness: 0.5,
+                            color: AppTheme.error.withOpacity(0.25)),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
                           child: settingsDangerRow(

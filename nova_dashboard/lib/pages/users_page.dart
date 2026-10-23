@@ -115,16 +115,16 @@ class _UsersPageState extends State<UsersPage> {
               child: Container(
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppTheme.backgroundGray,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: AppTheme.border),
                 ),
                 child: TextField(
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
                     decoration: const InputDecoration(
                         hintText: 'Buscar turista...',
-                        hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                        prefixIcon: Icon(Icons.search_rounded, size: 18, color: Color(0xFF94A3B8)),
+                        hintStyle: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                        prefixIcon: Icon(Icons.search_rounded, size: 18, color: AppTheme.textMuted),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 11)),
                     onChanged: _filterUsers),
@@ -136,12 +136,12 @@ class _UsersPageState extends State<UsersPage> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
                 child: Row(children: [
                   Text('${_filteredUsers.length} turistas',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8),
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted,
                           fontWeight: FontWeight.w500)),
                   if (_searchQuery.isNotEmpty) ...[
                     const SizedBox(width: 6),
                     Text('· filtrando por "$_searchQuery"',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                        style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                   ],
                 ])),
 
@@ -173,12 +173,12 @@ class _UsersPageState extends State<UsersPage> {
               ? Center(child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.people_outline, size: 56, color: Colors.grey[300]),
+                Icon(Icons.people_outline, size: 56, color: AppTheme.border),
                 const SizedBox(height: 12),
                 Text(_searchQuery.isNotEmpty
                     ? 'Sin resultados para "$_searchQuery"'
                     : 'No hay turistas registrados',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                    style: const TextStyle(fontSize: 14, color: AppTheme.textMuted)),
               ]))
               : Column(children: [
                   Expanded(

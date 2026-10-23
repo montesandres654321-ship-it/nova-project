@@ -1,6 +1,5 @@
 // lib/pages/scans/widgets/scans_mobile_list.dart
-// Extraído de scans_page.dart (_buildMobileList) sin cambios de
-// comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../scans_tokens.dart';
 
@@ -31,8 +30,8 @@ class ScansMobileList extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey[200]!),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            border: Border.all(color: AppTheme.border),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,11 +40,9 @@ class ScansMobileList extends StatelessWidget {
                 radius: 18,
                 backgroundColor: kScansPrimary.withOpacity(0.1),
                 child: Text(
-                  userName.isNotEmpty
-                      ? userName[0].toUpperCase() : '?',
+                  userName.isNotEmpty ? userName[0].toUpperCase() : '?',
                   style: TextStyle(fontSize: 13,
-                      color: kScansPrimary,
-                      fontWeight: FontWeight.w600),
+                      color: kScansPrimary, fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(width: 10),
@@ -54,35 +51,31 @@ class ScansMobileList extends StatelessWidget {
                 children: [
                   Text(userName, style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w600)),
-                  Text(email, style: TextStyle(
-                      fontSize: 11, color: Colors.grey[500])),
+                  Text(email, style: const TextStyle(
+                      fontSize: 11, color: AppTheme.textMuted)),
                   const SizedBox(height: 6),
                   Row(children: [
-                    Icon(scansPlaceIcon(placeType),
-                        color: color, size: 13),
+                    Icon(scansPlaceIcon(placeType), color: color, size: 13),
                     const SizedBox(width: 4),
                     Expanded(child: Text('$placeName · $placeLoc',
-                      style: TextStyle(fontSize: 12,
-                          color: Colors.grey[700]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis)),
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textBody),
+                      maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
                   const SizedBox(height: 4),
                   Row(children: [
-                    Icon(Icons.access_time_rounded,
-                        size: 11, color: Colors.grey[400]),
+                    const Icon(Icons.access_time_rounded,
+                        size: 11, color: AppTheme.textMuted),
                     const SizedBox(width: 3),
-                    Text(date, style: TextStyle(
-                        fontSize: 11, color: Colors.grey[500])),
+                    Text(date, style: const TextStyle(
+                        fontSize: 11, color: AppTheme.textMuted)),
                     if (gotReward) ...[
                       const SizedBox(width: 8),
                       Expanded(child: Text('$rewardIcon $rewardName',
                         style: const TextStyle(
                             fontSize: 11,
-                            color: Color(0xFFF59E0B),
+                            color: AppTheme.warning,
                             fontWeight: FontWeight.w500),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis)),
+                        maxLines: 1, overflow: TextOverflow.ellipsis)),
                     ],
                   ]),
                 ],

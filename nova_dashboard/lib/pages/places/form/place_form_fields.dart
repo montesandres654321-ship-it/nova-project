@@ -2,6 +2,7 @@
 // Helpers de formulario compartidos, extraídos de form_page.dart
 // (_sectionCard/_responsiveFieldRow/_inputDecoration/_field/_dropdown)
 // sin cambios de comportamiento ni de estilo.
+import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
 import 'place_form_tokens.dart';
@@ -32,10 +33,10 @@ Widget placeFormSectionCard(String title, List<Widget> children) {
               style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A))),
+                  color: AppTheme.textHead)),
         ]),
       ),
-      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+      const Divider(height: 1, color: AppTheme.backgroundGray),
       Padding(
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
           child: Column(
@@ -63,9 +64,9 @@ InputDecoration placeFormInputDecoration(String label, IconData icon,
   return InputDecoration(
     labelText: label,
     hintText: hint,
-    hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFCBD5E1)),
-    labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-    prefixIcon: Icon(icon, size: 17, color: const Color(0xFF94A3B8)),
+    hintStyle: const TextStyle(fontSize: 12, color: AppTheme.border),
+    labelStyle: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+    prefixIcon: Icon(icon, size: 17, color: AppTheme.textMuted),
     isDense: true,
     contentPadding:
         const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
@@ -82,10 +83,10 @@ InputDecoration placeFormInputDecoration(String label, IconData icon,
         borderSide: const BorderSide(color: kPlaceFormTeal, width: 2)),
     errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFFEF4444))),
+        borderSide: const BorderSide(color: AppTheme.error)),
     focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2)),
+        borderSide: const BorderSide(color: AppTheme.error, width: 2)),
   );
 }
 
@@ -116,7 +117,7 @@ Widget placeFormTypeDropdown({
   return DropdownButtonFormField<String>(
     value: value,
     decoration: placeFormInputDecoration(label, icon),
-    style: const TextStyle(fontSize: 13, color: Colors.black87),
+    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
     items: items
         .map((t) => DropdownMenuItem(value: t, child: Text(Place.tiposLabels[t] ?? t)))
         .toList(),
