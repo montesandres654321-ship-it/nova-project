@@ -13,6 +13,9 @@ import '../core/design/app_colors.dart';
 import '../services/google_auth_service.dart';
 import 'about_page.dart';
 import 'change_password_page.dart';
+import 'help_page.dart';
+import 'notifications_settings_page.dart';
+import 'terms_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -49,7 +52,8 @@ class SettingsPage extends StatelessWidget {
                             iconAsset: 'assets/icons/ic-bell.svg',
                             title: 'Notificaciones',
                             subtitle: 'Alertas de eventos y beneficios',
-                            onTap: () => _proximamente(context, 'Notificaciones'),
+                            onTap: () => Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => const NotificationsSettingsPage())),
                           ),
                           _SettingsRow(
                             iconAsset: 'assets/icons/ic-lock.svg',
@@ -76,13 +80,15 @@ class SettingsPage extends StatelessWidget {
                         iconAsset: 'assets/icons/ic-file-text.svg',
                         title: 'Términos y condiciones',
                         subtitle: 'Políticas de uso de la plataforma',
-                        onTap: () => _proximamente(context, 'Términos y condiciones'),
+                        onTap: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const TermsPage())),
                       ),
                       _SettingsRow(
                         iconAsset: 'assets/icons/ic-help-circle.svg',
                         title: 'Ayuda y Soporte',
                         subtitle: 'Preguntas frecuentes y contacto',
-                        onTap: () => _proximamente(context, 'Ayuda y Soporte'),
+                        onTap: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const HelpPage())),
                       ),
                       _SettingsRow(
                         iconAsset: 'assets/icons/ic-info.svg',
