@@ -1,6 +1,5 @@
 // lib/pages/login/login_header.dart
-// Extraído de login_page.dart (logo badge + título + subtítulo) sin
-// cambios de comportamiento ni de estilo.
+// Logo badge + título + subtítulo — usa AppTheme como única fuente de verdad.
 import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -12,12 +11,12 @@ class LoginHeader extends StatelessWidget {
     return Center(
       child: Column(children: [
 
-        // Logo badge con gradiente y sombra teal
+        // Logo badge con gradiente teal y sombra
         Container(
           width: 64, height: 64,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0F766E), AppTheme.primary],
+            gradient: LinearGradient(
+              colors: [AppTheme.primaryDark, AppTheme.primary],
               begin: Alignment.topLeft,
               end:   Alignment.bottomRight,
             ),
@@ -39,17 +38,17 @@ class LoginHeader extends StatelessWidget {
 
         const SizedBox(height: 18),
 
-        // Título dos tonos: NOVA (negro bold) + Dashboard (slate ligero)
+        // Título: NOVA (bold oscuro) + Dashboard (ligero)
         RichText(
           textAlign: TextAlign.center,
-          text: const TextSpan(
+          text: TextSpan(
             children: [
               TextSpan(
                 text: 'NOVA',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF0F172A),
+                  color: AppTheme.textHead,
                   letterSpacing: 2.0,
                 ),
               ),
@@ -58,7 +57,7 @@ class LoginHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w300,
-                  color: Color(0xFF475569),
+                  color: AppTheme.textBody,
                   letterSpacing: 0.4,
                 ),
               ),
@@ -68,11 +67,11 @@ class LoginHeader extends StatelessWidget {
 
         const SizedBox(height: 6),
 
-        const Text(
+        Text(
           'Panel de administración',
           style: TextStyle(
             fontSize: 13,
-            color: Color(0xFF94A3B8),
+            color: AppTheme.textMuted,
             letterSpacing: 0.2,
           ),
         ),

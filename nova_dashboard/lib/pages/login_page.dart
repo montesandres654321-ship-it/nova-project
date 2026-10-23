@@ -164,8 +164,8 @@ class _LoginPageState extends State<LoginPage>
                               const LoginHeader(),
 
                               const SizedBox(height: 28),
-                              const Divider(
-                                  color: Color(0xFFF1F5F9), height: 1, thickness: 1),
+                              Divider(
+                                  color: AppTheme.border, height: 1, thickness: 1),
                               const SizedBox(height: 24),
 
                               LoginEmailField(
@@ -214,6 +214,7 @@ class _LoginPageState extends State<LoginPage>
                                           style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
+                                            color: Colors.white,
                                             letterSpacing: 0.3,
                                           ),
                                         ),
@@ -223,12 +224,12 @@ class _LoginPageState extends State<LoginPage>
                               const SizedBox(height: 24),
 
                               // ── FOOTER ───────────────────
-                              const Text(
+                              Text(
                                 'Golfo de Morrosquillo · NOVA',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Color(0xFFCBD5E1),
+                                  color: AppTheme.textMuted,
                                   letterSpacing: 0.4,
                                 ),
                               ),
