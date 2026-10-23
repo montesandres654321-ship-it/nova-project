@@ -15,11 +15,11 @@ class AppColors {
   static const Color onPrimary    = Colors.white;
 
   // ============================================================
-  // ESTADOS (semánticos)
+  // ESTADOS (semánticos) — alineados con nova_app AppColors
   // ============================================================
-  static const Color success = Color(0xFF16A34A);
-  static const Color warning = Color(0xFFD97706);
-  static const Color error   = Color(0xFFDC2626);
+  static const Color success = Color(0xFF10B981); // = slateGreen, = AppColors.success móvil
+  static const Color warning = Color(0xFFF59E0B); // = slateAmber, igual en ambos
+  static const Color error   = Color(0xFFEF4444); // = slateRed,   = AppColors.error móvil
   static const Color info    = Color(0xFF2563EB);
 
   // ============================================================
@@ -30,18 +30,18 @@ class AppColors {
   static const Color secondaryLight = info;
 
   // ============================================================
-  // NEUTROS — escala con tinte teal
+  // NEUTROS — alineados con nova_app AppColors (escala Tailwind Gray)
   // ============================================================
-  static const Color gray900 = Color(0xFF1A2B2A);
-  static const Color gray800 = Color(0xFF2C3E3D);
-  static const Color gray700 = Color(0xFF3F5352);
-  static const Color gray600 = Color(0xFF5C7371);
-  static const Color gray500 = Color(0xFF5C7371);
-  static const Color gray400 = Color(0xFF94A9A7);
-  static const Color gray300 = Color(0xFFB7C7C5);
-  static const Color gray200 = Color(0xFFE2E8E9);
-  static const Color gray100 = Color(0xFFECF1F1);
-  static const Color gray50  = Color(0xFFF5F7F8);
+  static const Color gray900 = Color(0xFF111827); // = AppColors.textPrimary móvil
+  static const Color gray800 = Color(0xFF1F2937);
+  static const Color gray700 = Color(0xFF374151);
+  static const Color gray600 = Color(0xFF6B7280); // = AppColors.textSecondary móvil
+  static const Color gray500 = Color(0xFF6B7280);
+  static const Color gray400 = Color(0xFF9CA3AF); // = AppColors.textHint móvil
+  static const Color gray300 = Color(0xFFD1D5DB);
+  static const Color gray200 = Color(0xFFE5E7EB); // = AppColors.border móvil
+  static const Color gray100 = Color(0xFFF3F4F6); // = AppColors.surfaceVariant móvil
+  static const Color gray50  = Color(0xFFF9FAFB);
 
   // ============================================================
   // FONDOS Y SUPERFICIES

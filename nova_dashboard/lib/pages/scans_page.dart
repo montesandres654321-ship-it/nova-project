@@ -86,9 +86,7 @@ class _ScansPageState extends State<ScansPage> {
     final total  = _meta['total']  as int? ?? 0;
     final pages  = _meta['pages']  as int? ?? 1;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: Padding(
+    return Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,14 +103,7 @@ class _ScansPageState extends State<ScansPage> {
             // ── Tabla ─────────────────────────────────
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8, offset: const Offset(0, 2),
-                  )],
-                ),
+                decoration: AppTheme.cardDecoration(),
                 child: _loading
                     ? const Center(child: CircularProgressIndicator(
                         color: kScansPrimary))
@@ -150,7 +141,6 @@ class _ScansPageState extends State<ScansPage> {
               ),
           ],
         ),
-      ),
     );
   }
 

@@ -36,7 +36,7 @@ class _RewardsPageState extends State<RewardsPage> {
   Map<String, dynamic>? _stats; List<Map<String, dynamic>> _rewardsByDay = [];
   bool _loading = true; String? _error; int _selectedDays = 0;
   final List<int> _daysOptions = [7, 15, 30, 60, 90, 0];
-  static const _teal = AppTheme.primary, _green = Color(0xFF059669),
+  static const _teal = AppTheme.primary, _green = AppTheme.success,
       _amber = AppTheme.warning, _blue = AppTheme.info;
 
   @override
@@ -65,9 +65,11 @@ class _RewardsPageState extends State<RewardsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: const Color(0xFFF8FAFC),
-        body: _loading ? const Center(child: CircularProgressIndicator(color: _teal))
-            : _error != null ? _buildError() : _buildContent());
+    return _loading
+        ? const Center(child: CircularProgressIndicator(color: _teal))
+        : _error != null
+            ? _buildError()
+            : _buildContent();
   }
 
   Widget _buildContent() {
@@ -157,12 +159,7 @@ class _RewardsPageState extends State<RewardsPage> {
       onTap: tapFilter != null ? () => _navigateToDetail(tapFilter) : null,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
-          ),
+          decoration: AppTheme.cardDecoration(),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(height: 3, decoration: BoxDecoration(
               color: color, borderRadius: const BorderRadius.vertical(top: Radius.circular(11)))),
@@ -203,9 +200,7 @@ class _RewardsPageState extends State<RewardsPage> {
         height: double.infinity, showLegend: true);
   }
 
-  Widget _emptyChart(String msg) => Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: const Color(0xFFE5E7EB)),
-      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 3))]),
+  Widget _emptyChart(String msg) => Container(decoration: AppTheme.cardDecoration(),
       child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.bar_chart_rounded, size: 44, color: Colors.grey[300]), const SizedBox(height: 8),
         Text(msg, style: TextStyle(fontSize: 12, color: Colors.grey[500]))])));

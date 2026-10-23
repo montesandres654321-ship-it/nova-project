@@ -8,5 +8,5 @@ class AppRadii {
   static const double radiusLG   = 16.0;
   static const double radiusXL   = 24.0;
   static const double radiusFull = 9999.0;
-  static const double cardRadius = radiusMD; // alias — tarjeta estándar nova-design
+  static const double cardRadius = radiusLG; // alias — tarjeta estándar nova-design (= 16, igual que app móvil)
 }

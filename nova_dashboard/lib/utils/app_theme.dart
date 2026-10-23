@@ -153,10 +153,14 @@ class AppTheme {
   // TIPOGRAFÍA — jerarquía nova-design (mínimo 12px siempre)
   // ============================================================
   static const TextStyle textScreenTitle  = AppTypography.textScreenTitle;
+  static const TextStyle textHeadline     = AppTypography.textHeadline;
   static const TextStyle textSectionTitle = AppTypography.textSectionTitle;
   static const TextStyle textSubtitle     = AppTypography.textSubtitle;
+  static const TextStyle textLabel        = AppTypography.textLabel;
   static const TextStyle textBodyStyle    = AppTypography.textBodyStyle;
+  static const TextStyle textBodySm       = AppTypography.textBodySm;
   static const TextStyle textCaption      = AppTypography.textCaption;
+  static const TextStyle textSectionLabel = AppTypography.textSectionLabel;
 
   // ============================================================
   // THEME DATA
@@ -168,9 +172,10 @@ class AppTheme {
   // ============================================================
   static BoxDecoration cardDecoration({
     Color? color,
-    List<BoxShadow>? boxShadow,
+    Color? borderColor,
+    bool withShadow = false,
   }) =>
-      AppDecorations.card(color: color, boxShadow: boxShadow);
+      AppDecorations.card(color: color, borderColor: borderColor, withShadow: withShadow);
 
   static BoxDecoration statCardDecoration({required Color color}) =>
       AppDecorations.statCard(color: color);
