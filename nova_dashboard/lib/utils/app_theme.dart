@@ -37,10 +37,16 @@ class AppTheme {
   // ============================================================
   // MARCA
   // ============================================================
-  static const Color primary      = AppColors.primary;
-  static const Color primaryDark  = AppColors.primaryDark;
-  static const Color primaryLight = AppColors.primaryLight;
-  static const Color onPrimary    = AppColors.onPrimary;
+  static const Color primary            = AppColors.primary;
+  static const Color primaryDark        = AppColors.primaryDark;
+  static const Color primaryDeep        = AppColors.primaryDeep;
+  static const Color primaryGradientEnd = AppColors.primaryGradientEnd;
+  static const Color primaryAccentLight = AppColors.primaryAccentLight;
+  static const Color primaryLight       = AppColors.primaryLight;
+  static const Color onPrimary          = AppColors.onPrimary;
+
+  // Fondo alternativo neutro — error screens y scaffolds vacíos
+  static const Color backgroundAlt = AppColors.backgroundAlt;
 
   // ============================================================
   // ESTADOS (semánticos)
@@ -111,6 +117,34 @@ class AppTheme {
   static const Color slateAmber     = AppColors.slateAmber;
   static const Color slateGreen     = AppColors.slateGreen;
   static const Color slateRed       = AppColors.slateRed;
+
+  // ============================================================
+  // LOGROS Y RANGOS
+  // ============================================================
+  static const Color rankBronce = AppColors.rankBronce;
+
+  // ============================================================
+  // TIPOS DE LUGAR (QR) — colores semánticos por categoría
+  // ============================================================
+  static const Color tipoHotel         = AppColors.tipoHotel;
+  static const Color tipoGastronomia   = AppColors.tipoGastronomia;
+  static const Color tipoBar           = AppColors.tipoBar;
+  static const Color tipoDeportivo     = AppColors.tipoDeportivo;
+  static const Color tipoNaturaleza    = AppColors.tipoNaturaleza;
+  static const Color tipoArtesania     = AppColors.tipoArtesania;
+  static const Color tipoPlaya         = AppColors.tipoPlaya;
+  static const Color tipoRuta          = AppColors.tipoRuta;
+  static const Color tipoCompras       = AppColors.tipoCompras;
+  static const Color tipoHotelBg       = AppColors.tipoHotelBg;
+  static const Color tipoGastronomiaBg = AppColors.tipoGastronomiaBg;
+  static const Color tipoBarBg         = AppColors.tipoBarBg;
+  static const Color tipoDeportivoBg   = AppColors.tipoDeportivoBg;
+  static const Color tipoNaturalezaBg  = AppColors.tipoNaturalezaBg;
+  static const Color tipoArtesaniaBg   = AppColors.tipoArtesaniaBg;
+  static const Color tipoPLayaBg       = AppColors.tipoPLayaBg;
+  static const Color tipoRutaBg        = AppColors.tipoRutaBg;
+  static const Color tipoComprasBg     = AppColors.tipoComprasBg;
+  static const Color tipoDefaultBg     = AppColors.tipoDefaultBg;
 
   // ============================================================
   // ESPACIADO — escala oficial de 8

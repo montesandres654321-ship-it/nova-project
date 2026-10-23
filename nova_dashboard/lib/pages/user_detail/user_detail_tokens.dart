@@ -4,6 +4,6 @@ import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 const kUserDetailTeal  = AppTheme.primary;
-const kUserDetailGreen = Color(0xFF059669);
+const kUserDetailGreen = AppTheme.success;
 const kUserDetailAmber = AppTheme.warning;
 const kUserDetailBlue  = AppTheme.info;

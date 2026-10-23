@@ -160,7 +160,7 @@ class BarChartWidget extends StatelessWidget {
             drawVerticalLine: false,
             horizontalInterval: interval,
             getDrawingHorizontalLine: (_) =>
-                const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
+                const FlLine(color: AppTheme.slateBgPage, strokeWidth: 1),
           ),
           borderData: FlBorderData(
             show: true,

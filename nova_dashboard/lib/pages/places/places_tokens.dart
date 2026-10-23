@@ -16,7 +16,7 @@ const kPlacesAmber     = AppTheme.slateAmber;
 const kPlacesRed       = AppTheme.slateRed;
 const kPlacesTeal      = Color(0xFF14B8A6);
 const kPlacesPurple    = Color(0xFF8B5CF6);
-const kPlacesCyan      = Color(0xFF0EA5E9);
+const kPlacesCyan      = AppTheme.info;
 const kPlacesIndigo    = Color(0xFF6366F1);
 const kPlacesPink      = Color(0xFFEC4899);
 

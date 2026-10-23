@@ -4,5 +4,5 @@ import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 const kRewardsTeal  = AppTheme.primary;
-const kRewardsGreen = Color(0xFF059669);
+const kRewardsGreen = AppTheme.success;
 const kRewardsAmber = AppTheme.warning;

@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage>
                             spreadRadius: -8,
                           ),
                           BoxShadow(
-                            color: const Color(0xFF0F766E).withOpacity(0.18),
+                            color: AppTheme.primaryDeep.withOpacity(0.18),
                             blurRadius: 80,
                             offset: const Offset(0, 10),
                           ),

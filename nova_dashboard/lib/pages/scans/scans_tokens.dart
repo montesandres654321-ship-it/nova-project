@@ -7,9 +7,9 @@ const kScansPrimary = AppTheme.primary;
 
 Color scansPlaceColor(String? tipo) {
   switch (tipo) {
-    case 'hotel':      return const Color(0xFF3B82F6);
-    case 'restaurant': return const Color(0xFF10B981);
-    case 'bar':        return const Color(0xFFF59E0B);
+    case 'hotel':      return AppTheme.tipoHotel;
+    case 'restaurant': return AppTheme.tipoGastronomia;
+    case 'bar':        return AppTheme.tipoBar;
     default:           return kScansPrimary;
   }
 }

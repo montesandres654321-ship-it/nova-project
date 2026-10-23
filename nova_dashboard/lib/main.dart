@@ -98,7 +98,7 @@ class MyApp extends StatelessWidget {
   MaterialPageRoute _buildErrorRoute(String title, String message) {
     return MaterialPageRoute(
       builder: (context) => Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: AppColors.backgroundAlt,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -121,7 +121,7 @@ class MyApp extends StatelessWidget {
                   icon: const Icon(Icons.home),
                   label: const Text('Ir al Login'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF06B6A4),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                   ),
                 ),

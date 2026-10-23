@@ -17,9 +17,9 @@ class LoginBackground extends StatelessWidget {
             begin: Alignment.topLeft,
             end:   Alignment.bottomRight,
             colors: [
-              Color(0xFF0F766E), // teal oscuro
+              AppTheme.primaryDeep, // teal oscuro
               AppTheme.primary, // primary
-              Color(0xFF67E8F9), // light accent
+              AppTheme.primaryAccentLight, // light accent
             ],
           ),
         ),

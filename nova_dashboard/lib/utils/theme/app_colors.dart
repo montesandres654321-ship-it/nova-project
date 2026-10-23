@@ -9,10 +9,23 @@ class AppColors {
   // ============================================================
   // MARCA
   // ============================================================
-  static const Color primary      = Color(0xFF06B6A4);
-  static const Color primaryDark  = Color(0xFF048577);
-  static const Color primaryLight = Color(0xFFE6F7F5);
-  static const Color onPrimary    = Colors.white;
+  static const Color primary             = Color(0xFF06B6A4);
+  static const Color primaryDark         = Color(0xFF048577);
+  // Variante profunda del primary (teal-800, Tailwind) — usada en login
+  // como overlay sutil y en gradientes de profundidad.
+  static const Color primaryDeep         = Color(0xFF0F766E);
+  // Extremo del gradiente en profile_header — cyan-600, un tono
+  // más frío que el primary para dar profundidad al gradiente.
+  static const Color primaryGradientEnd  = Color(0xFF0891B2);
+  // Acento claro del gradiente de login background — cyan-200.
+  // Tono muy suave para el extremo derecho del gradiente de la pantalla de login.
+  static const Color primaryAccentLight  = Color(0xFF67E8F9);
+  static const Color primaryLight        = Color(0xFFE6F7F5);
+  static const Color onPrimary           = Colors.white;
+
+  // Fondo alternativo neutro — usado en pantallas de error y scaffolds
+  // sin contenido (no coincide exactamente con gray50 ni slateBgPage).
+  static const Color backgroundAlt       = Color(0xFFF5F5F5);
 
   // ============================================================
   // ESTADOS (semánticos) — alineados con nova_app AppColors
@@ -83,4 +96,39 @@ class AppColors {
   static const Color slateAmber     = Color(0xFFF59E0B);
   static const Color slateGreen     = Color(0xFF10B981);
   static const Color slateRed       = Color(0xFFEF4444);
+
+  // ============================================================
+  // LOGROS Y RANGOS — colores semánticos de gamificación
+  // ============================================================
+  // Color de bronce (tercer lugar) — amber-800 de Tailwind.
+  // Usado en el podio de visitantes frecuentes (visitors_page).
+  static const Color rankBronce = Color(0xFF92400E);
+
+  // ============================================================
+  // TIPOS DE LUGAR (QR) — colores semánticos por categoría
+  // Usados en qr_type_style.dart para identificar visualmente
+  // cada tipo de establecimiento en el mapa de QRs.
+  // Alineados con la paleta Tailwind (escala 600-700).
+  // ============================================================
+  // Colores principales (texto / ícono)
+  static const Color tipoHotel             = Color(0xFF2563EB); // blue-600
+  static const Color tipoGastronomia       = Color(0xFF059669); // emerald-600
+  static const Color tipoBar               = Color(0xFFD97706); // amber-600
+  static const Color tipoDeportivo         = Color(0xFFDC2626); // red-600
+  static const Color tipoNaturaleza        = Color(0xFF0D9488); // teal-600
+  static const Color tipoArtesania         = Color(0xFF7C3AED); // violet-600
+  static const Color tipoPlaya             = Color(0xFF0284C7); // sky-600
+  static const Color tipoRuta              = Color(0xFF4F46E5); // indigo-600
+  static const Color tipoCompras           = Color(0xFFDB2777); // pink-600
+  // Colores de fondo (chip / card ligero)
+  static const Color tipoHotelBg           = Color(0xFFDBEAFE); // blue-100
+  static const Color tipoGastronomiaBg     = Color(0xFFD1FAE5); // emerald-100
+  static const Color tipoBarBg             = Color(0xFFFEF3C7); // amber-100
+  static const Color tipoDeportivoBg       = Color(0xFFFEE2E2); // red-100
+  static const Color tipoNaturalezaBg      = Color(0xFFCCFBF1); // teal-100
+  static const Color tipoArtesaniaBg       = Color(0xFFEDE9FE); // violet-100
+  static const Color tipoPLayaBg           = Color(0xFFE0F2FE); // sky-100
+  static const Color tipoRutaBg            = Color(0xFFE0E7FF); // indigo-100
+  static const Color tipoComprasBg         = Color(0xFFFCE7F3); // pink-100
+  static const Color tipoDefaultBg         = Color(0xFFE0F7FA); // cyan-50
 }
