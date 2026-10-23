@@ -162,7 +162,7 @@ class _RutaPatrimonioPageState extends State<RutaPatrimonioPage> {
           _chip(Icons.schedule_rounded, '1 día completo'),
           _chip(Icons.location_on_rounded, '4 paradas'),
           _chip(Icons.directions_walk_rounded, 'Nivel fácil'),
-          _chip(Icons.hat_rounded ?? Icons.style_rounded, 'Sombrero vueltiao'),
+          _chip(Icons.style_rounded, 'Sombrero vueltiao'),
         ],
       ),
     );
