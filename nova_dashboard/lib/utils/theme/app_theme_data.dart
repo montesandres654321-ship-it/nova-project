@@ -2,6 +2,7 @@
 // ThemeData completo de Material — extraído de app_theme.dart (lightTheme)
 // sin cambiar ningún valor.
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppThemeData {
@@ -12,7 +13,8 @@ class AppThemeData {
       useMaterial3: true,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.backgroundGray,
-      fontFamily: 'Roboto',
+      // Open Sans — misma fuente que nova_app (alineación de diseño)
+      textTheme: GoogleFonts.openSansTextTheme(),
 
       // Color Scheme
       colorScheme: const ColorScheme.light(
@@ -37,7 +39,7 @@ class AppThemeData {
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.gray900,
-          fontFamily: 'Roboto',
+          
         ),
       ),
 
@@ -66,7 +68,7 @@ class AppThemeData {
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Roboto',
+            
           ),
         ),
       ),
@@ -86,7 +88,7 @@ class AppThemeData {
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Roboto',
+            
           ),
         ),
       ),
@@ -102,7 +104,7 @@ class AppThemeData {
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Roboto',
+            
           ),
         ),
       ),
@@ -151,12 +153,12 @@ class AppThemeData {
         labelStyle: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Roboto',
+          
         ),
         unselectedLabelStyle: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
+          
         ),
       ),
 
@@ -197,8 +199,9 @@ class AppThemeData {
         size: 24,
       ),
 
-      // Text Theme
-      textTheme: const TextTheme(
+      // Text Theme — Open Sans aplicado via GoogleFonts.openSansTextTheme() arriba.
+      // Este bloque sobreescribe colores/tamaños pero hereda la fuente.
+      textTheme: GoogleFonts.openSansTextTheme(const TextTheme(
         displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
@@ -283,7 +286,7 @@ class AppThemeData {
           fontWeight: FontWeight.w500,
           color: AppColors.gray500,
         ),
-      ),
+      )),
     );
   }
 }

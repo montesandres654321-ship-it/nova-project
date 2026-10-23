@@ -33,7 +33,7 @@ class AppColors {
   static const Color success = Color(0xFF10B981); // = slateGreen, = AppColors.success móvil
   static const Color warning = Color(0xFFF59E0B); // = slateAmber, igual en ambos
   static const Color error   = Color(0xFFEF4444); // = slateRed,   = AppColors.error móvil
-  static const Color info    = Color(0xFF2563EB);
+  static const Color info    = Color(0xFF0EA5E9); // sky-500, alineado con nova_app
 
   // ============================================================
   // SECUNDARIO — deprecado, apunta a info solo por compatibilidad
