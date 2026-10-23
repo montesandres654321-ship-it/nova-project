@@ -1,42 +1,47 @@
 // lib/pages/places/qr/qr_type_style.dart
 // Extraído de qr_dialog.dart (_typeColor/_typeLightColor/_typeIcon/
 // _qrData/_qrImageUrl) sin cambios de comportamiento.
+//
+// Todos los colores por tipo de lugar usan los tokens de AppTheme (alias
+// de AppColors.tipoXxx / AppColors.tipoXxxBg), que mapean a la escala
+// Tailwind 600 para íconos y 100 para fondos. Cero hardcodes.
 import 'package:flutter/material.dart';
 import '../../../models/place.dart';
+import '../../../utils/app_theme.dart';
 
 Color qrTypeColor(Place place) {
   switch (place.tipo.toLowerCase()) {
-    case 'hotel':               return const Color(0xFF2563EB);
+    case 'hotel':               return AppTheme.tipoHotel;
     case 'restaurant':
-    case 'gastronomia':         return const Color(0xFF059669);
-    case 'bar':                 return const Color(0xFFD97706);
-    case 'escenario_deportivo': return const Color(0xFFDC2626);
+    case 'gastronomia':         return AppTheme.tipoGastronomia;
+    case 'bar':                 return AppTheme.tipoBar;
+    case 'escenario_deportivo': return AppTheme.tipoDeportivo;
     case 'parque':
-    case 'naturaleza':          return const Color(0xFF0D9488);
+    case 'naturaleza':          return AppTheme.tipoNaturaleza;
     case 'cultura':
-    case 'artesania':           return const Color(0xFF7C3AED);
-    case 'playa':               return const Color(0xFF0284C7);
-    case 'ruta':                return const Color(0xFF4F46E5);
-    case 'compras':             return const Color(0xFFDB2777);
-    default:                    return const Color(0xFF06B6A4);
+    case 'artesania':           return AppTheme.tipoArtesania;
+    case 'playa':               return AppTheme.tipoPlaya;
+    case 'ruta':                return AppTheme.tipoRuta;
+    case 'compras':             return AppTheme.tipoCompras;
+    default:                    return AppTheme.primary;
   }
 }
 
 Color qrTypeLightColor(Place place) {
   switch (place.tipo.toLowerCase()) {
-    case 'hotel':               return const Color(0xFFDBEAFE);
+    case 'hotel':               return AppTheme.tipoHotelBg;
     case 'restaurant':
-    case 'gastronomia':         return const Color(0xFFD1FAE5);
-    case 'bar':                 return const Color(0xFFFEF3C7);
-    case 'escenario_deportivo': return const Color(0xFFFEE2E2);
+    case 'gastronomia':         return AppTheme.tipoGastronomiaBg;
+    case 'bar':                 return AppTheme.tipoBarBg;
+    case 'escenario_deportivo': return AppTheme.tipoDeportivoBg;
     case 'parque':
-    case 'naturaleza':          return const Color(0xFFCCFBF1);
+    case 'naturaleza':          return AppTheme.tipoNaturalezaBg;
     case 'cultura':
-    case 'artesania':           return const Color(0xFFEDE9FE);
-    case 'playa':               return const Color(0xFFE0F2FE);
-    case 'ruta':                return const Color(0xFFE0E7FF);
-    case 'compras':             return const Color(0xFFFCE7F3);
-    default:                    return const Color(0xFFE0F7FA);
+    case 'artesania':           return AppTheme.tipoArtesaniaBg;
+    case 'playa':               return AppTheme.tipoPLayaBg;
+    case 'ruta':                return AppTheme.tipoRutaBg;
+    case 'compras':             return AppTheme.tipoComprasBg;
+    default:                    return AppTheme.tipoDefaultBg;
   }
 }
 

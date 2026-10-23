@@ -4,5 +4,5 @@ import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 const kPlaceFormTeal   = AppTheme.primary;
-const kPlaceFormBorder = Color(0xFFE5E7EB);
+const kPlaceFormBorder = AppTheme.border;
 const kPlaceFormBg     = AppTheme.slateBgCard;

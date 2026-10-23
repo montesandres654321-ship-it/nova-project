@@ -176,7 +176,7 @@ class _OwnerVisitorsPageState extends State<OwnerVisitorsPage> {
     Color rankColor = _teal;
     if (rank == 1) rankColor = AppTheme.warning;
     if (rank == 2) rankColor = AppTheme.textBody;
-    if (rank == 3) rankColor = const Color(0xFF92400E);
+    if (rank == 3) rankColor = AppTheme.rankBronce;
 
     return Container(
       decoration: BoxDecoration(
