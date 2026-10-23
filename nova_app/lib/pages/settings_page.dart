@@ -20,13 +20,6 @@ import 'terms_page.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  void _proximamente(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('$feature: próximamente'),
-      backgroundColor: AppColors.bienvenidaAzul,
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,12 +47,6 @@ class SettingsPage extends StatelessWidget {
                             subtitle: 'Alertas de eventos y beneficios',
                             onTap: () => Navigator.push(context,
                                 MaterialPageRoute(builder: (_) => const NotificationsSettingsPage())),
-                          ),
-                          _SettingsRow(
-                            iconAsset: 'assets/icons/ic-lock.svg',
-                            title: 'Privacidad y Datos',
-                            subtitle: 'Gestionar permisos del dispositivo',
-                            onTap: () => _proximamente(context, 'Privacidad y Datos'),
                           ),
                           if (!isGoogleUser)
                             _SettingsRow(
