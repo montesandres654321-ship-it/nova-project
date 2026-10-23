@@ -307,7 +307,7 @@ class _HistoryPageState extends State<HistoryPage> {
               onTap: isRedeeming ? null : () => _redeem(reward),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(color: const AppColors.bienvenidaFondoChip, borderRadius: BorderRadius.circular(999)),
+                decoration: BoxDecoration(color: AppColors.bienvenidaFondoChip, borderRadius: BorderRadius.circular(999)),
                 child: isRedeeming
                     ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
                     : Text('Canjear', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.bienvenidaTextoMedio)),
@@ -458,7 +458,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget _buildItemEscaneo(ScanRecord scan) {
     final esVerde = scan.hasReward;
-    final colorFondoIcono = esVerde ? const AppColors.sistemaVerdeClaro : const Color(0xFFEAF7FF);
+    final colorFondoIcono = esVerde ? AppColors.sistemaVerdeClaro : const Color(0xFFEAF7FF);
     final colorTextoReward = esVerde ? AppColors.bienvenidaVerde : AppColors.bienvenidaAzul;
     final hora = '${scan.time.toLocal().hour.toString().padLeft(2, '0')}:${scan.time.toLocal().minute.toString().padLeft(2, '0')}';
 

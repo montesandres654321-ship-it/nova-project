@@ -28,7 +28,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
-                color: const AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -37,7 +37,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               ElevatedButton(
                 onPressed: onRetry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const AppColors.bienvenidaAzul,
+                  backgroundColor: AppColors.bienvenidaAzul,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   elevation: 0,
@@ -81,13 +81,13 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icono, size: 56, color: const AppColors.textHint),
+            Icon(icono, size: 56, color: AppColors.textHint),
             const SizedBox(height: 16),
             Text(
               mensaje,
               style: TextStyle(
                 fontSize: 15,
-                color: const AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -100,7 +100,7 @@ class EmptyStateWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const AppColors.bienvenidaAzul,
+                    color: AppColors.bienvenidaAzul,
                   ),
                 ),
               ),

@@ -197,7 +197,7 @@ class RutaJuegosPage extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(color: const AppColors.sistemaAzulClaro, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: AppColors.sistemaAzulClaro, borderRadius: BorderRadius.circular(10)),
             child: Text(d.dia, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.bienvenidaAzul)),
           ),
           const SizedBox(width: 14),
@@ -285,7 +285,7 @@ class RutaJuegosPage extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(color: const AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
+                      decoration: BoxDecoration(color: AppColors.sistemaVerdeClaro, borderRadius: BorderRadius.circular(999)),
                       child: Text('Verificado', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bienvenidaVerde)),
                     ),
                   ],
@@ -329,7 +329,7 @@ class RutaJuegosPage extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(color: const AppColors.bienvenidaFondoInput, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppColors.bienvenidaFondoInput, borderRadius: BorderRadius.circular(12)),
         child: Row(
           children: [
             SvgPicture.asset(icon, width: 20, height: 20),

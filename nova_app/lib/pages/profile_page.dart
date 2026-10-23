@@ -243,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const AppColors.bienvenidaFondoInput,
+      backgroundColor: AppColors.bienvenidaFondoInput,
       body: SafeArea(
         child: Column(
           children: [

@@ -365,7 +365,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: habilitado ? const AppColors.sistemaVerdeClaro : const Color(0xFFFFF8E1),
+                  color: habilitado ? AppColors.sistemaVerdeClaro : const Color(0xFFFFF8E1),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -405,7 +405,7 @@ class _EscenariosPageState extends State<EscenariosPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const AppColors.sistemaAzulClaro,
+                    color: AppColors.sistemaAzulClaro,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(

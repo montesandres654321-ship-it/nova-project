@@ -413,7 +413,7 @@ class DeportesPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: esPrimero ? const AppColors.categoriaGastroBg : Colors.white,
+        color: esPrimero ? AppColors.categoriaGastroBg : Colors.white,
         border: Border.all(
           color: esPrimero
               ? AppColors.bienvenidaCoral.withValues(alpha: 0.3)

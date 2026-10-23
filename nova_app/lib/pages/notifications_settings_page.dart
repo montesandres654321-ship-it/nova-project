@@ -57,7 +57,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const AppColors.bienvenidaFondoInput,
+      backgroundColor: AppColors.bienvenidaFondoInput,
       body: SafeArea(
         child: Column(
           children: [

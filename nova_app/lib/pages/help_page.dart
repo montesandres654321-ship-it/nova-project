@@ -79,7 +79,7 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const AppColors.bienvenidaFondoInput,
+      backgroundColor: AppColors.bienvenidaFondoInput,
       body: SafeArea(
         child: Column(
           children: [

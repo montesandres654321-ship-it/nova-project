@@ -153,7 +153,7 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                 const Spacer(),
                 Text(
                   _formatearHora(_hora),
-                  style: const AppTextStyles.caption,
+                  style: AppTextStyles.caption,
                 ),
               ],
             ),

@@ -62,11 +62,11 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
   Color get _colorFondo {
     switch (widget.tipo) {
       case 'escenario_deportivo':
-        return const AppColors.sistemaAzulClaro;
+        return AppColors.sistemaAzulClaro;
       case 'restaurant':
-        return const AppColors.categoriaGastroBg;
+        return AppColors.categoriaGastroBg;
       case 'parque':
-        return const AppColors.sistemaVerdeClaro;
+        return AppColors.sistemaVerdeClaro;
       case 'artesania':
         return const Color(0xFFFFF3E0);
       case 'compras':
@@ -76,7 +76,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
       case 'gastronomia':
         return const Color(0xFFFFF8F0);
       default:
-        return const AppColors.sistemaAzulClaro;
+        return AppColors.sistemaAzulClaro;
     }
   }
 

@@ -116,7 +116,7 @@ class CulturaPage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    const AppColors.categoriaPatrimonio.withValues(alpha: 0.30),
+                    AppColors.categoriaPatrimonio.withValues(alpha: 0.30),
                     const Color(0xFF4C1D95).withValues(alpha: 0.88),
                   ],
                 ),
@@ -212,7 +212,7 @@ class CulturaPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         titulo,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: const AppColors.categoriaPatrimonio),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.categoriaPatrimonio),
       ),
     );
   }
@@ -235,10 +235,10 @@ class CulturaPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: destacado ? const AppColors.categoriaPatrimonioBg : Colors.white,
+        color: destacado ? AppColors.categoriaPatrimonioBg : Colors.white,
         border: Border.all(
           color: destacado
-              ? const AppColors.categoriaPatrimonio.withValues(alpha: 0.25)
+              ? AppColors.categoriaPatrimonio.withValues(alpha: 0.25)
               : AppColors.bienvenidaBorde,
         ),
         borderRadius: BorderRadius.circular(16),
@@ -250,10 +250,10 @@ class CulturaPage extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: destacado ? const AppColors.categoriaPatrimonio : const AppColors.categoriaPatrimonioBg,
+              color: destacado ? AppColors.categoriaPatrimonio : AppColors.categoriaPatrimonioBg,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(e.icono, size: 22, color: destacado ? Colors.white : const AppColors.categoriaPatrimonio),
+            child: Icon(e.icono, size: 22, color: destacado ? Colors.white : AppColors.categoriaPatrimonio),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -306,8 +306,8 @@ class CulturaPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const AppColors.categoriaPatrimonioBg,
-          border: Border.all(color: const AppColors.categoriaPatrimonio.withValues(alpha: 0.2)),
+          color: AppColors.categoriaPatrimonioBg,
+          border: Border.all(color: AppColors.categoriaPatrimonio.withValues(alpha: 0.2)),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -324,7 +324,7 @@ class CulturaPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Información tentativa',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: const AppColors.categoriaPatrimonio)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.categoriaPatrimonio)),
                   const SizedBox(height: 3),
                   Text('La programación cultural oficial se publicará próximamente en el portal de los Juegos Nacionales 2027.',
                       style: TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.4)),
