@@ -9,6 +9,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors    = require('cors');
+const helmet  = require('helmet');
 const path    = require('path');
 const { AppError } = require('./src/utils/errors');
 const { requestContext, responseAdapter } = require('./src/middleware/response');
@@ -43,6 +44,11 @@ const sendErrorFallback = (req, res, statusCode, code, message, details = null) 
 // ── Middleware ────────────────────────────────────────────
 app.use(requestContext);
 app.use(responseAdapter);
+// Helmet: headers HTTP de seguridad (XSS, clickjacking, MIME sniffing, etc.)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // permite servir imágenes a la app
+  contentSecurityPolicy: false, // la app no sirve HTML, innecesario
+}));
 app.use(cors({
   origin: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())

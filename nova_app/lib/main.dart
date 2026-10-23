@@ -33,7 +33,7 @@ import 'services/notification_service.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService.saveNotification(message);
-  print('[FCM Background] ${message.notification?.title}');
+  debugPrint('[FCM Background] ${message.notification?.title}');
 }
 
 void main() async {

@@ -160,9 +160,9 @@ class NotificationService {
           },
           body: jsonEncode({'token': fcmToken}),
         );
-        print('[FCM] Token registrado en backend');
+        debugPrint('[FCM] Token registrado en backend');
       } catch (e) {
-        print('[FCM] Error registrando token: $e');
+        debugPrint('[FCM] Error registrando token: $e');
       }
     }
   }
@@ -176,7 +176,7 @@ class NotificationService {
     final title     = message.notification?.title ?? '';
     final body      = message.notification?.body  ?? '';
 
-    print('[FCM] Tap en notificación — municipio: $municipio');
+    debugPrint('[FCM] Tap en notificación — municipio: $municipio');
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AppConstants.keyToken);
@@ -220,7 +220,7 @@ class NotificationService {
 
     // App en foreground → mostrar en bandeja del sistema como notificación real
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('[FCM Foreground] ${message.notification?.title}');
+      debugPrint('[FCM Foreground] ${message.notification?.title}');
       saveNotification(message);
       _showLocalNotification(message);
     });
