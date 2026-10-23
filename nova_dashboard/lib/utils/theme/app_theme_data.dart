@@ -13,8 +13,6 @@ class AppThemeData {
       useMaterial3: true,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.backgroundGray,
-      // Open Sans — misma fuente que nova_app (alineación de diseño)
-      textTheme: GoogleFonts.openSansTextTheme(),
 
       // Color Scheme
       colorScheme: const ColorScheme.light(
