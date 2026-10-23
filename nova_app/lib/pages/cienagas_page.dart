@@ -239,12 +239,12 @@ class _CienagasPageState extends State<CienagasPage> {
                   ),
                   const SizedBox(height: 18),
                   // Stats
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
                     children: [
-                      for (final d in _kDatos) ...[
+                      for (final d in _kDatos)
                         _buildStatChip(d.icono, d.valor, d.etiqueta),
-                        const SizedBox(width: 10),
-                      ],
                     ],
                   ),
                 ],

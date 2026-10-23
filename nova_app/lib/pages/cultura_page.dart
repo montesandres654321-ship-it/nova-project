@@ -165,12 +165,12 @@ class CulturaPage extends StatelessWidget {
                     style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   const SizedBox(height: 18),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
                     children: [
                       _buildStatChip(Icons.event_rounded, '${_kEventos.length}', 'Eventos'),
-                      const SizedBox(width: 10),
                       _buildStatChip(Icons.location_city_rounded, '3', 'Municipios'),
-                      const SizedBox(width: 10),
                       _buildStatChip(Icons.calendar_month_rounded, 'Oct', '2027'),
                     ],
                   ),
@@ -267,10 +267,11 @@ class CulturaPage extends StatelessWidget {
                 Text(e.descripcion,
                     style: GoogleFonts.openSans(fontSize: 12, color: AppColors.textSecondary, height: 1.4)),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
                   children: [
                     _buildBadge(Icons.calendar_today_rounded, e.fecha),
-                    const SizedBox(width: 8),
                     _buildBadge(Icons.location_on_rounded, e.lugar),
                   ],
                 ),

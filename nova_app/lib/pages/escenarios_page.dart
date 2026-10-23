@@ -213,12 +213,12 @@ class _EscenariosPageState extends State<EscenariosPage> {
                     style: GoogleFonts.openSans(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   const SizedBox(height: 18),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
                     children: [
                       _buildStatChip(Icons.stadium_rounded, '${_kEscenarios.length}', 'Escenarios'),
-                      const SizedBox(width: 10),
                       _buildStatChip(Icons.location_city_rounded, '3', 'Municipios'),
-                      const SizedBox(width: 10),
                       _buildStatChip(
                         Icons.check_circle_rounded,
                         '${_kEscenarios.where((e) => e.estado == 'Habilitado').length}',

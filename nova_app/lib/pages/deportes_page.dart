@@ -261,12 +261,12 @@ class DeportesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   // Stats rápidos
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
                     children: [
                       _buildStatChip(Icons.emoji_events_rounded, '${_kDisciplinas.length}', 'Disciplinas'),
-                      const SizedBox(width: 10),
                       _buildStatChip(Icons.calendar_today_rounded, '${_kCalendario.length}', 'Eventos'),
-                      const SizedBox(width: 10),
                       _buildStatChip(Icons.location_on_rounded, '3', 'Sedes'),
                     ],
                   ),
@@ -328,7 +328,7 @@ class DeportesPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 1.05,
+          childAspectRatio: 1.3,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),
