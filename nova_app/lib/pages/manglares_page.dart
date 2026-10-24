@@ -242,13 +242,13 @@ class _ManglaresPageState extends State<ManglaresPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Stats
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                  // Stats — Row garantiza que los 3 chips queden en una sola línea
+                  Row(
                     children: [
-                      for (final d in _kDatos)
-                        _buildStatChip(d.icono, d.valor, d.etiqueta),
+                      for (int i = 0; i < _kDatos.length; i++) ...[
+                        Expanded(child: _buildStatChip(_kDatos[i].icono, _kDatos[i].valor, _kDatos[i].etiqueta)),
+                        if (i < _kDatos.length - 1) const SizedBox(width: 6),
+                      ],
                     ],
                   ),
                 ],
@@ -262,16 +262,16 @@ class _ManglaresPageState extends State<ManglaresPage> {
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 14, color: Colors.white),
-          const SizedBox(width: 6),
+          const SizedBox(width: 5),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

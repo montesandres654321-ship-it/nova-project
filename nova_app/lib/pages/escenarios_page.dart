@@ -212,17 +212,18 @@ class _EscenariosPageState extends State<EscenariosPage> {
                     style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                   const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 6,
+                  // Stats — Row para que los 3 queden siempre en línea
+                  Row(
                     children: [
-                      _buildStatChip(Icons.stadium_rounded, '${_kEscenarios.length}', 'Escenarios'),
-                      _buildStatChip(Icons.location_city_rounded, '3', 'Municipios'),
-                      _buildStatChip(
+                      Expanded(child: _buildStatChip(Icons.stadium_rounded, '${_kEscenarios.length}', 'Escenarios')),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildStatChip(Icons.location_city_rounded, '3', 'Municipios')),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildStatChip(
                         Icons.check_circle_rounded,
                         '${_kEscenarios.where((e) => e.estado == 'Habilitado').length}',
                         'Habilitados',
-                      ),
+                      )),
                     ],
                   ),
                 ],
@@ -236,13 +237,13 @@ class _EscenariosPageState extends State<EscenariosPage> {
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 14, color: Colors.white),
           const SizedBox(width: 6),

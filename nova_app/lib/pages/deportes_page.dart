@@ -259,14 +259,14 @@ class DeportesPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Stats rápidos
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 6,
+                  // Stats rápidos — Row para que los 3 queden siempre en línea
+                  Row(
                     children: [
-                      _buildStatChip(Icons.emoji_events_rounded, '${_kDisciplinas.length}', 'Disciplinas'),
-                      _buildStatChip(Icons.calendar_today_rounded, '${_kCalendario.length}', 'Eventos'),
-                      _buildStatChip(Icons.location_on_rounded, '3', 'Sedes'),
+                      Expanded(child: _buildStatChip(Icons.emoji_events_rounded, '${_kDisciplinas.length}', 'Disciplinas')),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildStatChip(Icons.calendar_today_rounded, '${_kCalendario.length}', 'Eventos')),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildStatChip(Icons.location_on_rounded, '3', 'Sedes')),
                     ],
                   ),
                 ],
@@ -280,13 +280,13 @@ class DeportesPage extends StatelessWidget {
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 14, color: Colors.white),
           const SizedBox(width: 6),
