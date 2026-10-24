@@ -124,7 +124,7 @@ class CulturaPage extends StatelessWidget {
             ),
             // Contenido
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -163,7 +163,7 @@ class CulturaPage extends StatelessWidget {
                     'Eventos, tradiciones y patrimonio del Golfo de Morrosquillo',
                     style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
                     runSpacing: 6,
@@ -184,7 +184,7 @@ class CulturaPage extends StatelessWidget {
 
   Widget _buildStatChip(IconData icon, String valor, String etiqueta) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(12),
