@@ -67,7 +67,7 @@ router.get('/all', authenticateToken, authorize(['admin_general', 'user_general'
 });
 
 // ─── PATCH /:id/status — activar/desactivar lugar ─────────────────────────────
-router.patch('/:id/status', authenticateToken, authorize(['admin_general']), async (req, res) => {
+router.patch('/:id/status', authenticateToken, authorize(['admin_general', 'user_general']), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { is_active } = req.body;
