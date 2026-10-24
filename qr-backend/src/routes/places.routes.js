@@ -5,14 +5,32 @@ const { authenticateToken } = require('../middleware/auth');
 const authorize      = require('../middleware/authorize');
 const checkOwnership = require('../middleware/checkOwnership');
 
+// Convierte tipos no serializables de $queryRaw: BigInt → Number, Date → ISO string
+function serializeRaw(rows) {
+  return rows.map(row => {
+    const obj = {};
+    for (const [k, v] of Object.entries(row)) {
+      obj[k] = typeof v === 'bigint' ? Number(v) :
+               v instanceof Date    ? v.toISOString() : v;
+    }
+    return obj;
+  });
+}
+
 const parsePlace = (place) => ({
   ...place,
+  id:           typeof place.id === 'bigint' ? Number(place.id) : place.id,
   amenities: (() => {
     try { return place.amenities ? JSON.parse(place.amenities) : []; }
     catch { return []; }
   })(),
   has_reward:   place.has_reward === true,
-  reward_stock: place.reward_stock ?? null,
+  reward_stock: place.reward_stock != null
+    ? (typeof place.reward_stock === 'bigint' ? Number(place.reward_stock) : place.reward_stock)
+    : null,
+  rating: place.rating != null
+    ? (typeof place.rating === 'bigint' ? Number(place.rating) : Number(place.rating))
+    : 0,
 });
 
 // Tipos de lugar soportados — ampliado para el Home/Explorar del Figma
@@ -41,7 +59,7 @@ router.get('/', async (req, res) => {
     } else {
       places = await prisma.$queryRaw`SELECT * FROM places WHERE is_active = TRUE ORDER BY rating DESC`;
     }
-    return res.json({ success: true, data: places.map(parsePlace) });
+    return res.json({ success: true, data: serializeRaw(places).map(parsePlace) });
   } catch (error) {
     console.error('❌ Error en GET /places:', error);
     return res.status(500).json({ success: false, error: 'Error al obtener lugares' });
@@ -59,7 +77,7 @@ router.get('/all', authenticateToken, authorize(['admin_general', 'user_general'
     } else {
       places = await prisma.$queryRaw`SELECT * FROM places ORDER BY is_active DESC, name ASC`;
     }
-    return res.json({ success: true, data: places.map(parsePlace) });
+    return res.json({ success: true, data: serializeRaw(places).map(parsePlace) });
   } catch (error) {
     console.error('❌ Error en GET /places/all:', error);
     return res.status(500).json({ success: false, error: 'Error al obtener lugares' });
@@ -94,7 +112,7 @@ router.get('/type/:type', async (req, res) => {
     }
     const t = type.toLowerCase();
     const places = await prisma.$queryRaw`SELECT * FROM places WHERE tipo = ${t} AND is_active = TRUE ORDER BY rating DESC`;
-    return res.json({ success: true, data: places.map(parsePlace) });
+    return res.json({ success: true, data: serializeRaw(places).map(parsePlace) });
   } catch (error) {
     console.error('❌ Error en GET /places/type/:type:', error);
     return res.status(500).json({ success: false, error: 'Error al obtener lugares' });
