@@ -197,6 +197,59 @@ router.get('/user-context/:userId', requireServiceSecret, async (req, res) => {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
+// POST /internal/test-job
+// Crea un job de prueba manualmente — SOLO para testing del flujo n8n
+// No requiere que el cron haya disparado ni que el usuario tenga ubicación fresca
+//
+// Body (todos opcionales):
+//   userId   — default 12 (usuario con FCM token)
+//   municipio — default 'sincelejo'
+//
+// Respuesta: { success, job: { id, userId, municipio, eventId } }
+// ═══════════════════════════════════════════════════════════════════════════
+router.post('/test-job', requireServiceSecret, async (req, res) => {
+  // Bloquear en producción real — solo permitir si TEST_MODE activo o env=development
+  if (process.env.NODE_ENV === 'production' && process.env.NOTIFICATION_TEST_MODE !== 'true') {
+    return res.status(403).json({
+      success: false,
+      error: 'test-job solo disponible con NOTIFICATION_TEST_MODE=true',
+    });
+  }
+
+  const userId   = parseInt(req.body?.userId   ?? '12', 10);
+  const municipio = req.body?.municipio ?? 'sincelejo';
+  const eventId  = `test_${Date.now()}_u${userId}`;
+
+  try {
+    const rows = await prisma.$queryRaw`
+      INSERT INTO notification_jobs (user_id, municipio, event_id, estado, created_at)
+      VALUES (${userId}, ${municipio}, ${eventId}, 'pending', NOW())
+      RETURNING id, user_id, municipio, event_id, created_at
+    `;
+
+    const job = serializeRaw(rows)[0];
+    console.log(`[internal/test-job] ✅ Job de prueba creado id=${job.id} userId=${userId} municipio=${municipio}`);
+
+    return res.json({
+      success:  true,
+      job: {
+        id:        job.id,
+        userId:    job.user_id,
+        municipio: job.municipio,
+        eventId:   job.event_id,
+        createdAt: job.created_at,
+      },
+      instrucciones: 'Ejecuta el flujo n8n UNA sola vez. SKIP LOCKED reclama este job en el primer polling.',
+    });
+
+  } catch (err) {
+    console.error('[internal/test-job]', err.message);
+    return res.status(500).json({ success: false, error: 'Error creando job de prueba' });
+  }
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GET /internal/recommendation-jobs
 // n8n consulta periódicamente para obtener jobs pendientes (polling/outbox)
 //
