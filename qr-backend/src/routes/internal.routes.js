@@ -392,6 +392,52 @@ router.post('/notificacion-ia', requireWebhookSecret, async (req, res) => {
 });
 
 
+// ═══════════════════════════════════════════════════════════════════════════
+// POST /internal/jobs/:id/complete
+// n8n llama este endpoint después de procesar un job exitosamente
+// Evita que el job quede en 'processing' si n8n falla antes de llamar al webhook
+//
+// Body: { status: 'sent' | 'failed' | 'skipped', errorMsg?: string }
+// ═══════════════════════════════════════════════════════════════════════════
+router.post('/jobs/:id/complete', requireServiceSecret, async (req, res) => {
+  const jobId = parseInt(req.params.id, 10);
+  if (!jobId || isNaN(jobId)) {
+    return res.status(400).json({ success: false, error: 'jobId inválido' });
+  }
+
+  const { status, errorMsg } = req.body;
+  const allowedStatuses = ['sent', 'failed', 'skipped'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ success: false, error: `status debe ser: ${allowedStatuses.join(', ')}` });
+  }
+
+  try {
+    const result = await prisma.$executeRaw`
+      UPDATE notification_jobs
+      SET estado = ${status},
+          processed_at = NOW(),
+          error_msg = CASE
+            WHEN ${errorMsg ?? null}::text IS NOT NULL THEN ${errorMsg ?? ''}
+            ELSE error_msg
+          END
+      WHERE id = ${jobId}
+        AND estado = 'processing'
+    `;
+
+    if (result === 0) {
+      return res.json({ success: false, reason: 'job_not_found_or_not_processing' });
+    }
+
+    console.log(`[internal/jobs] Job ${jobId} marcado como '${status}'`);
+    return res.json({ success: true, jobId, status });
+
+  } catch (err) {
+    console.error('[internal/jobs/complete]', err.message);
+    return res.status(500).json({ success: false, error: 'Error actualizando job' });
+  }
+});
+
+
 // ─── Helpers para marcar estado de jobs ──────────────────────────────────────
 
 async function _markJobFailed(eventId, errorMsg) {
