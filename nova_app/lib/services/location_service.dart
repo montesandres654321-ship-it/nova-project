@@ -3,11 +3,20 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../utils/constants.dart';
 
+/// Resultado del ping de ubicación al backend.
+/// [municipio] es el slug si el usuario está en la región de Sucre,
+/// [ciudad] es el nombre de la ciudad real (ej. "Medellín, Antioquia")
+/// cuando está fuera de cobertura (obtenido por reverse geocoding en el backend).
+class LocationResult {
+  final String? municipio;
+  final String? ciudad;
+  const LocationResult({this.municipio, this.ciudad});
+}
+
 class LocationService {
   /// Pide permiso si hace falta, obtiene la posición y la envía al backend.
-  /// Retorna el slug del municipio resuelto (p.ej. 'sampues') si todo va
-  /// bien, o `null` si el permiso fue denegado o hubo un error.
-  static Future<String?> pingLocation(String authToken) async {
+  /// Retorna [LocationResult] con el municipio y/o ciudad real.
+  static Future<LocationResult?> pingLocation(String authToken) async {
     try {
       // Verificar permisos
       LocationPermission permission = await Geolocator.checkPermission();
@@ -42,9 +51,11 @@ class LocationService {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        // El backend devuelve { success: true, municipio: 'sampues' }
-        final municipio = body['municipio'] as String?;
-        return municipio; // puede ser null si las coords no caen en ningún bbox
+        // El backend devuelve { success: true, municipio: 'sampues', ciudad: 'Medellín, Antioquia' }
+        return LocationResult(
+          municipio: body['municipio'] as String?,
+          ciudad: body['ciudad'] as String?,
+        );
       }
       return null;
     } catch (e) {
@@ -53,13 +64,13 @@ class LocationService {
   }
 
   /// Verifica el permiso actual SIN solicitarlo (no interrumpe al usuario).
-  /// Si ya está concedido, hace el ping y retorna el municipio resuelto;
+  /// Si ya está concedido, hace el ping y retorna el resultado de ubicación;
   /// si no, retorna null para que el caller mantenga visible el banner.
-  static Future<String?> checkAndPing(String authToken) async {
+  static Future<LocationResult?> checkAndPing(String authToken) async {
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
-      return pingLocation(authToken); // hace el POST y devuelve municipio
+      return pingLocation(authToken); // hace el POST y devuelve resultado
     }
     return null; // banner sigue visible
   }

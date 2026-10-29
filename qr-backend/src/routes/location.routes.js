@@ -1,7 +1,37 @@
 const express = require('express');
 const router = express.Router();
+const https = require('https');
 const prisma = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth');
+
+// Reverse geocoding con Nominatim (OpenStreetMap) — sin API key requerida
+// Devuelve "Ciudad, Departamento" en español o null si falla
+async function reversGeocode(lat, lng) {
+  return new Promise((resolve) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`;
+    const options = {
+      headers: { 'User-Agent': 'SucreApp/1.0 (turismo sucre colombia)' },
+    };
+    const req = https.get(url, options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const addr = json.address || {};
+          // Prioridad: city > town > village > county
+          const ciudad = addr.city || addr.town || addr.village || addr.county || null;
+          const dpto   = addr.state || null;
+          if (ciudad && dpto) resolve(`${ciudad}, ${dpto}`);
+          else if (ciudad)    resolve(ciudad);
+          else                resolve(null);
+        } catch { resolve(null); }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.setTimeout(4000, () => { req.destroy(); resolve(null); });
+  });
+}
 
 // Bounding boxes para los 4 municipios del Golfo de Morrosquillo
 // Coordenadas ajustadas para evitar solapamientos — orden específico para máxima precisión
@@ -31,6 +61,13 @@ router.post('/ping', authenticateToken, async (req, res) => {
   }
 
   const municipio = resolveMunicipio(lat, lng);
+
+  // Si está fuera de los municipios de Sucre, obtener ciudad real del GPS
+  // (máx 4 s — no bloquea si Nominatim tarda o falla)
+  let ciudadReal = null;
+  if (!municipio) {
+    ciudadReal = await reversGeocode(lat, lng);
+  }
 
   try {
     await prisma.$executeRaw`
@@ -79,7 +116,7 @@ router.post('/ping', authenticateToken, async (req, res) => {
       }
     }
 
-    res.json({ success: true, municipio });
+    res.json({ success: true, municipio, ciudad: ciudadReal });
   } catch (err) {
     console.error('[location/ping]', err.message);
     res.status(500).json({ error: 'Error guardando ubicación' });

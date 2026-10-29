@@ -141,6 +141,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   // Municipio resuelto por GPS (slug: 'sampues', 'sincelejo', etc.)
   String? _userMunicipio;
+  // Ciudad real cuando el usuario está fuera de la región de Sucre
+  // (ej. "Medellín, Antioquia" — obtenida por reverse geocoding en el backend)
+  String? _ciudadReal;
 
   // ── Lifecycle ──────────────────────────────────────────────
 
@@ -209,9 +212,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(AppConstants.keyToken);
       if (token == null || token.isEmpty) return;
-      final municipio = await LocationService.checkAndPing(token);
+      final result = await LocationService.checkAndPing(token);
       if (!mounted) return;
-      _updateLocationBanner(municipio == null);
+      _updateLocationBanner(result == null || result.municipio == null);
     } catch (e) {
       debugPrint('Error verificando ubicación: $e');
     }
@@ -223,21 +226,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(AppConstants.keyMunicipio);
+      final savedCiudad = prefs.getString('ciudad_real');
       if (saved != null && mounted) {
         setState(() => _userMunicipio = saved);
+      } else if (savedCiudad != null && mounted) {
+        setState(() => _ciudadReal = savedCiudad);
       }
       final token = prefs.getString(AppConstants.keyToken);
       if (token == null) return;
-      final municipio = await LocationService.checkAndPing(token);
-      if (municipio != null && mounted) {
-        // Usuario dentro de cobertura → actualizar y guardar
-        setState(() => _userMunicipio = municipio);
-        await prefs.setString(AppConstants.keyMunicipio, municipio);
-      } else if (municipio == null && mounted) {
-        // Usuario fuera de cobertura (otra ciudad/país) → limpiar el
-        // municipio anterior guardado para no mostrar ciudad incorrecta
-        setState(() => _userMunicipio = null);
+      final result = await LocationService.checkAndPing(token);
+      if (!mounted) return;
+      if (result?.municipio != null) {
+        // Usuario dentro de cobertura de Sucre → mostrar municipio
+        setState(() {
+          _userMunicipio = result!.municipio;
+          _ciudadReal = null;
+        });
+        await prefs.setString(AppConstants.keyMunicipio, result!.municipio!);
+        await prefs.remove('ciudad_real');
+      } else {
+        // Fuera de cobertura → mostrar ciudad real del GPS si está disponible
+        final ciudad = result?.ciudad;
+        setState(() {
+          _userMunicipio = null;
+          _ciudadReal = ciudad;
+        });
         await prefs.remove(AppConstants.keyMunicipio);
+        if (ciudad != null) {
+          await prefs.setString('ciudad_real', ciudad);
+        } else {
+          await prefs.remove('ciudad_real');
+        }
       }
     } catch (e) {
       debugPrint('Error resolviendo municipio GPS: $e');
@@ -347,11 +366,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     'sampues':          'Sampués',
   };
 
-  // Prioridad: GPS resuelto > último QR escaneado > fallback
+  // Prioridad: municipio Sucre > ciudad real GPS > último QR > fallback
   String get _userLocation {
     if (_userMunicipio != null) {
       return _kNombreMunicipio[_userMunicipio] ?? _userMunicipio!;
     }
+    if (_ciudadReal != null) return _ciudadReal!;
     return _lastScan?.place ?? 'Sucre, Colombia';
   }
 
