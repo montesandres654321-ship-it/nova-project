@@ -2,13 +2,22 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../config/prisma');
 
-const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues', 'medellin'];
+// Municipios NOVA propios — para notificaciones y recomendaciones del Golfo.
+// Esta ruta acepta cualquier municipio normalizado (cualquier ciudad de Colombia).
+function normalizeMunicipio(m) {
+  if (!m) return null;
+  return m.trim()
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_]/g, '');
+}
 
 // GET /recommendations/:municipio
 router.get('/:municipio', async (req, res) => {
-  const { municipio } = req.params;
+  const municipio = normalizeMunicipio(req.params.municipio);
 
-  if (!VALID_MUNICIPIOS.includes(municipio)) {
+  if (!municipio) {
     return res.status(400).json({ error: 'Municipio inválido' });
   }
 

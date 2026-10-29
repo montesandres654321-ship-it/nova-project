@@ -6,6 +6,7 @@
 import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import '../../../data/colombia_geo_data.dart';
 import '../../../models/admin_model.dart';
 import '../../../models/place.dart';
 import 'place_form_fields.dart';
@@ -103,7 +104,12 @@ List<Widget> buildDetallesSection({
   required TextEditingController amenitiesController,
   required bool isActive,
   required void Function(bool) onActiveChanged,
+  // Cascada País → Departamento → Municipio
+  required String? selectedPais,
+  required String? selectedDepartamento,
   required String? selectedMunicipio,
+  required void Function(String?) onPaisChanged,
+  required void Function(String?) onDepartamentoChanged,
   required void Function(String?) onMunicipioChanged,
   required TextEditingController latitudController,
   required TextEditingController longitudController,
@@ -119,18 +125,51 @@ List<Widget> buildDetallesSection({
       icon: Icons.list,
       hint: 'Wifi, Piscina, A/C'),
   const SizedBox(height: 12),
+
+  // ── País (fijo: Colombia) ──────────────────────────────────────────────────
   DropdownButtonFormField<String>(
-    value: selectedMunicipio,
-    decoration: placeFormInputDecoration('Municipio', Icons.map_outlined,
-        hint: 'Sin municipio asignado'),
+    value: selectedPais ?? 'Colombia',
+    decoration: placeFormInputDecoration('País', Icons.flag_outlined),
     style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
-    items: Place.municipiosValidos
-        .map((m) => DropdownMenuItem(
-            value: m, child: Text(Place.municipiosLabels[m] ?? m)))
-        .toList(),
-    onChanged: onMunicipioChanged,
+    items: const [
+      DropdownMenuItem(value: 'Colombia', child: Text('🇨🇴  Colombia')),
+    ],
+    onChanged: onPaisChanged,
   ),
   const SizedBox(height: 12),
+
+  // ── Departamento ──────────────────────────────────────────────────────────
+  DropdownButtonFormField<String>(
+    value: selectedDepartamento,
+    decoration: placeFormInputDecoration('Departamento', Icons.map_outlined,
+        hint: 'Selecciona un departamento'),
+    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
+    isExpanded: true,
+    items: colombiaDepartamentosOrdenados
+        .map((dep) => DropdownMenuItem(value: dep, child: Text(dep)))
+        .toList(),
+    onChanged: onDepartamentoChanged,
+  ),
+  const SizedBox(height: 12),
+
+  // ── Municipio (filtrado por departamento seleccionado) ────────────────────
+  DropdownButtonFormField<String>(
+    value: selectedMunicipio,
+    decoration: placeFormInputDecoration('Municipio', Icons.location_city_outlined,
+        hint: selectedDepartamento == null
+            ? 'Primero selecciona un departamento'
+            : 'Selecciona un municipio'),
+    style: const TextStyle(fontSize: 13, color: AppTheme.textHead),
+    isExpanded: true,
+    items: selectedDepartamento == null
+        ? []
+        : municipiosDe(selectedDepartamento)
+            .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+            .toList(),
+    onChanged: selectedDepartamento == null ? null : onMunicipioChanged,
+  ),
+  const SizedBox(height: 12),
+
   placeFormResponsiveFieldRow(
     TextFormField(
       controller: latitudController,

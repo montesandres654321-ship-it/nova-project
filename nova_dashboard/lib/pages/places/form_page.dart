@@ -6,6 +6,7 @@
 import 'package:nova_dashboard/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../data/colombia_geo_data.dart';
 import '../../models/place.dart';
 import '../../models/admin_model.dart';
 import '../../services/place_service.dart';
@@ -39,6 +40,9 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
   late TextEditingController _rewardStockController;
   late TextEditingController _latitudController;
   late TextEditingController _longitudController;
+  // Cascada geográfica: País → Departamento → Municipio
+  String  _selectedPais         = 'Colombia';
+  String? _selectedDepartamento;
   String? _selectedMunicipio;
 
   List<AdminModel> _availableOwners = [];
@@ -84,13 +88,28 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         text: p?.rewardStock?.toString() ?? '');
     _latitudController  = TextEditingController(text: p?.latitud?.toString() ?? '');
     _longitudController = TextEditingController(text: p?.longitud?.toString() ?? '');
-    _selectedMunicipio  = p?.municipio;
+    _selectedPais       = p?.pais ?? 'Colombia';
     if (p != null) {
       _selectedType       = p.tipo;
       _isActive           = p.isActive;
       _hasReward          = p.hasReward;
       _selectedRewardIcon = p.rewardIcon ?? '☕';
       _selectedOwnerId    = p.ownerAdminId;
+      // Restaurar departamento y municipio al editar un lugar existente
+      _selectedDepartamento = p.departamento;
+      // Si el municipio guardado en BD (snake_case) coincide con alguno de la lista,
+      // buscamos el label legible (capitalizado) que usa el dropdown.
+      if (p.municipio != null && p.departamento != null) {
+        final munisDelDep = municipiosDe(p.departamento!);
+        // El municipio en BD está en snake_case; buscamos coincidencia insensible
+        final munNorm = p.municipio!.toLowerCase().replaceAll('_', ' ');
+        final match = munisDelDep.firstWhere(
+          (m) => m.toLowerCase() == munNorm ||
+                 m.toLowerCase().replaceAll(' ', '_') == p.municipio!.toLowerCase(),
+          orElse: () => '',
+        );
+        _selectedMunicipio = match.isNotEmpty ? match : null;
+      }
     }
   }
 
@@ -166,10 +185,12 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
         rewardDescription: _hasReward ? _rewardDescriptionController.text.trim() : null,
         rewardIcon:  _hasReward ? _selectedRewardIcon : null,
         rewardStock: _hasReward ? _parseStock(_rewardStockController.text.trim()) : null,
-        ownerAdminId: _selectedOwnerId,
-        municipio: _selectedMunicipio,
-        latitud:   double.tryParse(_latitudController.text.trim()),
-        longitud:  double.tryParse(_longitudController.text.trim()),
+        ownerAdminId:  _selectedOwnerId,
+        municipio:     _selectedMunicipio,
+        departamento:  _selectedDepartamento,
+        pais:          _selectedPais,
+        latitud:       double.tryParse(_latitudController.text.trim()),
+        longitud:      double.tryParse(_longitudController.text.trim()),
       );
 
       final result = widget.place == null
@@ -292,7 +313,14 @@ class _PlaceFormPageState extends State<PlaceFormPage> {
       amenitiesController: _amenitiesController,
       isActive: _isActive,
       onActiveChanged: (v) => setState(() => _isActive = v),
+      selectedPais: _selectedPais,
+      selectedDepartamento: _selectedDepartamento,
       selectedMunicipio: _selectedMunicipio,
+      onPaisChanged: (v) => setState(() { _selectedPais = v ?? 'Colombia'; }),
+      onDepartamentoChanged: (v) => setState(() {
+        _selectedDepartamento = v;
+        _selectedMunicipio = null; // resetear municipio al cambiar departamento
+      }),
       onMunicipioChanged: (v) => setState(() => _selectedMunicipio = v),
       latitudController: _latitudController,
       longitudController: _longitudController);

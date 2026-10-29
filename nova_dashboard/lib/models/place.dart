@@ -15,6 +15,8 @@ class Place {
   final String? phone;
   final String? priceRange;
   final String? municipio;
+  final String? departamento;
+  final String? pais;
   final double? latitud;
   final double? longitud;
   final List<String> amenities;
@@ -50,6 +52,8 @@ class Place {
     this.phone,
     this.priceRange,
     this.municipio,
+    this.departamento,
+    this.pais,
     this.latitud,
     this.longitud,
     required this.amenities,
@@ -100,7 +104,9 @@ class Place {
       address:     json['address'],
       phone:       json['phone'],
       priceRange:  json['price_range'],
-      municipio:   json['municipio'],
+      municipio:    json['municipio'],
+      departamento: json['departamento'],
+      pais:         json['pais'] ?? 'Colombia',
       latitud:     (json['latitud'] as num?)?.toDouble(),
       longitud:    (json['longitud'] as num?)?.toDouble(),
       amenities:   amenitiesList,
@@ -139,7 +145,9 @@ class Place {
       'address':     address,
       'phone':       phone,
       'price_range': priceRange,
-      'municipio':   municipio,
+      'municipio':    municipio,
+      'departamento': departamento,
+      'pais':         pais ?? 'Colombia',
       'latitud':     latitud,
       'longitud':    longitud,
       'amenities':   jsonEncode(amenities),
@@ -254,7 +262,8 @@ class Place {
     int? id, String? name, String? tipo, String? lugar,
     String? description, String? imageUrl, String? qrImageUrl,
     double? rating, String? address, String? phone,
-    String? priceRange, String? municipio, double? latitud, double? longitud,
+    String? priceRange, String? municipio, String? departamento, String? pais,
+    double? latitud, double? longitud,
     List<String>? amenities, bool? isActive,
     bool? hasReward, String? rewardName, String? rewardDescription,
     String? rewardIcon,
@@ -275,7 +284,9 @@ class Place {
       address:     address     ?? this.address,
       phone:       phone       ?? this.phone,
       priceRange:  priceRange  ?? this.priceRange,
-      municipio:   municipio   ?? this.municipio,
+      municipio:    municipio    ?? this.municipio,
+      departamento: departamento ?? this.departamento,
+      pais:         pais         ?? this.pais,
       latitud:     latitud     ?? this.latitud,
       longitud:    longitud    ?? this.longitud,
       amenities:   amenities   ?? this.amenities,

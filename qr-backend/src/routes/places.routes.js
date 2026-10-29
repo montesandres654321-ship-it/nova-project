@@ -41,13 +41,27 @@ const VALID_TIPOS = [
   'cultura', 'artesania', 'playa', 'ruta',
   'gastronomia', 'compras', 'servicio',
 ];
-const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues', 'medellin'];
+// Municipios propios de NOVA (Golfo de Morrosquillo) — solo para filtros de lectura
+// y notificaciones. NO limitan qué municipios se pueden registrar en la BD.
+const NOVA_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues'];
+
+// Normaliza un municipio a snake_case sin tildes para almacenamiento consistente
+// Ej: "Medellín" → "medellin", "Santiago de Tolú" → "santiago_de_tolu"
+function normalizeMunicipio(m) {
+  if (!m) return null;
+  return m.trim()
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar tildes
+    .replace(/\s+/g, '_')                             // espacios → _
+    .replace(/[^a-z0-9_]/g, '');                      // solo letras, números, _
+}
 
 router.get('/', async (req, res) => {
   try {
     const { tipo, municipio } = req.query;
     const t = tipo && VALID_TIPOS.includes(tipo.toLowerCase()) ? tipo.toLowerCase() : null;
-    const m = municipio && VALID_MUNICIPIOS.includes(municipio.toLowerCase()) ? municipio.toLowerCase() : null;
+    // Filtro de municipio: acepta cualquier valor normalizado (no solo los 4 de NOVA)
+    const m = municipio ? normalizeMunicipio(municipio) : null;
 
     let places;
     if (t && m) {
@@ -309,14 +323,12 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
       reward_icon, reward_stock, owner_id, municipio, categoria,
-      latitud, longitud,
+      latitud, longitud, pais, departamento,
     } = req.body;
 
     if (!name || !tipo || !lugar || !description) return res.status(400).json({ success: false, error: 'Campos requeridos' });
     if (!VALID_TIPOS.includes(tipo)) return res.status(400).json({ success: false, error: 'Tipo inválido' });
-    if (municipio !== undefined && municipio !== null && !VALID_MUNICIPIOS.includes(municipio)) {
-      return res.status(400).json({ success: false, error: 'Municipio inválido' });
-    }
+    // municipio ya NO tiene whitelist — acepta cualquier municipio de Colombia
 
     const isActive        = (req.body.is_active ?? 1) !== 0;
     const amenitiesStr    = amenities ? JSON.stringify(amenities) : null;
@@ -325,14 +337,16 @@ router.post('/', authenticateToken, authorize(['admin_general']), async (req, re
     const rewardIconVal   = reward_icon || '🎁';
     const rewardStockVal  = reward_stock !== undefined ? reward_stock : null;
     const ownerIdVal      = owner_id || null;
-    const municipioVal    = municipio || null;
+    const municipioVal    = normalizeMunicipio(municipio);
     const categoriaVal    = categoria || null;
     const latitudVal      = latitud !== undefined ? latitud : null;
     const longitudVal     = longitud !== undefined ? longitud : null;
+    const paisVal         = pais || 'Colombia';
+    const departamentoVal = departamento || null;
 
     const inserted = await prisma.$queryRaw`
-      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active, municipio, categoria, latitud, longitud)
-      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive}, ${municipioVal}, ${categoriaVal}, ${latitudVal}, ${longitudVal})
+      INSERT INTO places (name, tipo, lugar, description, image_url, rating, address, phone, price_range, amenities, has_reward, reward_name, reward_description, reward_icon, reward_stock, owner_id, is_active, municipio, categoria, latitud, longitud, pais, departamento)
+      VALUES (${name}, ${tipo}, ${lugar}, ${description}, ${image_url || null}, ${ratingVal}, ${address || null}, ${phone || null}, ${price_range || null}, ${amenitiesStr}, ${hasRewardVal}, ${reward_name || null}, ${reward_description || null}, ${rewardIconVal}, ${rewardStockVal}, ${ownerIdVal}, ${isActive}, ${municipioVal}, ${categoriaVal}, ${latitudVal}, ${longitudVal}, ${paisVal}, ${departamentoVal})
       RETURNING id
     `;
 
@@ -352,7 +366,7 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
       name, tipo, lugar, description, image_url, rating, address, phone,
       price_range, amenities, has_reward, reward_name, reward_description,
       reward_icon, reward_stock, owner_id, municipio, categoria,
-      latitud, longitud,
+      latitud, longitud, pais, departamento,
     } = req.body;
 
     const place = (await prisma.$queryRaw`SELECT * FROM places WHERE id = ${id}`)[0];
@@ -361,9 +375,7 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
     if (tipo !== undefined && !VALID_TIPOS.includes(tipo)) {
       return res.status(400).json({ success: false, error: 'Tipo inválido' });
     }
-    if (municipio !== undefined && municipio !== null && !VALID_MUNICIPIOS.includes(municipio)) {
-      return res.status(400).json({ success: false, error: 'Municipio inválido' });
-    }
+    // municipio ya NO tiene whitelist — acepta cualquier municipio de Colombia
 
     const n  = name  || place.name;
     const t  = tipo  || place.tipo;
@@ -381,13 +393,15 @@ router.put('/:id', authenticateToken, authorize(['admin_general']), async (req, 
     const ri = reward_icon  !== undefined ? reward_icon  : place.reward_icon;
     const rs = reward_stock !== undefined ? reward_stock : place.reward_stock;
     const oi = owner_id     !== undefined ? owner_id     : place.owner_id;
-    const mu = municipio    !== undefined ? municipio    : place.municipio;
+    const mu = municipio    !== undefined ? normalizeMunicipio(municipio) : place.municipio;
     const ca = categoria    !== undefined ? categoria    : place.categoria;
     const lat = latitud     !== undefined ? latitud      : place.latitud;
     const lon = longitud    !== undefined ? longitud     : place.longitud;
+    const pa = pais         !== undefined ? pais         : (place.pais || 'Colombia');
+    const dep = departamento !== undefined ? departamento : place.departamento;
 
     await prisma.$executeRaw`
-      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, municipio=${mu}, categoria=${ca}, latitud=${lat}, longitud=${lon}, updated_at=NOW()
+      UPDATE places SET name=${n}, tipo=${t}, lugar=${l}, description=${d}, image_url=${iu}, rating=${r}, address=${a}, phone=${ph}, price_range=${pr}, amenities=${am}, has_reward=${hr}, reward_name=${rn}, reward_description=${rd}, reward_icon=${ri}, reward_stock=${rs}, owner_id=${oi}, municipio=${mu}, categoria=${ca}, latitud=${lat}, longitud=${lon}, pais=${pa}, departamento=${dep}, updated_at=NOW()
       WHERE id=${id}
     `;
 

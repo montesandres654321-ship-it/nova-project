@@ -126,7 +126,9 @@ class PlaceService {
       if (place.rewardIcon        != null) body['reward_icon']        = place.rewardIcon;
       body['reward_stock'] = place.rewardStock;
 
-      if (place.municipio != null) body['municipio'] = place.municipio;
+      if (place.municipio    != null) body['municipio']    = place.municipio;
+      if (place.departamento != null) body['departamento'] = place.departamento;
+      body['pais'] = place.pais ?? 'Colombia';
       if (place.latitud  != null) body['latitud']   = place.latitud;
       if (place.longitud != null) body['longitud']  = place.longitud;
       if (place.ownerAdminId != null) body['owner_id'] = place.ownerAdminId;
@@ -162,6 +164,12 @@ class PlaceService {
       if (place.rewardDescription != null) body['reward_description'] = place.rewardDescription;
       if (place.rewardIcon        != null) body['reward_icon']        = place.rewardIcon;
       body['reward_stock'] = place.rewardStock;
+
+      if (place.municipio    != null) body['municipio']    = place.municipio;
+      if (place.departamento != null) body['departamento'] = place.departamento;
+      body['pais'] = place.pais ?? 'Colombia';
+      if (place.latitud  != null) body['latitud']  = place.latitud;
+      if (place.longitud != null) body['longitud'] = place.longitud;
 
       body['owner_id'] = place.ownerAdminId;
 
