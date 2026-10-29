@@ -79,7 +79,7 @@ class SettingsPage extends StatelessWidget {
                       ),
                       _SettingsRow(
                         iconAsset: 'assets/icons/ic-info.svg',
-                        title: 'Acerca de Nova',
+                        title: 'Acerca de Sucre App',
                         subtitle: 'Versión, créditos y más',
                         onTap: () => Navigator.push(context,
                             MaterialPageRoute(builder: (_) => const AboutPage())),
@@ -119,7 +119,7 @@ class SettingsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Ajustes de Nova',
+                Text('Ajustes de Sucre App',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 Text('Configuraciones de la aplicación',
                     style: AppTextStyles.bodySm),

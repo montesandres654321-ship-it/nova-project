@@ -19,14 +19,14 @@ class _Faq {
 const _kFaqs = [
   _Faq(
     '¿Cómo escaneo un código QR?',
-    'Abre Nova y pulsa el ícono de escáner en la pantalla principal. Apunta la cámara al código QR visible en el establecimiento y espera a que se registre automáticamente. Asegúrate de tener buena iluminación y que el código esté completo en el encuadre.',
+    'Abre Sucre App y pulsa el ícono de escáner en la pantalla principal. Apunta la cámara al código QR visible en el establecimiento y espera a que se registre automáticamente. Asegúrate de tener buena iluminación y que el código esté completo en el encuadre.',
   ),
   _Faq(
     '¿Cómo acumulo puntos y recompensas?',
     'Cada vez que escaneas el código QR de un establecimiento participante acumulas puntos. La cantidad de puntos varía según el establecimiento y la categoría. Puedes ver tus puntos acumulados en la sección "Perfil" de la app.',
   ),
   _Faq(
-    '¿Puedo usar Nova sin conexión a internet?',
+    '¿Puedo usar Sucre App sin conexión a internet?',
     'Algunas secciones como el mapa y el contenido ya visitado funcionan con datos en caché. Sin embargo, el escaneo de códigos QR, la actualización de recompensas y tu perfil requieren conexión activa.',
   ),
   _Faq(
@@ -38,8 +38,8 @@ const _kFaqs = [
     'Es posible que el establecimiento aún no esté registrado en la plataforma. Puedes reportarlo usando el correo de soporte para que evaluemos su inclusión. Los datos del mapa se actualizan periódicamente.',
   ),
   _Faq(
-    '¿Es seguro compartir mis datos con Nova?',
-    'Sí. Nova protege tu información de acuerdo con las leyes colombianas de protección de datos. Solo recopilamos la información necesaria para tu experiencia turística y nunca la vendemos a terceros. Consulta nuestra política en Términos y Condiciones.',
+    '¿Es seguro compartir mis datos con Sucre App?',
+    'Sí. Sucre App protege tu información de acuerdo con las leyes colombianas de protección de datos. Solo recopilamos la información necesaria para tu experiencia turística y nunca la vendemos a terceros. Consulta nuestra política en Términos y Condiciones.',
   ),
   _Faq(
     '¿Cómo elimino mi cuenta?',
@@ -47,7 +47,7 @@ const _kFaqs = [
   ),
   _Faq(
     '¿La app funciona en iOS?',
-    'Por ahora Nova está disponible exclusivamente para Android. Estamos trabajando en la versión para iOS y la anunciaremos próximamente en nuestras redes sociales.',
+    'Por ahora Sucre App está disponible exclusivamente para Android. Estamos trabajando en la versión para iOS y la anunciaremos próximamente en nuestras redes sociales.',
   ),
 ];
 
@@ -331,7 +331,7 @@ class _HelpPageState extends State<HelpPage> {
           _buildRedRow(
             icon: Icons.facebook_rounded,
             red: 'Facebook',
-            handle: 'Nova App Colombia',
+            handle: 'Sucre App Colombia',,
             color: const Color(0xFF1877F2),
           ),
           const Divider(height: 20, thickness: 1, color: AppColors.bienvenidaBorde),

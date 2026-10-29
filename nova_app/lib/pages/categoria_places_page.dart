@@ -246,7 +246,7 @@ class _CategoriaPlacesPageState extends State<CategoriaPlacesPage> {
                         Icon(_icono, size: 12, color: Colors.white),
                         const SizedBox(width: 6),
                         Text(
-                          'Nova · Golfo de Morrosquillo',
+                          'Sucre App · Golfo de Morrosquillo',
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                         ),
                       ],

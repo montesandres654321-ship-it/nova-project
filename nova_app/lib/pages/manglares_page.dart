@@ -213,7 +213,7 @@ class _ManglaresPageState extends State<ManglaresPage> {
                         const Icon(Icons.eco_rounded, size: 12, color: Colors.white),
                         const SizedBox(width: 6),
                         Text(
-                          'Nova · Naturaleza y parques',
+                          'Sucre App · Naturaleza y parques',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,

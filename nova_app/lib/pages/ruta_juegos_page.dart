@@ -138,7 +138,7 @@ class RutaJuegosPage extends StatelessWidget {
                       border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
                     ),
                     child: Text(
-                      'Nova · Rutas y recorridos',
+                      'Sucre App · Rutas y recorridos',
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),

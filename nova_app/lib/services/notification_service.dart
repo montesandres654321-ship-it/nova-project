@@ -10,7 +10,7 @@ import 'auth_service.dart';
 
 /// Canal de notificaciones — debe coincidir con el channelId que envía el backend
 const String _kChannelId   = 'nova_recomendaciones';
-const String _kChannelName = 'Recomendaciones NOVA';
+const String _kChannelName = 'Recomendaciones Sucre App';
 const String _kChannelDesc = 'Lugares y recompensas cerca de ti';
 
 final FlutterLocalNotificationsPlugin _localNotif =

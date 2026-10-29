@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Nova App',
+      title: 'Sucre App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       initialRoute: '/splash',

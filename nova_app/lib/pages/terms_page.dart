@@ -20,23 +20,23 @@ class _Seccion {
 const _kSecciones = [
   _Seccion(
     '1. Aceptación de los términos',
-    'Al descargar, instalar o usar la aplicación Nova, aceptas quedar vinculado por estos Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos, no debes usar la aplicación.',
+    'Al descargar, instalar o usar la aplicación Sucre App, aceptas quedar vinculado por estos Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos, no debes usar la aplicación.',
   ),
   _Seccion(
     '2. Descripción del servicio',
-    'Nova es una plataforma digital de turismo que facilita la conexión entre turistas y establecimientos del Golfo de Morrosquillo, Sucre, Colombia. A través de la app puedes escanear códigos QR en establecimientos participantes, acumular recompensas y acceder a información turística de la región.',
+    'Sucre App es una plataforma digital de turismo que facilita la conexión entre turistas y establecimientos del Golfo de Morrosquillo, Sucre, Colombia. A través de la app puedes escanear códigos QR en establecimientos participantes, acumular recompensas y acceder a información turística de la región.',
   ),
   _Seccion(
     '3. Registro y cuenta de usuario',
-    'Para acceder a todas las funciones de Nova debes crear una cuenta con información verídica. Eres responsable de mantener la confidencialidad de tus credenciales y de todas las actividades realizadas desde tu cuenta. Debes notificarnos de inmediato ante cualquier uso no autorizado.',
+    'Para acceder a todas las funciones de Sucre App debes crear una cuenta con información verídica. Eres responsable de mantener la confidencialidad de tus credenciales y de todas las actividades realizadas desde tu cuenta. Debes notificarnos de inmediato ante cualquier uso no autorizado.',
   ),
   _Seccion(
     '4. Uso aceptable',
-    'Aceptas usar Nova únicamente para fines lícitos y de acuerdo con estos términos. Está prohibido: (a) usar la aplicación de manera que viole leyes o regulaciones locales, nacionales o internacionales; (b) manipular el sistema de recompensas de forma fraudulenta; (c) intentar acceder sin autorización a sistemas o redes de Nova.',
+    'Aceptas usar Sucre App únicamente para fines lícitos y de acuerdo con estos términos. Está prohibido: (a) usar la aplicación de manera que viole leyes o regulaciones locales, nacionales o internacionales; (b) manipular el sistema de recompensas de forma fraudulenta; (c) intentar acceder sin autorización a sistemas o redes de Sucre App.',
   ),
   _Seccion(
     '5. Sistema de recompensas',
-    'Las recompensas acumuladas en Nova tienen valor dentro de la plataforma y los establecimientos participantes. Nova se reserva el derecho de modificar, suspender o cancelar el programa de recompensas con previo aviso. Las recompensas no son canjeables por dinero en efectivo.',
+    'Las recompensas acumuladas en Sucre App tienen valor dentro de la plataforma y los establecimientos participantes. Sucre App se reserva el derecho de modificar, suspender o cancelar el programa de recompensas con previo aviso. Las recompensas no son canjeables por dinero en efectivo.',
   ),
   _Seccion(
     '6. Privacidad y datos personales',
@@ -44,19 +44,19 @@ const _kSecciones = [
   ),
   _Seccion(
     '7. Propiedad intelectual',
-    'Todo el contenido de Nova —incluyendo logos, textos, imágenes, diseño y código— es propiedad de Nova o sus licenciantes y está protegido por las leyes de propiedad intelectual vigentes en Colombia. Queda prohibida su reproducción sin autorización expresa.',
+    'Todo el contenido de Sucre App —incluyendo logos, textos, imágenes, diseño y código— es propiedad de Sucre App o sus licenciantes y está protegido por las leyes de propiedad intelectual vigentes en Colombia. Queda prohibida su reproducción sin autorización expresa.',
   ),
   _Seccion(
     '8. Limitación de responsabilidad',
-    'Nova no se responsabiliza por: (a) interrupciones del servicio por mantenimiento o fuerza mayor; (b) información inexacta proporcionada por establecimientos terceros; (c) daños indirectos derivados del uso de la aplicación. Hacemos nuestro mejor esfuerzo para garantizar la disponibilidad y precisión de la información.',
+    'Sucre App no se responsabiliza por: (a) interrupciones del servicio por mantenimiento o fuerza mayor; (b) información inexacta proporcionada por establecimientos terceros; (c) daños indirectos derivados del uso de la aplicación. Hacemos nuestro mejor esfuerzo para garantizar la disponibilidad y precisión de la información.',
   ),
   _Seccion(
     '9. Modificaciones',
-    'Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor al momento de su publicación en la aplicación. El uso continuado de Nova después de la publicación de los cambios constituye tu aceptación de los mismos.',
+    'Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor al momento de su publicación en la aplicación. El uso continuado de Sucre App después de la publicación de los cambios constituye tu aceptación de los mismos.',
   ),
   _Seccion(
     '10. Ley aplicable',
-    'Estos términos se rigen por las leyes de la República de Colombia. Cualquier controversia derivada del uso de Nova será sometida a los tribunales competentes de la ciudad de Sincelejo, Sucre.',
+    'Estos términos se rigen por las leyes de la República de Colombia. Cualquier controversia derivada del uso de Sucre App será sometida a los tribunales competentes de la ciudad de Sincelejo, Sucre.',
   ),
   _Seccion(
     '11. Contacto',
@@ -110,7 +110,7 @@ class TermsPage extends StatelessWidget {
 
                     // Introducción
                     Text(
-                      'Bienvenido a Nova, la plataforma oficial de turismo digital del Golfo de Morrosquillo. '
+                      'Bienvenido a Sucre App, la plataforma oficial de turismo digital del Golfo de Morrosquillo. '
                       'Antes de usar nuestra aplicación, te pedimos leer detenidamente los siguientes términos.',
                       style: TextStyle(
                           fontSize: 13,
@@ -160,7 +160,7 @@ class TermsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
-                        '© 2026 Nova App — Plataforma de Turismo Digital del Golfo de Morrosquillo, Sucre, Colombia.',
+                        '© 2026 Sucre App — Plataforma de Turismo Digital del Golfo de Morrosquillo, Sucre, Colombia.',
                         style: TextStyle(
                             fontSize: 11,
                             color: AppColors.bienvenidaAzul,

@@ -75,7 +75,7 @@ class AboutPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Acerca de Nova',
+                Text('Acerca de Sucre App',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
                 Text('Información de la plataforma',
                     style: AppTextStyles.bodySm),
@@ -92,7 +92,7 @@ class AboutPage extends StatelessWidget {
       children: [
         SvgPicture.asset('assets/images/logos/logo-nova-verde.svg', width: 112, height: 67),
         const SizedBox(height: 8),
-        Text('Nova Sucre',
+        Text('Sucre App',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.bienvenidaTextoFuerte)),
         Text('Versión 1.0.0',
             style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
@@ -116,7 +116,7 @@ class AboutPage extends StatelessWidget {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.bienvenidaAzul)),
           const SizedBox(height: 12),
           Text(
-            'Nova permite descubrir y gestionar lugares, escenarios deportivos '
+            'Sucre App permite descubrir y gestionar lugares, escenarios deportivos '
             'y servicios de Coveñas, Santiago de Tolú y Sincelejo mediante QR.',
             style: TextStyle(fontSize: 13, height: 20 / 13, color: AppColors.bienvenidaTextoFuerte),
           ),
