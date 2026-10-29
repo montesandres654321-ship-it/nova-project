@@ -230,8 +230,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (token == null) return;
       final municipio = await LocationService.checkAndPing(token);
       if (municipio != null && mounted) {
+        // Usuario dentro de cobertura → actualizar y guardar
         setState(() => _userMunicipio = municipio);
         await prefs.setString(AppConstants.keyMunicipio, municipio);
+      } else if (municipio == null && mounted) {
+        // Usuario fuera de cobertura (otra ciudad/país) → limpiar el
+        // municipio anterior guardado para no mostrar ciudad incorrecta
+        setState(() => _userMunicipio = null);
+        await prefs.remove(AppConstants.keyMunicipio);
       }
     } catch (e) {
       debugPrint('Error resolviendo municipio GPS: $e');
