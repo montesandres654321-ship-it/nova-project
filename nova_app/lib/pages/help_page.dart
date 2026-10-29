@@ -331,7 +331,7 @@ class _HelpPageState extends State<HelpPage> {
           _buildRedRow(
             icon: Icons.facebook_rounded,
             red: 'Facebook',
-            handle: 'Sucre App Colombia',,
+            handle: 'Sucre App Colombia',
             color: const Color(0xFF1877F2),
           ),
           const Divider(height: 20, thickness: 1, color: AppColors.bienvenidaBorde),
