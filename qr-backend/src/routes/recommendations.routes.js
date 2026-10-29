@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../config/prisma');
 
-const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues'];
+const VALID_MUNICIPIOS = ['sincelejo', 'santiago_de_tolu', 'covenas', 'sampues', 'medellin'];
 
 // GET /recommendations/:municipio
 router.get('/:municipio', async (req, res) => {

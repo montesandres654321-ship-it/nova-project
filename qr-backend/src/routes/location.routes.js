@@ -40,14 +40,14 @@ router.post('/ping', authenticateToken, async (req, res) => {
             updated_at = NOW()
     `;
 
-    // Actualizar también el municipio del device_token
-    if (municipio) {
-      await prisma.$executeRaw`
-        UPDATE device_tokens
-        SET municipio = ${municipio}, updated_at = NOW()
-        WHERE user_id = ${userId}
-      `;
-    }
+    // Sincronizar municipio en device_tokens:
+    // - Si el usuario está en cobertura → actualizar con el municipio real
+    // - Si está fuera de cobertura → limpiar a NULL (evita notificaciones con ciudad incorrecta)
+    await prisma.$executeRaw`
+      UPDATE device_tokens
+      SET municipio = ${municipio}, updated_at = NOW()
+      WHERE user_id = ${userId}
+    `;
 
     // ── Crear job de recomendación IA si el usuario está en un municipio ──
     // Condición: tiene municipio resuelto + no tiene job pendiente/processing

@@ -46,6 +46,12 @@ const MENSAJES_POR_MUNICIPIO = {
     { titulo: '🧵 ¿Ya exploraste Sampués hoy?',  cuerpo: 'Talleres y artesanías con recompensas hoy' },
     { titulo: '🎨 Tarde artesanal en Sampués',   cuerpo: 'Los mejores talleres te esperan esta tarde' },
   ],
+  // Medellín — mensajes de prueba para testing fuera de cobertura NOVA
+  medellin: [
+    { titulo: '🌿 Buenos días desde Medellín',   cuerpo: 'Explora lugares cerca de ti y gana recompensas' },
+    { titulo: '🌺 ¿Qué hay en Medellín hoy?',    cuerpo: 'Lugares con recompensas esperándote en la ciudad' },
+    { titulo: '🌇 Tarde paisa en Medellín',       cuerpo: 'El mejor plan de la tarde está cerca de ti' },
+  ],
   default: [
     { titulo: '🌅 Buenos días',                  cuerpo: 'Descubre lugares cerca de ti hoy' },
     { titulo: '☀️ ¿Ya exploraste hoy?',          cuerpo: 'Hay lugares con recompensas esperándote' },
@@ -60,13 +66,28 @@ async function sendDailyNotifications(turno) {
     return;
   }
 
+  // ── Fuente de verdad: user_locations (GPS en tiempo real) ──────────────────
+  // Frescura máxima: 2 horas. Si el usuario no ha enviado GPS en 2h, se omite.
+  // JOIN con device_tokens para obtener el FCM token activo.
+  // BUG ANTERIOR: leía device_tokens.municipio (congelado en el registro del device).
+  // CORRECCIÓN: lee user_locations.municipio (actualizado con cada ping de GPS).
   const rows = await prisma.$queryRaw`
-    SELECT token, municipio, user_id FROM device_tokens
-    WHERE token IS NOT NULL AND municipio IS NOT NULL
+    SELECT
+      dt.token,
+      dt.user_id,
+      ul.municipio,
+      ul.lat,
+      ul.lng,
+      ul.updated_at AS location_updated_at
+    FROM device_tokens dt
+    INNER JOIN user_locations ul ON ul.user_id = dt.user_id
+    WHERE dt.token IS NOT NULL
+      AND ul.municipio IS NOT NULL
+      AND ul.updated_at > NOW() - INTERVAL '2 hours'
   `;
 
   if (rows.length === 0) {
-    console.log(`[Notificaciones turno ${turno}] Sin dispositivos registrados`);
+    console.log(`[Notificaciones turno ${turno}] Sin dispositivos con ubicación reciente (< 2h)`);
     return;
   }
 
@@ -83,9 +104,10 @@ async function sendDailyNotifications(turno) {
     lugaresPorMunicipio[mun] = lugares;
   }
 
-  let enviadas = 0, errores = 0;
+  let enviadas = 0, errores = 0, omitidas = 0;
 
   for (const row of rows) {
+    // Si el municipio no tiene mensajes definidos, usamos el default
     const mensajes = MENSAJES_POR_MUNICIPIO[row.municipio] ?? MENSAJES_POR_MUNICIPIO.default;
     const msg = mensajes[turno] ?? mensajes[0];
 
@@ -126,8 +148,8 @@ async function sendDailyNotifications(turno) {
     }
   }
 
-  console.log(`[Notificaciones turno ${turno}] ✅ ${enviadas} enviadas ❌ ${errores} errores de ${rows.length} dispositivos`);
-  return { turno, enviadas, errores, total: rows.length };
+  console.log(`[Notificaciones turno ${turno}] ✅ ${enviadas} enviadas ❌ ${errores} errores ⏭️  ${omitidas} omitidas de ${rows.length} dispositivos con GPS reciente`);
+  return { turno, enviadas, errores, omitidas, total: rows.length };
 }
 
 
