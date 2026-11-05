@@ -80,6 +80,31 @@ function serializeRaw(rows) {
  * @returns {403} Si el usuario es administrador (no puede escanear)
  * @returns {404} Si el lugar no existe o está inactivo
  */
+/**
+ * @openapi
+ * /scan:
+ *   post:
+ *     summary: Registrar un escaneo QR (turista visita un lugar)
+ *     tags: [Scans]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [placeId]
+ *             properties:
+ *               placeId: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Escaneo registrado — incluye recompensa otorgada si aplica
+ *       400:
+ *         description: Faltan userId o placeId
+ *       403:
+ *         description: Un administrador intentó escanear
+ *       404:
+ *         description: Lugar no encontrado o inactivo
+ */
 router.post('/scan', authenticateToken, validate(schemas.scan), async (req, res) => {
   try {
     const userId  = req.user.id;
@@ -190,6 +215,23 @@ router.post('/scan', authenticateToken, validate(schemas.scan), async (req, res)
  * @param {number} req.params.userId - ID del turista
  * @returns {200} { success: true, data: Array<{ scan, place, reward }> }
  * @returns {403} Si un turista intenta ver el historial de otro usuario
+ */
+/**
+ * @openapi
+ * /scans/details/{userId}:
+ *   get:
+ *     summary: Historial de escaneos de un turista
+ *     tags: [Scans]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Lista de escaneos con lugar y recompensa asociada
+ *       403:
+ *         description: Un turista intentó ver el historial de otro usuario
  */
 router.get('/scans/details/:userId', authenticateToken, async (req, res) => {
   try {

@@ -11,6 +11,8 @@ const express = require('express');
 const cors    = require('cors');
 const helmet  = require('helmet');
 const path    = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 const { AppError } = require('./src/utils/errors');
 const { requestContext, responseAdapter } = require('./src/middleware/response');
 
@@ -72,6 +74,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ── Documentación OpenAPI ─────────────────────────────────
+// Montada antes de cualquier middleware de auth: /api-docs es pública.
+app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ── HTTPS forzado + headers de seguridad ─────────────────
 if (process.env.NODE_ENV === 'production') {
@@ -239,7 +246,7 @@ if (require.main === module) {
   });
 
   process.on('SIGINT', () => {
-    try { require('./src/config/database').end(); } catch (e) {}
+    try { require('./src/config/database').end(); } catch { /* sin pool legacy que cerrar */ }
     process.exit(0);
   });
 }

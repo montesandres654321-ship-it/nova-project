@@ -60,6 +60,23 @@ function serializeRaw(rows) {
  * @returns {200} { success: true, data: UserReward[], stats: { total, pending, redeemed } }
  * @returns {403} Si un turista intenta ver las recompensas de otro usuario
  */
+/**
+ * @openapi
+ * /rewards/user/{userId}:
+ *   get:
+ *     summary: Recompensas obtenidas por un turista
+ *     tags: [Rewards]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Lista de recompensas + estadísticas (total, pendientes, canjeadas)
+ *       403:
+ *         description: Un turista intentó ver las recompensas de otro usuario
+ */
 router.get('/rewards/user/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -166,6 +183,27 @@ router.get('/rewards/place/:placeId', authenticateToken, async (req, res) => {
  * @returns {400} Si la recompensa ya fue canjeada previamente
  * @returns {403} Si el usuario no tiene permiso para canjear esta recompensa
  * @returns {404} Si la recompensa no existe
+ */
+/**
+ * @openapi
+ * /rewards/{id}/redeem:
+ *   patch:
+ *     summary: Canjear una recompensa
+ *     tags: [Rewards]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Recompensa canjeada exitosamente
+ *       400:
+ *         description: La recompensa ya fue canjeada
+ *       403:
+ *         description: Sin permiso para canjear esta recompensa
+ *       404:
+ *         description: Recompensa no encontrada
  */
 router.patch('/rewards/:id/redeem', authenticateToken, async (req, res) => {
   try {

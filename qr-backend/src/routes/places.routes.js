@@ -56,6 +56,26 @@ function normalizeMunicipio(m) {
     .replace(/[^a-z0-9_]/g, '');                      // solo letras, números, _
 }
 
+/**
+ * @openapi
+ * /places:
+ *   get:
+ *     summary: Listar lugares turísticos activos
+ *     tags: [Places]
+ *     security: []
+ *     parameters:
+ *       - in: query
+ *         name: tipo
+ *         schema: { type: string }
+ *         description: Filtra por tipo de lugar (hotel, restaurant, bar, playa, ...)
+ *       - in: query
+ *         name: municipio
+ *         schema: { type: string }
+ *         description: Filtra por municipio (sincelejo, santiago_de_tolu, covenas, sampues)
+ *     responses:
+ *       200:
+ *         description: Lista de lugares activos
+ */
 router.get('/', async (req, res) => {
   try {
     const { tipo, municipio } = req.query;
@@ -305,6 +325,24 @@ router.patch('/my-place',
   }
 );
 
+/**
+ * @openapi
+ * /places/{id}:
+ *   get:
+ *     summary: Obtener un lugar turístico por ID
+ *     tags: [Places]
+ *     security: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Datos del lugar
+ *       404:
+ *         description: Lugar no encontrado
+ */
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);

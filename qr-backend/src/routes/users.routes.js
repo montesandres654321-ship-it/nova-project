@@ -21,6 +21,18 @@ function serializeRaw(rows) {
 // Usado por SplashPage (app móvil) para validar que el token
 // guardado localmente sigue siendo válido antes de ir al Home.
 // authenticateToken ya verifica firma/expiración, revocación e is_active.
+/**
+ * @openapi
+ * /users/me:
+ *   get:
+ *     summary: Obtener el perfil del usuario autenticado
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Datos del usuario autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
 router.get('/users/me', authenticateToken, async (req, res) => {
   try {
     const user = (await prisma.$queryRaw`

@@ -72,6 +72,18 @@ function serializeRaw(rows) {
  *   }
  * }
  */
+/**
+ * @openapi
+ * /dashboard/summary:
+ *   get:
+ *     summary: KPIs globales del dashboard administrativo
+ *     tags: [Dashboard]
+ *     responses:
+ *       200:
+ *         description: KPIs, top lugares, escaneos de los últimos 7 días y actividad reciente
+ *       403:
+ *         description: Rol sin acceso al dashboard administrativo
+ */
 router.get(
   '/dashboard/summary',
   authenticateToken,

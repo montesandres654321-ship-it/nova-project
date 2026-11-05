@@ -121,6 +121,33 @@ const loginResponse = (user, token) => ({
  * @returns {401} Si las credenciales son incorrectas o la cuenta no existe
  * @returns {403} Si la cuenta está desactivada (is_active = false)
  */
+/**
+ * @openapi
+ * /login:
+ *   post:
+ *     summary: Autenticar usuario
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string, format: password }
+ *     responses:
+ *       200:
+ *         description: Login exitoso — retorna token JWT y datos del usuario
+ *       400:
+ *         description: Faltan email o contraseña
+ *       401:
+ *         description: Credenciales inválidas
+ *       403:
+ *         description: Cuenta desactivada
+ */
 router.post('/login', validate(schemas.login), async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -185,6 +212,35 @@ router.post('/login', validate(schemas.login), async (req, res) => {
  * @returns {201} { success: true, token, user, data: { token, user } }
  * @returns {400} Si faltan campos requeridos o el email tiene formato inválido
  * @returns {409} Si el email o username ya están en uso por otro turista
+ */
+/**
+ * @openapi
+ * /users/register:
+ *   post:
+ *     summary: Registrar un nuevo turista
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, username]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string, format: password }
+ *               username: { type: string }
+ *               firstName: { type: string }
+ *               lastName: { type: string }
+ *               phone: { type: string }
+ *     responses:
+ *       201:
+ *         description: Turista registrado — retorna token JWT y datos del usuario
+ *       400:
+ *         description: Faltan campos requeridos o email inválido
+ *       409:
+ *         description: Email o username ya en uso
  */
 router.post('/users/register', validate(schemas.register), async (req, res) => {
   try {

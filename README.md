@@ -12,29 +12,81 @@ NOVA App es una plataforma de turismo digital que permite a los visitantes
 del Golfo de Morrosquillo explorar establecimientos turísticos, registrar
 sus visitas mediante códigos QR y obtener recompensas exclusivas.
 
-El sistema está compuesto por tres componentes:
+El sistema está compuesto por estos componentes:
 - **App Móvil** (Flutter Android) — para turistas
 - **Dashboard Web** (Flutter Web) — para administradores y propietarios
-- **API REST** (Node.js + Prisma) — backend del sistema
+- **API REST** (Node.js + Prisma) — backend del sistema, único punto de entrada a los datos
+- **n8n + Hermes** — workflow de recomendaciones turísticas por IA (self-hosted, Docker)
+- **Firebase Cloud Messaging** — notificaciones push (recomendaciones, recordatorios)
 
 ---
 
 ## 🏗️ Arquitectura
 
+La App Móvil y el Dashboard Web son clientes independientes: **ambos llaman
+directamente a la API REST** (ninguno pasa por el otro). El backend es el único
+componente con acceso a la base de datos.
+
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   App Móvil     │    │  Dashboard Web   │    │   API REST      │
-│  Flutter Android│    │  Flutter Web     │    │  Node.js +      │
-│  (Turistas)     │───▶│  (Admins)        │───▶│  Prisma +       │
-│                 │    │                  │    │  PostgreSQL     │
-└─────────────────┘    └──────────────────┘    └────────┬────────┘
-                                                         │
-                                               ┌─────────▼────────┐
-                                               │    Supabase      │
-                                               │  PostgreSQL +    │
-                                               │  Storage         │
-                                               └──────────────────┘
+┌─────────────────┐                              ┌──────────────────┐
+│   App Móvil     │─────────────────┐            │  Dashboard Web   │
+│  Flutter Android│                 │            │  Flutter Web     │
+│  (Turistas)     │                 ▼            │  (Admins/Owners) │
+└─────────────────┘      ┌─────────────────────┐ └────────┬─────────┘
+                         │      API REST        │◀─────────┘
+                         │  Node.js + Express + │
+                         │  Prisma  (qr-backend)│
+                         └──────────┬────────────┘
+                                    │
+               ┌────────────────────┼─────────────────────┐
+               ▼                    ▼                      ▼
+     ┌──────────────────┐  ┌─────────────────┐   ┌───────────────────┐
+     │     Supabase      │  │   Firebase FCM   │   │   n8n + Hermes    │
+     │  PostgreSQL +      │  │  (push al cerrar  │   │  (recomendaciones │
+     │  Storage           │  │   sesión/eventos) │   │   IA, self-hosted │
+     └──────────────────┘  └─────────────────┘   │   vía Docker)      │
+                                                   └──────────┬────────┘
+                                                              │
+                                        polling /internal/*  │  webhook
+                                        (x-internal-secret)   │  /webhooks/notificacion-ia
+                                                              │  (x-webhook-secret)
+                                                              ▼
+                                                   vuelve a tocar la API REST
 ```
+
+**Flujo escaneo QR → recompensa** (el caso de uso central del sistema):
+1. El turista escanea el QR de un establecimiento en la app móvil.
+2. La app llama a `POST /scan` con `placeId` (requiere JWT de turista).
+3. El backend registra la visita en `scans`, valida stock de recompensa del
+   lugar y, si corresponde, crea un registro en `user_rewards`.
+4. El backend responde con el conteo de visitas y la recompensa obtenida (si aplica).
+5. En paralelo, n8n hace polling a `GET /internal/recommendation-jobs` y,
+   cuando corresponde, genera una recomendación con Hermes y llama a
+   `POST /webhooks/notificacion-ia` → el backend envía la notificación por FCM.
+
+---
+
+## 📖 Documentación de la API (OpenAPI/Swagger)
+
+Con el backend corriendo, la documentación interactiva está en:
+- Local: `http://localhost:3000/api-docs`
+- Producción: `https://nova-project-xzpe.onrender.com/api-docs`
+- Spec JSON: agregar `.json` a la ruta anterior (`/api-docs.json`)
+
+Generada con `swagger-jsdoc` a partir de los bloques `@openapi` en
+`qr-backend/src/routes/*.js`. Al agregar un endpoint nuevo, documentarlo ahí.
+
+---
+
+## 🌿 Flujo de ramas (Git Flow)
+
+- `main` — código en producción (Render/Vercel despliegan desde aquí).
+- `develop` — integración de features antes de pasar a `main`.
+- `feature/*` — una rama por feature o sprint, creada desde `develop`.
+- `fix/*` — correcciones puntuales.
+
+Flujo: `feature/*` → PR a `develop` → PR de `develop` a `main` cuando se
+valida el sprint.
 
 ---
 
@@ -69,6 +121,12 @@ El sistema está compuesto por tres componentes:
 - **Framework:** Flutter (Android/iOS)
 - **Escaneo QR:** mobile_scanner
 - **Almacenamiento local:** shared_preferences
+
+### Recomendaciones IA y notificaciones
+- **Workflow:** n8n (self-hosted, Docker Desktop local) + modelo Hermes
+- **Push:** Firebase Cloud Messaging (firebase-admin en el backend)
+- **Comunicación n8n ↔ backend:** polling a `/internal/*` + webhook a `/webhooks/notificacion-ia`,
+  autenticados con `x-internal-secret` / `x-webhook-secret` (nunca JWT de usuario)
 
 ---
 
@@ -117,16 +175,20 @@ npx prisma generate
 npm start
 ```
 
-### Variables de entorno requeridas (.env)
-```env
-PORT=3000
-JWT_SECRET=tu_secreto_jwt
-DATABASE_URL=postgresql://...
-DIRECT_URL=postgresql://...
-SUPABASE_URL=https://...supabase.co
-SUPABASE_SERVICE_KEY=sb_secret_...
-SUPABASE_BUCKET=places-images
-```
+### Variables de entorno requeridas
+
+Ver `qr-backend/.env.example` para el detalle completo. Resumen por categoría
+(solo nombres — nunca copiar valores reales en este README):
+
+| Categoría | Variables |
+|-----------|-----------|
+| Servidor | `PORT`, `NODE_ENV`, `CORS_ORIGIN` |
+| Auth | `JWT_SECRET`, `JWT_EXPIRES_IN` |
+| Base de datos (Supabase) | `DATABASE_URL`, `DIRECT_URL` |
+| Storage (Supabase) | `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `SUPABASE_BUCKET` |
+| Push (Firebase Admin) | `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` |
+| Google Sign-In | `GOOGLE_WEB_CLIENT_ID` |
+| Servicio interno (n8n) | `INTERNAL_SERVICE_SECRET`, `WEBHOOK_N8N_SECRET` — solo en Render y en las Credentials de n8n, nunca en el repo |
 
 ### Dashboard Web
 ```bash
